@@ -1908,7 +1908,6 @@ export type Database = {
           availability: string | null
           avatar_url: string | null
           created_at: string | null
-          discord_username: string | null
           id: string | null
           note: string | null
           platform: Database["public"]["Enums"]["platform"] | null
@@ -1923,7 +1922,6 @@ export type Database = {
           avatar_url: string | null
           banned_until: string | null
           created_at: string | null
-          discord_username: string | null
           id: string | null
           is_free_agent: boolean | null
           platform: Database["public"]["Enums"]["platform"] | null
@@ -1933,7 +1931,6 @@ export type Database = {
           avatar_url?: string | null
           banned_until?: string | null
           created_at?: string | null
-          discord_username?: string | null
           id?: string | null
           is_free_agent?: boolean | null
           platform?: Database["public"]["Enums"]["platform"] | null
@@ -1943,7 +1940,6 @@ export type Database = {
           avatar_url?: string | null
           banned_until?: string | null
           created_at?: string | null
-          discord_username?: string | null
           id?: string | null
           is_free_agent?: boolean | null
           platform?: Database["public"]["Enums"]["platform"] | null
@@ -1988,6 +1984,28 @@ export type Database = {
       can_staff_match: { Args: { p_match_id: string }; Returns: boolean }
       can_staff_team: { Args: { p_team_id: string }; Returns: boolean }
       cancel_invite: { Args: { p_invite_id: string }; Returns: undefined }
+      free_agent_board: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_platform?: Database["public"]["Enums"]["platform"]
+          p_role?: string
+          p_search?: string
+        }
+        Returns: {
+          activision_id: string
+          availability: string
+          avatar_url: string
+          discord_username: string
+          id: string
+          note: string
+          platform: Database["public"]["Enums"]["platform"]
+          post_id: string
+          posted_at: string
+          preferred_role: string
+          total_count: number
+        }[]
+      }
       has_role: {
         Args: { p_role: Database["public"]["Enums"]["staff_role"] }
         Returns: boolean
@@ -2014,10 +2032,37 @@ export type Database = {
       is_profile_complete: { Args: { p_user_id: string }; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
       leave_team: { Args: { p_team_id: string }; Returns: undefined }
+      like_pattern: { Args: { p: string }; Returns: string }
       match_captain_team: { Args: { p_match_id: string }; Returns: string }
       match_of_dispute: { Args: { p_dispute_id: string }; Returns: string }
       match_of_map: { Args: { p_match_map_id: string }; Returns: string }
       my_team_ids: { Args: { p_season_id: string }; Returns: string[] }
+      player_directory: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_player_id?: string
+          p_search?: string
+        }
+        Returns: {
+          activision_id: string
+          avatar_url: string
+          banned: boolean
+          discord_username: string
+          id: string
+          is_captain: boolean
+          is_co_captain: boolean
+          is_free_agent: boolean
+          joined_at: string
+          platform: Database["public"]["Enums"]["platform"]
+          team_id: string
+          team_logo_url: string
+          team_name: string
+          team_role: Database["public"]["Enums"]["member_role"]
+          team_tag: string
+          total_count: number
+        }[]
+      }
       remove_player: {
         Args: { p_team_id: string; p_user_id: string }
         Returns: undefined

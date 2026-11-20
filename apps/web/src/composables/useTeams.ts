@@ -1,6 +1,8 @@
 import { ref, watch, type MaybeRefOrGetter, toValue } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { sortRoster, type RosterPlayer, type SeasonRules, type TeamStatus } from '@/lib/teams'
+import { playerName } from '@/lib/players'
+import { useAuthStore } from '@/stores/auth'
 
 export interface TeamSummary {
   id: string
@@ -22,12 +24,20 @@ export interface TeamDetail extends TeamSummary {
   roster: RosterPlayer[]
 }
 
+// Discord usernames are only readable when signed in, so there are two selects.
 const TEAM_DETAIL_SELECT = `
   id, name, tag, logo_url, status, season_id, captain_id, co_captain_id, roster_changes_used,
   division:divisions(name),
   season:seasons(name, status, max_roster, max_starters, max_subs, max_roster_changes, roster_lock_at),
   members:team_members(id, user_id, role, joined_at, left_at, is_emergency,
     profile:profiles(discord_username, avatar_url, activision_id, platform))
+`
+const TEAM_DETAIL_SELECT_PUBLIC = `
+  id, name, tag, logo_url, status, season_id, captain_id, co_captain_id, roster_changes_used,
+  division:divisions(name),
+  season:seasons(name, status, max_roster, max_starters, max_subs, max_roster_changes, roster_lock_at),
+  members:team_members(id, user_id, role, joined_at, left_at, is_emergency,
+    profile:profiles(avatar_url, activision_id, platform))
 `
 
 /** Public list of teams in the active season (removed teams hidden). */
@@ -65,6 +75,7 @@ export function useTeamList() {
 
 /** One team with its active roster and the season's roster rules. */
 export function useTeam(id: MaybeRefOrGetter<string | null | undefined>) {
+  const auth = useAuthStore()
   const team = ref<TeamDetail | null>(null)
   const loading = ref(true)
   const error = ref<string | null>(null)
@@ -77,11 +88,9 @@ export function useTeam(id: MaybeRefOrGetter<string | null | undefined>) {
       return
     }
     loading.value = true
-    const { data, error: err } = await supabase
-      .from('teams')
-      .select(TEAM_DETAIL_SELECT)
-      .eq('id', teamId)
-      .maybeSingle()
+    const { data, error: err } = auth.isSignedIn
+      ? await supabase.from('teams').select(TEAM_DETAIL_SELECT).eq('id', teamId).maybeSingle()
+      : await supabase.from('teams').select(TEAM_DETAIL_SELECT_PUBLIC).eq('id', teamId).maybeSingle()
     loading.value = false
     if (err || !data || !data.season) {
       team.value = null
@@ -96,7 +105,11 @@ export function useTeam(id: MaybeRefOrGetter<string | null | undefined>) {
         userId: m.user_id,
         role: m.role,
         joinedAt: m.joined_at,
-        name: m.profile?.discord_username ?? 'Player',
+        name: playerName({
+          discordUsername:
+            m.profile && 'discord_username' in m.profile ? (m.profile.discord_username as string | null) : null,
+          activisionId: m.profile?.activision_id,
+        }),
         avatarUrl: m.profile?.avatar_url ?? null,
         activisionId: m.profile?.activision_id ?? null,
         platform: m.profile?.platform ?? null,
@@ -121,6 +134,6 @@ export function useTeam(id: MaybeRefOrGetter<string | null | undefined>) {
     }
   }
 
-  watch(() => toValue(id), load, { immediate: true })
+  watch([() => toValue(id), () => auth.isSignedIn], load, { immediate: true })
   return { team, loading, error, reload: load }
 }

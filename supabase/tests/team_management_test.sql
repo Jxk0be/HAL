@@ -20,7 +20,12 @@ begin
                              age_confirmed_at = now(), controller_confirmed_at = now()
    where id in (v_cap, v_co, v_p, v_late);
 
-  insert into public.seasons (name, status) values ('TM Test ' || gen_random_uuid(), 'signups') returning id into v_season;
+  -- Reuse the active season if there is one (only one may exist); force signups for this test.
+  select id into v_season from public.seasons where status in ('signups', 'regular', 'playoffs');
+  if v_season is null then
+    insert into public.seasons (name, status) values ('TM Test ' || gen_random_uuid(), 'signups') returning id into v_season;
+  end if;
+  update public.seasons set status = 'signups', roster_lock_at = null where id = v_season;
 
   -- A player creates a team during signups and becomes captain + first starter.
   perform set_config('request.jwt.claims', json_build_object('sub', v_cap, 'role', 'authenticated')::text, true);
@@ -79,6 +84,7 @@ begin
   v_checks := v_checks + 3;
 
   -- No new teams once the season leaves signups.
+  perform set_config('request.jwt.claims', '', true);
   update public.seasons set status = 'regular' where id = v_season;
   perform set_config('request.jwt.claims', json_build_object('sub', v_late, 'role', 'authenticated')::text, true);
   set local role authenticated;

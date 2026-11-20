@@ -43,19 +43,19 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/players',
     name: 'players',
-    component: Placeholder,
+    component: () => import('@/views/PlayersView.vue'),
     meta: { title: 'Players', eyebrow: 'League', description: 'Every player this season.', buildStep: 7 },
   },
   {
     path: '/players/:id',
     name: 'player',
-    component: Placeholder,
+    component: () => import('@/views/PlayerView.vue'),
     meta: { title: 'Player', eyebrow: 'Player', description: 'Profile, team and season stats.', buildStep: 7 },
   },
   {
     path: '/free-agents',
     name: 'free-agents',
-    component: Placeholder,
+    component: () => import('@/views/FreeAgentsView.vue'),
     meta: { title: 'Free Agents', eyebrow: 'Recruiting', description: 'Players looking for a team. Captains can invite them while they have an open spot.', buildStep: 7 },
   },
   {

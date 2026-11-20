@@ -128,6 +128,20 @@ The step-by-step build plan is `hal-build-guide.html` (kept outside the repo); e
   - `RosterList` is a table from 640px up and cards below. `/my-team` is create-or-manage, `/teams` and `/teams/:id` are public, and pending invites sit on `/profile` (`InvitesCard`).
   - Adds and drops never need admin approval (the owner's decision). In `regular` and `playoffs` they count toward `max_roster_changes`. Check-in eligibility uses `team_members.joined_at`, which is the moment the invite was accepted.
 - Tests: `supabase/tests/team_management_test.sql` (captaincy, co-captain, signups-only creation) runs like `rules_test.sql`.
+- Discord names are for signed-in users only (step 7):
+  - Anon has no SELECT on `profiles.discord_username`, and the `profiles_public`/`free_agents` views don't include it.
+  - Never select or embed `discord_username` in a query that can run logged out. `useTeam` switches between two selects on `auth.isSignedIn`.
+  - Show names with `playerName()` (`src/lib/players.ts`): the Discord name when present, otherwise the Activision ID.
+  - The public audit feed still names the staff member who acted; that's intended.
+- Free Agents board and Players directory:
+  - Both are SECURITY DEFINER functions with filtering and paging (30 per page, max 60): `free_agent_board(search, platform, role, limit, offset)` and `player_directory(search, player_id, limit, offset)`, each with `total_count` on every row.
+  - Both return `discord_username` only to signed-in callers, and only signed-in callers can search by it. Search input goes through `like_pattern()`, so wildcards are escaped.
+  - The board lists free agents with a complete profile who aren't banned, posts first. Use `useFreeAgentBoard`, `usePlayerDirectory` and `usePlayer` in `useDirectory.ts`.
+- Free agent posts:
+  - `preferred_role` is one of `AR`, `SMG`, `Flex`. Posting needs a complete profile and no team, and lists you as a free agent (`free_agent_posts_guard`).
+  - Joining a team deactivates your post. Staff can take down or delete any post (audited).
+  - Use `useMyFreeAgentPost`, `useFreeAgentModeration` and `useOpenSpots`. Captains see "Invite to team" on board cards while `team_open_spots` reports an open spot.
+- Test seasons: only one active season can exist, so tests reuse it (forced to `signups` inside the rolled-back block). `supabase/tests/free_agents_test.sql` covers the board, privacy and posts.
 - Check every page at 375px (no horizontal scroll). Don't put responsive `hidden`/`sm:inline-flex` classes on a component whose root already sets `display`; wrap it in a span instead.
 
 ## Database (as built)

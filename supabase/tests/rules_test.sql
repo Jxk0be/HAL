@@ -55,8 +55,12 @@ begin
   insert into public.staff_roles (user_id, role) values
     (v_owner, 'owner'), (v_admin_on_a, 'admin'), (v_admin, 'admin'), (v_caster, 'caster');
 
-  insert into public.seasons (name, status) values ('Test Season ' || gen_random_uuid(), 'signups')
-  returning id into v_season;
+  -- Reuse the active season if there is one (only one may exist); force signups for this test.
+  select id into v_season from public.seasons where status in ('signups', 'regular', 'playoffs');
+  if v_season is null then
+    insert into public.seasons (name, status) values ('Test Season ' || gen_random_uuid(), 'signups') returning id into v_season;
+  end if;
+  update public.seasons set status = 'signups', roster_lock_at = null where id = v_season;
 
   insert into public.teams (season_id, name, tag, captain_id, status)
   values (v_season, 'Alpha ' || left(gen_random_uuid()::text, 6), 'ALP', v_cap_a, 'approved')
