@@ -1,0 +1,11 @@
+{
+  "name": "scripts",
+  "private": true,
+  "type": "module",
+  "description": "One-off Node/TS scripts (e.g. Discord slash command registration). Run with: pnpm --filter scripts exec tsx <file>",
+  "devDependencies": {
+    "tsx": "^4.20.0",
+    "@types/node": "^26.6.6",
+    "typescript": "^6.0.3"
+  }
+}

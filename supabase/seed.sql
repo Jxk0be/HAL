@@ -1,0 +1,3 @@
+-- HAL local seed data (runs on `supabase db reset`).
+-- PLACEHOLDER: the league owner will supply the MW4 game modes, map pool (with legal map/mode pairs)
+-- and GAs. Add them here once the schema exists (step 2), or manage them from the admin pages.

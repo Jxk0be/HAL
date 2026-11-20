@@ -1,0 +1,17 @@
+{
+  "name": "hal-league",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.22.0",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "typecheck": "pnpm --filter web typecheck",
+    "lint": "pnpm --filter web lint",
+    "test": "pnpm --filter web test",
+    "db:types": "supabase gen types typescript --project-id lluwzpwiybvgnsimpwey --schema public > apps/web/src/types/database.ts"
+  },
+  "devDependencies": {
+    "supabase": "^3.1.0"
+  }
+}

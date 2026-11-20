@@ -1,0 +1,8 @@
+packages:
+  - apps/*
+  - scripts
+
+# Packages allowed to run install scripts (supabase downloads its CLI binary).
+allowBuilds:
+  esbuild: true
+  supabase: true
