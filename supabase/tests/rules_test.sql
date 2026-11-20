@@ -39,9 +39,11 @@ begin
             jsonb_build_object('provider_id', 'd-' || u, 'full_name', 'user ' || left(u::text, 8)),
             now(), now());
   end loop;
-  update public.profiles set activision_id = 'atvi#' || left(id::text, 6), age_confirmed_at = now(),
-                             platform = 'playstation'
+  -- Everyone onboarded except p6 (no controller confirmation yet).
+  update public.profiles set activision_id = 'p' || left(id::text, 8) || '#1234567', age_confirmed_at = now(),
+                             controller_confirmed_at = now(), platform = 'playstation'
    where id = any (array[v_owner, v_admin_on_a, v_admin, v_caster, v_cap_a, v_cap_b] || v_p);
+  update public.profiles set controller_confirmed_at = null where id = v_p[6];
 
   -- 1. Signing up makes you a free agent.
   if (select count(*) from public.profiles
@@ -240,6 +242,69 @@ begin
   end if;
   v_checks := v_checks + 3;
 
+  -- -------------------------------------------------------------------------
+  -- Onboarding: an incomplete profile can't join; confirmations are set-once
+  -- -------------------------------------------------------------------------
+  perform set_config('request.jwt.claims', json_build_object('sub', v_p[6], 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  begin
+    perform public.respond_to_invite(
+      (select id from public.team_invites where user_id = v_p[6] and status = 'pending'), true);
+    raise exception 'FAIL: incomplete profile joined a team';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    if sqlerrm not like 'Finish your profile%' then raise exception 'FAIL: unexpected error for incomplete join: %', sqlerrm; end if;
+  end;
+  -- Completing onboarding: the server stamps the time, whatever the client sends.
+  update public.profiles set controller_confirmed_at = '2000-01-01' where id = v_p[6];
+  if (select controller_confirmed_at < now() - interval '1 minute' from public.profiles where id = v_p[6]) then
+    raise exception 'FAIL: client chose its own confirmation timestamp';
+  end if;
+  begin
+    update public.profiles set age_confirmed_at = null where id = v_p[6];
+    raise exception 'FAIL: age confirmation withdrawn';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  begin
+    update public.profiles set banned_until = null where id = v_p[6];
+    update public.profiles set banned_until = now() - interval '1 day' where id = v_p[6];
+    raise exception 'FAIL: player edited their own ban';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  begin
+    update public.profiles set activision_id = 'no-hash-here' where id = v_p[6];
+    raise exception 'FAIL: bad Activision ID accepted';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  begin
+    update public.profiles
+       set activision_id = upper((select activision_id from public.profiles where id = v_p[1]))
+     where id = v_p[6];
+    raise exception 'FAIL: duplicate Activision ID accepted';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  reset role;
+  perform set_config('request.jwt.claims', json_build_object('sub', v_p[1], 'role', 'authenticated')::text, true);
+  set local role authenticated;
+  update public.profiles set is_free_agent = false where id = v_p[1];
+  begin
+    update public.profiles set is_free_agent = true where id = v_p[1];
+    raise exception 'FAIL: rostered player listed themselves as a free agent';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  begin
+    update public.profiles set platform = 'xbox' where id = v_p[2];
+    get diagnostics v_rows = row_count;
+    if v_rows <> 0 then raise exception 'FAIL: player edited someone else''s profile'; end if;
+  end;
+  reset role;
+  v_checks := v_checks + 8;
+
   -- A player can leave on their own.
   perform set_config('request.jwt.claims', json_build_object('sub', v_p[3], 'role', 'authenticated')::text, true);
   set local role authenticated;
@@ -335,7 +400,9 @@ begin
     raise exception 'FAIL: set_broadcast did not set exactly the broadcast fields';
   end if;
   if not exists (
-    select 1 from public.audit_log where row_id = v_match::text and action = 'broadcast_start' and actor_id = v_caster
+    select 1 from public.audit_log
+     where table_name = 'matches' and row_id = v_match::text and actor_id = v_caster
+       and actor_role = 'caster' and (new_data ->> 'broadcast_live')::boolean
   ) then
     raise exception 'FAIL: set_broadcast was not audited';
   end if;
@@ -382,6 +449,90 @@ begin
   end if;
   reset role;
   v_checks := v_checks + 5;
+
+  -- -------------------------------------------------------------------------
+  -- 7. Audit log
+  -- -------------------------------------------------------------------------
+  -- The neutral admin's edit (week 1 -> 2) is logged with only the changed column.
+  if not exists (
+    select 1 from public.audit_log
+     where table_name = 'matches' and row_id = v_match::text and action = 'update'
+       and actor_id = v_admin and actor_role = 'admin'
+       and old_data = '{"week": 1}'::jsonb and new_data = '{"week": 2}'::jsonb
+  ) then
+    raise exception 'FAIL: admin match edit not logged with old and new values';
+  end if;
+  -- Captain/player actions are not logged: the invite, the accept (roster add), leaving.
+  if exists (
+    select 1 from public.audit_log
+     where (table_name = 'team_members' and new_data ->> 'user_id' = v_p[5]::text)
+        or (table_name = 'team_invites' and actor_id = v_cap_a)
+        or actor_id in (v_cap_a, v_p[3], v_p[5])
+  ) then
+    raise exception 'FAIL: a captain/player roster action was audit-logged';
+  end if;
+  -- Private fields never reach the log.
+  if exists (
+    select 1 from public.audit_log
+     where coalesce(new_data, '{}'::jsonb) ? 'discord_id' or coalesce(old_data, '{}'::jsonb) ? 'discord_id'
+        or coalesce(new_data, '{}'::jsonb) ? 'discord_thread_id'
+  ) then
+    raise exception 'FAIL: private field stored in the audit log';
+  end if;
+  v_checks := v_checks + 3;
+
+  -- Append-only for every role.
+  begin
+    delete from public.audit_log;
+    raise exception 'FAIL: database owner deleted audit rows';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  begin
+    update public.audit_log set action = 'x';
+    raise exception 'FAIL: database owner updated audit rows';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  foreach u in array array[v_owner, v_admin] loop
+    perform set_config('request.jwt.claims', json_build_object('sub', u, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+    begin
+      delete from public.audit_log;
+      raise exception 'FAIL: staff deleted audit rows';
+    exception when others then
+      if sqlerrm like 'FAIL%' then raise; end if;
+    end;
+    reset role;
+  end loop;
+  perform set_config('request.jwt.claims', '', true);
+  set local role service_role;
+  begin
+    delete from public.audit_log;
+    raise exception 'FAIL: service role deleted audit rows';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  reset role;
+  v_checks := v_checks + 5;
+
+  -- Visitors read the readable public feed, not the raw table.
+  set local role anon;
+  if not exists (
+    select 1 from public.audit_log_public
+     where row_id = v_match::text and actor_role = 'admin'
+       and summary like 'Admin user % changed match ALP vs BRV (week 2): week 1 → 2'
+  ) then
+    raise exception 'FAIL: public audit feed missing a readable summary';
+  end if;
+  begin
+    perform 1 from public.audit_log limit 1;
+    raise exception 'FAIL: anon read the raw audit log';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  reset role;
+  v_checks := v_checks + 2;
 
   raise exception 'ALL TESTS PASSED (% checks)', v_checks;
 end;

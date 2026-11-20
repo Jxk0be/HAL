@@ -10,5 +10,14 @@ if (!url || !key) {
   )
 }
 
-/** The single Supabase client. Components go through composables, never this directly. */
-export const supabase = createClient<Database>(url, key)
+/** The single Supabase client. Components go through composables/stores, never this directly. */
+export const supabase = createClient<Database>(url, key, {
+  auth: {
+    // PKCE: the OAuth redirect carries a one-time ?code that the client exchanges on load
+    // (detectSessionInUrl), instead of tokens in the URL fragment.
+    flowType: 'pkce',
+    detectSessionInUrl: true,
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+})

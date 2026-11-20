@@ -933,12 +933,14 @@ export type Database = {
           age_confirmed_at: string | null
           avatar_url: string | null
           banned_until: string | null
+          controller_confirmed_at: string | null
           created_at: string
           discord_id: string | null
           discord_username: string | null
           id: string
           is_free_agent: boolean
           platform: Database["public"]["Enums"]["platform"] | null
+          pov_ack_at: string | null
           updated_at: string
         }
         Insert: {
@@ -946,12 +948,14 @@ export type Database = {
           age_confirmed_at?: string | null
           avatar_url?: string | null
           banned_until?: string | null
+          controller_confirmed_at?: string | null
           created_at?: string
           discord_id?: string | null
           discord_username?: string | null
           id: string
           is_free_agent?: boolean
           platform?: Database["public"]["Enums"]["platform"] | null
+          pov_ack_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -959,12 +963,14 @@ export type Database = {
           age_confirmed_at?: string | null
           avatar_url?: string | null
           banned_until?: string | null
+          controller_confirmed_at?: string | null
           created_at?: string
           discord_id?: string | null
           discord_username?: string | null
           id?: string
           is_free_agent?: boolean
           platform?: Database["public"]["Enums"]["platform"] | null
+          pov_ack_at?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1784,6 +1790,22 @@ export type Database = {
       }
     }
     Views: {
+      audit_log_public: {
+        Row: {
+          action: string | null
+          actor_id: string | null
+          actor_name: string | null
+          actor_role: string | null
+          created_at: string | null
+          id: number | null
+          new_data: Json | null
+          old_data: Json | null
+          row_id: string | null
+          summary: string | null
+          table_name: string | null
+        }
+        Relationships: []
+      }
       disputes_public: {
         Row: {
           created_at: string | null
@@ -1930,6 +1952,39 @@ export type Database = {
       }
     }
     Functions: {
+      audit_log_feed: {
+        Args: never
+        Returns: {
+          action: string
+          actor_id: string
+          actor_name: string
+          actor_role: string
+          created_at: string
+          id: number
+          new_data: Json
+          old_data: Json
+          row_id: string
+          summary: string
+          table_name: string
+        }[]
+      }
+      audit_row_label: {
+        Args: { p_data: Json; p_row_id: string; p_table: string }
+        Returns: string
+      }
+      audit_strip: { Args: { p: Json }; Returns: Json }
+      audit_summary: {
+        Args: {
+          p_action: string
+          p_actor_name: string
+          p_actor_role: string
+          p_new: Json
+          p_old: Json
+          p_row_id: string
+          p_table: string
+        }
+        Returns: string
+      }
       can_staff_match: { Args: { p_match_id: string }; Returns: boolean }
       can_staff_team: { Args: { p_team_id: string }; Returns: boolean }
       cancel_invite: { Args: { p_invite_id: string }; Returns: undefined }
@@ -1956,6 +2011,8 @@ export type Database = {
       is_on_team: { Args: { p_team_id: string }; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
       is_party_to_match: { Args: { p_match_id: string }; Returns: boolean }
+      is_profile_complete: { Args: { p_user_id: string }; Returns: boolean }
+      is_staff: { Args: never; Returns: boolean }
       leave_team: { Args: { p_team_id: string }; Returns: undefined }
       match_captain_team: { Args: { p_match_id: string }; Returns: string }
       match_of_dispute: { Args: { p_dispute_id: string }; Returns: string }
@@ -1980,6 +2037,10 @@ export type Database = {
           starters_open: number
           subs_open: number
         }[]
+      }
+      transfer_captaincy: {
+        Args: { p_new_captain: string; p_team_id: string }
+        Returns: undefined
       }
       try_uuid: { Args: { p: string }; Returns: string }
     }
