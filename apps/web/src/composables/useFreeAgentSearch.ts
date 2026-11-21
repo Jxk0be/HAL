@@ -12,7 +12,10 @@ export interface FreeAgentResult {
   platform: Platform | null
 }
 
-/** Debounced search of the free agent board by Discord name (signed in) or Activision ID. */
+/**
+ * Debounced search for players a captain can invite: anyone with a finished profile who isn't on a
+ * team this season (invitable_players), whether or not they list themselves on the Free Agents page.
+ */
 export function useFreeAgentSearch(query: Ref<string>, limit = 8) {
   const results = ref<FreeAgentResult[]>([])
   const loading = ref(false)
@@ -25,7 +28,7 @@ export function useFreeAgentSearch(query: Ref<string>, limit = 8) {
       return
     }
     loading.value = true
-    const { data } = await supabase.rpc('free_agent_board', { p_search: q, p_limit: limit })
+    const { data } = await supabase.rpc('invitable_players', { p_search: q, p_limit: limit })
     if (raw !== query.value) return // a newer search is on its way
     results.value = (data ?? []).map((r) => ({
       id: r.id,

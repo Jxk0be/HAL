@@ -3030,6 +3030,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      invitable_players: {
+        Args: { p_limit?: number; p_search: string }
+        Returns: {
+          activision_id: string
+          avatar_url: string
+          discord_username: string
+          id: string
+          listed: boolean
+          platform: Database["public"]["Enums"]["platform"]
+        }[]
+      }
       invite_player: {
         Args: {
           p_role?: Database["public"]["Enums"]["member_role"]

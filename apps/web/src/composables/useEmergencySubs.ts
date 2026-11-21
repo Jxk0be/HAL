@@ -138,10 +138,17 @@ export function useMatchEmergencySubs(
     return { ok: true }
   }
 
-  /** Free agents for the picker (the database re-checks eligibility on request). */
+  /**
+   * Players for the picker: listed free agents when the box is empty, otherwise anyone not on a team
+   * matching the search (invitable_players). The database re-checks eligibility on request.
+   */
   async function search(q: string): Promise<EsubCandidate[]> {
-    const { data } = await supabase.rpc('free_agent_board', { p_search: q.trim() || undefined, p_limit: 8 })
-    return (data ?? []).map((f) => ({ id: f.id, activisionId: f.activision_id, platform: f.platform, role: f.preferred_role }))
+    if (q.trim().length < 2) {
+      const { data } = await supabase.rpc('free_agent_board', { p_limit: 8 })
+      return (data ?? []).map((f) => ({ id: f.id, activisionId: f.activision_id, platform: f.platform, role: f.preferred_role }))
+    }
+    const { data } = await supabase.rpc('invitable_players', { p_search: q, p_limit: 8 })
+    return (data ?? []).map((f) => ({ id: f.id, activisionId: f.activision_id, platform: f.platform, role: null }))
   }
 
   watch([() => toValue(match).id, () => toValue(teamId)], load, { immediate: true })

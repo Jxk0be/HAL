@@ -46,7 +46,7 @@ const expires = (iso: string) => new Date(iso).toLocaleDateString(undefined, { m
     <div>
       <UiInput
         v-model="query"
-        label="Find a free agent"
+        label="Find a player"
         placeholder="Discord name or Activision ID"
         autocomplete="off"
         :disabled="!canInvite"
@@ -66,7 +66,7 @@ const expires = (iso: string) => new Date(iso).toLocaleDateString(undefined, { m
 
       <div v-if="query.trim().length >= 2" class="mt-3" aria-live="polite">
         <p v-if="loading" class="text-sm text-muted">Searching…</p>
-        <p v-else-if="results.length === 0" class="text-sm text-muted">No free agents match “{{ query.trim() }}”.</p>
+        <p v-else-if="results.length === 0" class="text-sm text-muted">No players without a team match “{{ query.trim() }}”.</p>
         <ul v-else class="divide-y divide-line overflow-hidden rounded-lg border border-line">
           <li v-for="r in results" :key="r.id" class="flex items-center gap-3 bg-surface-2/50 px-3 py-2.5">
             <UiAvatar :src="r.avatarUrl" :name="r.name" size="sm" decorative />
