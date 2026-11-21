@@ -18,7 +18,7 @@ The step-by-step build plan is `hal-build-guide.html` (kept outside the repo); e
 - Supabase project: "Heaven's Arena League", ref `lluwzpwiybvgnsimpwey`, region us-west-2, URL `https://lluwzpwiybvgnsimpwey.supabase.co`.
   Schema work goes through the Supabase MCP (`apply_migration`, `generate_typescript_types`, `get_advisors`) or the CLI. Keep each local migration file's version prefix equal to the version in the remote migration history.
 - Hosting: Netlify (SPA). GitHub repo: `Jxk0be/HAL` (public, so rulebook history is visible).
-- Discord server invite: `VITE_DISCORD_INVITE_URL` = https://discord.gg/G3WjuvFak8 (set to never expire).
+- Discord server invite: `VITE_DISCORD_INVITE_URL` = https://discord.gg/WWavSTQXWR (set to never expire).
 
 ## League
 - Name: Heaven's Arena League (HAL). Look: serious and clean. Dark theme, gold accent (`#F8B800`, taken from the logo), winged "HAL" logo.

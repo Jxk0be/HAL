@@ -20,7 +20,7 @@ Nothing secret ever goes in a `VITE_` variable: those are compiled into the publ
 |---|---|---|
 | `VITE_SUPABASE_URL` | `https://lluwzpwiybvgnsimpwey.supabase.co` | Public |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase → Project Settings → API Keys → publishable key | Public by design; RLS protects the data |
-| `VITE_DISCORD_INVITE_URL` | `https://discord.gg/G3WjuvFak8` | Set the invite to never expire in Discord |
+| `VITE_DISCORD_INVITE_URL` | `https://discord.gg/WWavSTQXWR` | Set the invite to never expire in Discord |
 | `VITE_RULEBOOK_REPO` | `Jxk0be/HAL` | The repo must be public for the Rules page to load `rules/rulebook.md` |
 | `VITE_SITE_URL` | Your Netlify URL, e.g. `https://hal-league.netlify.app` (later your domain) | No trailing slash. Used for share previews |
 

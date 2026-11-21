@@ -1,7 +1,7 @@
 # Heaven's Arena League (HAL)
 
 Website and Discord bot for Heaven's Arena League, a competitive Call of Duty league.
-Join the Discord: https://discord.gg/G3WjuvFak8
+Join the Discord: https://discord.gg/WWavSTQXWR
 
 ## Run locally
 ```
