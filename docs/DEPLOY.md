@@ -44,11 +44,13 @@ Node 22 and pnpm (from `package.json` `packageManager`) are picked automatically
 | `discord_sync_url` | `https://lluwzpwiybvgnsimpwey.supabase.co/functions/v1/discord-sync` | Set (the scheduler URL is derived from it) |
 | `discord_sync_secret` | Random secret shared by the database and the functions | Set (generated in the database; never put it in a migration) |
 
-### GitHub (repo → Settings → Secrets and variables → Actions)
+### GitHub (repo → Settings → Secrets and variables → Actions → Secrets tab → **Repository secrets**)
+
+These let GitHub Actions lint the database, apply migrations and deploy the Edge Functions on every push to `main`. Use repository secrets, not environment secrets (the workflow names no environment, so it can't read those), and nothing goes in the Variables tab. Without them CI still typechecks, lints, tests and builds, and skips the database steps. Netlify can't take this job: it only builds the website.
 
 | Name | Value |
 |---|---|
-| `SUPABASE_ACCESS_TOKEN` | supabase.com → Account → Access Tokens → new token |
+| `SUPABASE_ACCESS_TOKEN` | Open https://supabase.com/dashboard/account/tokens (signed in) → **Generate new token**. Copy it at once; it is shown only once. If asked for an expiry, pick none or note the date: CI deploys fail once it expires |
 | `SUPABASE_PROJECT_REF` | `lluwzpwiybvgnsimpwey` |
 | `SUPABASE_DB_PASSWORD` | Database password (Project Settings → Database; reset it there if you don't have it) |
 
@@ -62,7 +64,7 @@ Channel IDs for `#lfg-free-agents`, `#results`, `#announcements`, `#disputes` an
 
 ## 2. First deploy, in order
 
-1. **Push** `main` to GitHub. Add the three GitHub secrets first so the `deploy` job succeeds.
+1. **GitHub secrets**, then **push** `main`. The `deploy` job should pass and change nothing the first time (every migration is already applied).
 2. **Netlify:** Add new site → Import from Git → pick `Jxk0be/HAL`. Netlify reads `netlify.toml` (base `/`, build `pnpm --filter web build`, publish `apps/web/dist`). Add the `VITE_` variables, then deploy. Note the site URL.
 3. **Point everything at the live URL:**
    - Netlify: set `VITE_SITE_URL` to the site URL and redeploy.
@@ -78,7 +80,15 @@ Channel IDs for `#lfg-free-agents`, `#results`, `#announcements`, `#disputes` an
 
 ## 3. Every later deploy
 
-Push to `main`. Netlify rebuilds the site; GitHub Actions applies any new migrations and redeploys the three functions. Pull requests run the same checks without deploying.
+Push to `main`. Netlify rebuilds the site; GitHub Actions runs the checks, applies any new migrations (`supabase db push`) and redeploys the three functions. Pull requests run the same checks without deploying.
+
+- `db push` compares `supabase/migrations` with the remote history, so each local file's version prefix must equal its remote version (migrations applied early with MCP `apply_migration` are then skipped, not re-run). A mismatch fails the `deploy` job.
+- Netlify and GitHub Actions run in parallel, so for website code that needs a new migration or function, apply/deploy it first (MCP or the command below) and push afterwards.
+- Manual function deploy, if ever needed (from the repo root):
+
+```
+npx supabase functions deploy discord-interactions discord-scheduler discord-sync --no-verify-jwt --project-ref lluwzpwiybvgnsimpwey --use-api
+```
 
 New slash commands or changed command options need `pnpm commands:register` again.
 

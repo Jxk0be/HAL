@@ -1,5 +1,5 @@
-# Netlify builds the web app from the repo root (pnpm workspace). Edge Functions and the database
-# deploy from GitHub Actions (.github/workflows/ci.yml), not from Netlify.
+# Netlify builds the web app from the repo root (pnpm workspace). The database and Edge Functions
+# are deployed separately (see docs/DEPLOY.md), never from Netlify.
 
 [build]
   base = "/"
