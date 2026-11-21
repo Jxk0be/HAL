@@ -2544,6 +2544,7 @@ export type Database = {
         Returns: string
       }
       admin_clear_result: { Args: { p_match_id: string }; Returns: undefined }
+      admin_delete_team: { Args: { p_team_id: string }; Returns: Json }
       admin_forfeit: {
         Args: { p_forfeit_team_id: string; p_match_id: string }
         Returns: undefined

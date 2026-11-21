@@ -507,8 +507,22 @@ export function useContentTeams(seasonId: MaybeRefOrGetter<string | null | undef
   const update = (teamId: string, patch: { name?: string; tag?: string; status?: ContentTeam['status']; division_id?: string | null }) =>
     runWrite(busy, supabase.from('teams').update(patch).eq('id', teamId).select('id'), load, RECUSED)
 
+  /**
+   * Deletes a team and makes every player on it a free agent. Teams that already have matches
+   * are marked removed instead (so opponents' results stay), with the roster emptied.
+   */
+  async function deleteTeam(teamId: string): Promise<Result<{ deleted: boolean; released: number }>> {
+    busy.value = true
+    const { data, error } = await supabase.rpc('admin_delete_team', { p_team_id: teamId })
+    busy.value = false
+    if (error) return { ok: false, message: dbErrorMessage(error) }
+    await load()
+    const r = (data ?? {}) as { deleted?: boolean; released?: number }
+    return { ok: true, value: { deleted: r.deleted ?? true, released: r.released ?? 0 } }
+  }
+
   watch(() => toValue(seasonId), load, { immediate: true })
-  return { teams, divisions, loading, busy, update, reload: load }
+  return { teams, divisions, loading, busy, update, deleteTeam, reload: load }
 }
 
 export interface ContentPost {

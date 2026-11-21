@@ -46,6 +46,27 @@ async function saveEdit() {
     editOpen.value = false
   } else toast.error(r.message)
 }
+
+// Delete: every player becomes a free agent; teams with matches are kept as "removed".
+const deleteOpen = ref(false)
+const deleting = ref<ContentTeam | null>(null)
+function askDelete(t: ContentTeam) {
+  deleting.value = t
+  deleteOpen.value = true
+}
+async function confirmDelete() {
+  const t = deleting.value
+  if (!t) return
+  const r = await c.deleteTeam(t.id)
+  if (!r.ok) return toast.error(r.message)
+  deleteOpen.value = false
+  const players = r.value.released === 1 ? '1 player is' : `${r.value.released} players are`
+  toast.success(
+    r.value.deleted
+      ? `${t.name} deleted. ${players} now free agents.`
+      : `${t.name} has matches, so it's kept as removed for the record. ${players} now free agents.`,
+  )
+}
 </script>
 
 <template>
@@ -74,8 +95,8 @@ async function saveEdit() {
             <option v-for="d in divisions" :key="d.id" :value="d.id">{{ d.name }}</option>
           </select>
           <UiButton size="sm" variant="ghost" @click="edit(t)">Edit</UiButton>
-          <UiButton v-if="t.status !== 'removed'" size="sm" variant="danger" :disabled="busy" @click="apply(t, { status: 'removed' }, `${t.name} removed. Its Discord role and channel are deleted.`)">Remove</UiButton>
-          <UiButton v-else size="sm" variant="secondary" :disabled="busy" @click="apply(t, { status: 'approved' }, `${t.name} restored.`)">Restore</UiButton>
+          <UiButton v-if="t.status === 'removed' && t.rosterSize > 0" size="sm" variant="secondary" :disabled="busy" @click="apply(t, { status: 'approved' }, `${t.name} restored.`)">Restore</UiButton>
+          <UiButton v-if="t.status !== 'removed' || t.rosterSize > 0" size="sm" variant="danger" :disabled="busy" @click="askDelete(t)">Delete</UiButton>
         </span>
       </li>
     </ul>
@@ -90,6 +111,24 @@ async function saveEdit() {
           <UiButton type="submit" :loading="busy">Save</UiButton>
         </div>
       </form>
+    </UiModal>
+
+    <UiModal v-model="deleteOpen" :title="deleting ? `Delete ${deleting.name}?` : 'Delete team?'">
+      <div v-if="deleting" class="flex flex-col gap-4 text-sm">
+        <p>
+          All {{ deleting.rosterSize }} {{ deleting.rosterSize === 1 ? 'player' : 'players' }} on {{ deleting.name }}, captain included,
+          leave the team and become free agents. Its Discord role and channel are deleted.
+        </p>
+        <p class="text-muted">
+          If the team already has matches, it stays on record as removed so opponents' results and standings don't change.
+          Otherwise it's deleted completely. This can't be undone.
+        </p>
+        <PublicLogNotice />
+        <div class="flex justify-end gap-2">
+          <UiButton variant="ghost" @click="deleteOpen = false">Cancel</UiButton>
+          <UiButton variant="danger" :loading="busy" @click="confirmDelete">Delete team</UiButton>
+        </div>
+      </div>
     </UiModal>
   </div>
 </template>
