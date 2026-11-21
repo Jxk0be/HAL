@@ -150,6 +150,13 @@ export type Database = {
             foreignKeyName: "checkins_match_id_fkey"
             columns: ["match_id"]
             isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
+          {
+            foreignKeyName: "checkins_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
             referencedRelation: "matches"
             referencedColumns: ["id"]
           },
@@ -296,6 +303,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "disputes_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
           {
             foreignKeyName: "disputes_match_id_fkey"
             columns: ["match_id"]
@@ -631,6 +645,13 @@ export type Database = {
             foreignKeyName: "match_maps_match_id_fkey"
             columns: ["match_id"]
             isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
+          {
+            foreignKeyName: "match_maps_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
             referencedRelation: "matches"
             referencedColumns: ["id"]
           },
@@ -846,6 +867,13 @@ export type Database = {
             foreignKeyName: "penalties_match_id_fkey"
             columns: ["match_id"]
             isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
+          {
+            foreignKeyName: "penalties_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
             referencedRelation: "matches"
             referencedColumns: ["id"]
           },
@@ -1050,6 +1078,13 @@ export type Database = {
             foreignKeyName: "report_submissions_match_id_fkey"
             columns: ["match_id"]
             isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
+          {
+            foreignKeyName: "report_submissions_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
             referencedRelation: "matches"
             referencedColumns: ["id"]
           },
@@ -1121,6 +1156,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "reschedule_requests_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
           {
             foreignKeyName: "reschedule_requests_match_id_fkey"
             columns: ["match_id"]
@@ -1223,6 +1265,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "roster_requests_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
           {
             foreignKeyName: "roster_requests_match_id_fkey"
             columns: ["match_id"]
@@ -1661,6 +1710,13 @@ export type Database = {
             foreignKeyName: "team_members_emergency_match_fkey"
             columns: ["emergency_match_id"]
             isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
+          {
+            foreignKeyName: "team_members_emergency_match_fkey"
+            columns: ["emergency_match_id"]
+            isOneToOne: false
             referencedRelation: "matches"
             referencedColumns: ["id"]
           },
@@ -1713,6 +1769,7 @@ export type Database = {
           id: string
           logo_url: string | null
           name: string
+          review_note: string | null
           roster_changes_used: number
           season_id: string
           status: Database["public"]["Enums"]["team_status"]
@@ -1730,6 +1787,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name: string
+          review_note?: string | null
           roster_changes_used?: number
           season_id: string
           status?: Database["public"]["Enums"]["team_status"]
@@ -1747,6 +1805,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name?: string
+          review_note?: string | null
           roster_changes_used?: number
           season_id?: string
           status?: Database["public"]["Enums"]["team_status"]
@@ -1872,6 +1931,13 @@ export type Database = {
             foreignKeyName: "disputes_match_id_fkey"
             columns: ["match_id"]
             isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
+          {
+            foreignKeyName: "disputes_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
             referencedRelation: "matches"
             referencedColumns: ["id"]
           },
@@ -1940,6 +2006,90 @@ export type Database = {
         }
         Relationships: []
       }
+      match_results_v: {
+        Row: {
+          deciding_diff: number | null
+          division_id: string | null
+          is_home: boolean | null
+          maps_lost: number | null
+          maps_won: number | null
+          match_id: string | null
+          opponent_id: string | null
+          playoff_round: number | null
+          scheduled_at: string | null
+          season_id: string | null
+          stage: Database["public"]["Enums"]["match_stage"] | null
+          status: Database["public"]["Enums"]["match_status"] | null
+          team_id: string | null
+          week: number | null
+          won: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_division_id_fkey"
+            columns: ["division_id"]
+            isOneToOne: false
+            referencedRelation: "divisions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_season_stats_v: {
+        Row: {
+          activision_id: string | null
+          avatar_url: string | null
+          avg_score: number | null
+          deaths: number | null
+          kd: number | null
+          kills: number | null
+          maps_played: number | null
+          plus_minus: number | null
+          qualifies: boolean | null
+          season_id: string | null
+          team_id: string | null
+          team_maps_played: number | null
+          team_name: string | null
+          team_tag: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_map_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_map_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_map_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles_public: {
         Row: {
           activision_id: string | null
@@ -1969,6 +2119,48 @@ export type Database = {
           platform?: Database["public"]["Enums"]["platform"] | null
         }
         Relationships: []
+      }
+      team_maps_played_v: {
+        Row: {
+          maps_played: number | null
+          season_id: string | null
+          team_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_mode_records_v: {
+        Row: {
+          losses: number | null
+          mode_id: string | null
+          mode_name: string | null
+          season_id: string | null
+          team_id: string | null
+          wins: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_maps_mode_id_fkey"
+            columns: ["mode_id"]
+            isOneToOne: false
+            referencedRelation: "game_modes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -2016,11 +2208,35 @@ export type Database = {
         Returns: boolean
       }
       cancel_invite: { Args: { p_invite_id: string }; Returns: undefined }
+      create_matches: {
+        Args: { p_matches: Json; p_replace?: boolean; p_season_id: string }
+        Returns: number
+      }
       discord_sync_enqueue: {
         Args: { p_action: string; p_payload?: Json }
         Returns: undefined
       }
       discord_sync_secret: { Args: never; Returns: string }
+      division_standings: {
+        Args: { p_division_id?: string; p_season_id: string }
+        Returns: {
+          deciding_diff: number
+          h2h_wins: number
+          last5: string[]
+          logo_url: string
+          losses: number
+          map_diff: number
+          maps_lost: number
+          maps_won: number
+          name: string
+          needs_admin_decision: boolean
+          played: number
+          rank: number
+          tag: string
+          team_id: string
+          wins: number
+        }[]
+      }
       free_agent_board: {
         Args: {
           p_limit?: number

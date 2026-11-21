@@ -13,20 +13,20 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/matches',
     name: 'matches',
-    component: Placeholder,
-    meta: { title: 'Matches', eyebrow: 'Schedule & results', description: 'Every match this season, filterable by week and team, with broadcast links.', buildStep: 13 },
+    component: () => import('@/views/MatchesView.vue'),
+    meta: { title: 'Matches' },
   },
   {
     path: '/matches/:id',
     name: 'match',
-    component: Placeholder,
-    meta: { title: 'Match', eyebrow: 'Match', description: 'Series result, map-by-map scores and the full scoreboard.', buildStep: 13 },
+    component: () => import('@/views/MatchView.vue'),
+    meta: { title: 'Match' },
   },
   {
     path: '/standings',
     name: 'standings',
-    component: Placeholder,
-    meta: { title: 'Standings', eyebrow: 'Season', description: 'The league table and stat leaderboards.', buildStep: 13 },
+    component: () => import('@/views/StandingsView.vue'),
+    meta: { title: 'Standings' },
   },
   {
     path: '/teams',
@@ -67,8 +67,8 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/audit-log',
     name: 'audit-log',
-    component: Placeholder,
-    meta: { title: 'Audit Log', eyebrow: 'Transparency', description: 'Every staff action, in public.', buildStep: 13 },
+    component: () => import('@/views/AuditLogView.vue'),
+    meta: { title: 'Audit Log' },
   },
   {
     path: '/login',
@@ -119,8 +119,8 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/admin',
     name: 'admin',
-    component: Placeholder,
-    meta: { title: 'Admin', eyebrow: 'Staff', description: 'League operations.', buildStep: 15, requiresAuth: true, staff: 'any' },
+    component: () => import('@/views/admin/AdminHomeView.vue'),
+    meta: { title: 'Admin', requiresAuth: true, staff: 'any' },
   },
   {
     path: '/admin/mismatches',
@@ -143,8 +143,8 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/admin/season',
     name: 'admin-season',
-    component: Placeholder,
-    meta: { title: 'Season & Schedule', eyebrow: 'Admin', description: 'Seasons, divisions and the match schedule.', buildStep: 12, requiresAuth: true, staff: 'admin' },
+    component: () => import('@/views/admin/AdminSeasonView.vue'),
+    meta: { title: 'Season & Schedule', requiresAuth: true, staff: 'admin' },
   },
   {
     path: '/admin/content',

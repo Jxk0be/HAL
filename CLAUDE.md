@@ -174,6 +174,26 @@ The step-by-step build plan is `hal-build-guide.html` (kept outside the repo); e
   - The function is deployed with `verify_jwt: false` and authenticates in code (secret header, or owner JWT for `full_resync`).
   - The audit trigger ignores changes that only touch Discord ids or `discord_synced_at`.
   - pg_net is installed in the `extensions` schema; call it as `net.http_post`.
+- Season admin (step 12):
+  - `/admin/season` has six tabs: Season (only the owner can edit), Team approvals (deny sets `status = removed` plus a `review_note` shown on the captain's My Team page), Divisions (owner), Modes & maps (admins), Schedule and Playoffs (admins).
+  - Data hooks: `useSeasonAdmin`, `useGameData`, `useSeasonMatches`. Team and match edits that return 0 rows mean the editor is recused, and the hooks report that.
+  - Time maths lives in `src/lib/time.ts`: `zonedToUtc` (DST-safe via Intl), `toZoned`, `formatLeagueTime` ("Tue, Jan 12 · 9:00 PM ET"). Don't hand-roll offsets elsewhere.
+  - Schedule generator (`src/lib/schedule.ts`): circle-method round robin over weeks × nights rounds. Later cycles rotate, home/away is balanced greedily, odd team counts get byes, and a seeded shuffle drives Regenerate. `playoffPairs` / `bracketOrder` produce 1v8, 4v5, 2v7, 3v6.
+  - Standings (`src/lib/standings.ts`) follow rulebook 5.5: series wins, map differential, head-to-head, deciding-map round differential, then teams flagged for an admin decision.
+  - Matches are saved only through the `create_matches(season, matches jsonb, replace)` RPC (admin only, one transaction). Replace refuses once any match in that division/stage/round has started.
+  - Bulk generation isn't recused (it's league-wide); editing a single match is.
+  - Week 1 starts on the Monday of `seasons.starts_on`. Playoff matches use week `regular_weeks + round`.
+- Public season pages (step 13):
+  - Stat maths lives in Postgres:
+    - `match_results_v` has one row per team per counted match. Confirmed and forfeit only, and a forfeit is a 3–0 loss.
+    - `division_standings(season, division?)` is security invoker and sorts by rule 5.5: series wins, map diff, head-to-head among tied teams, deciding-map round diff, then `needs_admin_decision`. It returns `last5` newest first.
+    - `player_season_stats_v` covers confirmed values only. `qualifies` = played at least 40% of the team's maps; it carries Activision IDs, never Discord names.
+    - `team_mode_records_v` and `team_maps_played_v`.
+  - Realtime: `matches` and `match_maps` are in the `supabase_realtime` publication. `useRealtime(name, tables, cb)` debounces reloads.
+  - Data hooks: `useSeasonSchedule` (the whole season's matches, filtered client-side), `useMatchDetail`, `useStandings`, `useLeaderboards`, `useTeamRecord`, `useTeamModeRecords`, `usePlayerStats`, `useAuditLog`, `useDivisions`.
+  - Times: show them with `LeagueTime` (the viewer's local time, with Eastern on hover).
+  - Match detail: screenshots come from `report_submissions` (RLS limits them to the two teams and staff) as one-hour signed URLs. Check-ins are visible to the teams and staff only.
+  - Tests: `supabase/tests/stats_test.sql` and `supabase/tests/schedule_test.sql`.
 - Test seasons: only one active season can exist, so tests reuse it (forced to `signups` inside the rolled-back block). `supabase/tests/free_agents_test.sql` covers the board, privacy and posts.
 - Check every page at 375px (no horizontal scroll). Don't put responsive `hidden`/`sm:inline-flex` classes on a component whose root already sets `display`; wrap it in a span instead.
 

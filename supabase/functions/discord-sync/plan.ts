@@ -69,10 +69,12 @@ export function teamChannelName(tag: string, name: string): string {
   return (slug || 'team').slice(0, 90)
 }
 
-const MANAGE_CHANNELS = 1n << 4n
-const MANAGE_ROLES = 1n << 28n
-
-/** Private team channel: hidden from everyone except the team, HAL Admin and the bot. */
+/**
+ * Private team channel: hidden from everyone except the team, HAL Admin and the bot.
+ * The bot's overwrite only lets it see and post: its server-wide Manage Channels already covers
+ * editing and deleting. Discord rejects overwrites that grant Manage Channels/Manage Permissions
+ * unless the bot is an Administrator, so they must not be included.
+ */
 export function teamChannelOverwrites(opts: {
   guildId: string
   teamRoleId: string
@@ -90,19 +92,7 @@ export function teamChannelOverwrites(opts: {
     { id: opts.guildId, type: 0, deny: perms(PERMISSIONS.VIEW_CHANNEL) }, // @everyone
     { id: opts.teamRoleId, type: 0, allow: member },
     { id: opts.adminRoleId, type: 0, allow: member },
-    {
-      id: opts.botUserId,
-      type: 1,
-      allow: perms(
-        PERMISSIONS.VIEW_CHANNEL,
-        PERMISSIONS.SEND_MESSAGES,
-        PERMISSIONS.READ_MESSAGE_HISTORY,
-        PERMISSIONS.EMBED_LINKS,
-        PERMISSIONS.ATTACH_FILES,
-        MANAGE_CHANNELS,
-        MANAGE_ROLES,
-      ),
-    },
+    { id: opts.botUserId, type: 1, allow: member },
   ]
 }
 

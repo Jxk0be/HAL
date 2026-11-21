@@ -215,6 +215,8 @@ export async function syncTeam(
     if (role && role.name !== team.name) await editRole(guildId, roleId, { name: team.name }, REASON)
   } else {
     roleId = (await createRole(guildId, { name: team.name, color: TEAM_ROLE_COLOR, mentionable: true }, REASON)).id
+    // Save it straight away so a later failure (e.g. creating the channel) can't orphan the role.
+    await db.from('teams').update({ discord_role_id: roleId }).eq('id', teamId)
   }
 
   // Channel: reuse if it still exists (and refresh name and permissions), otherwise create.
@@ -244,7 +246,7 @@ export async function syncTeam(
     ).id
   }
 
-  if (roleId !== team.discord_role_id || channelId !== team.discord_channel_id) {
+  if (channelId !== team.discord_channel_id) {
     await db.from('teams').update({ discord_role_id: roleId, discord_channel_id: channelId }).eq('id', teamId)
   }
   stats.teams++

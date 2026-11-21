@@ -172,6 +172,13 @@ const lockDate = computed(() =>
             <UiBadge v-if="team.division">{{ team.division }}</UiBadge>
           </div>
         </div>
+        <p
+          v-if="team.status === 'removed' && team.reviewNote"
+          role="status"
+          class="rounded-md border border-loss/40 bg-loss-soft px-4 py-3 text-sm"
+        >
+          <strong class="text-loss">Note from league staff:</strong> {{ team.reviewNote }}
+        </p>
 
         <dl class="grid grid-cols-2 overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-4" style="gap: 1px">
           <div class="bg-surface p-4">

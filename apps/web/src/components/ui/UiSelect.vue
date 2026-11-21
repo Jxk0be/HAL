@@ -3,7 +3,7 @@ import { useId } from 'vue'
 
 defineProps<{
   label: string
-  options: readonly { value: T; label: string; disabled?: boolean }[]
+  options: readonly { value: T | ''; label: string; disabled?: boolean }[]
   placeholder?: string
   hint?: string
   error?: string

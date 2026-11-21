@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase'
 import type { Database } from '@/types/database'
 
 const SEASON_COLUMNS =
-  'id, name, status, starts_on, max_roster, max_starters, max_subs, max_roster_changes, roster_lock_at, match_nights, match_time, timezone'
+  'id, name, status, starts_on, max_roster, max_starters, max_subs, max_roster_changes, roster_lock_at, match_nights, match_time, timezone, playoff_teams, regular_weeks'
 
 export type ActiveSeason = Pick<
   Database['public']['Tables']['seasons']['Row'],
@@ -19,6 +19,8 @@ export type ActiveSeason = Pick<
   | 'match_nights'
   | 'match_time'
   | 'timezone'
+  | 'playoff_teams'
+  | 'regular_weeks'
 >
 
 /** The season in signups, regular season or playoffs (at most one exists). */
