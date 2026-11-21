@@ -34,3 +34,11 @@ Deno.test('/reschedule has match, day (autocomplete) and 12 time choices', () =>
   assertEquals(opts[0].autocomplete && opts[1].autocomplete, true)
   assertEquals(opts[2].choices.length, 12)
 })
+
+Deno.test('withMentions pings exactly the given players, once each', async () => {
+  const { withMentions } = await import('./match_messages.ts')
+  const p = withMentions({ embeds: [] }, ['1', '2', '1'])
+  assertEquals(p.content, '<@1> <@2>')
+  assertEquals(p.allowed_mentions, { parse: [], users: ['1', '2'] })
+  assertEquals(withMentions({ content: 'x' }, []), { content: 'x' })
+})

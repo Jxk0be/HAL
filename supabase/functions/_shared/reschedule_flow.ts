@@ -1,13 +1,13 @@
 /**
  * Reschedule posts in team channels, shared by /reschedule (discord-interactions) and the
  * scheduler (requests and answers made on the site). bot_events makes each post happen once:
- *   rs:<requestId>       the request in each team channel (Accept/Decline in the opponent's)
+ *   rs:<requestId>       the request in each team channel (Accept/Decline in the opponent's), pinging that roster
  *   rs_done:<requestId>  the outcome notice in each team channel
  */
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
 import { editMessage, sendMessage } from './discord.ts'
-import { claimEvent, findEvent, loadMatch, recordEvent, releaseEvent } from './match_data.ts'
-import { rescheduleMessage, rescheduleOutcomeMessage, rescheduleRequestMessage, type RescheduleEvent } from './match_messages.ts'
+import { claimEvent, findEvent, loadMatch, loadRosterDiscordIds, recordEvent, releaseEvent } from './match_data.ts'
+import { rescheduleMessage, rescheduleOutcomeMessage, rescheduleRequestMessage, withMentions, type RescheduleEvent } from './match_messages.ts'
 
 export interface RequestRow {
   id: string
@@ -48,7 +48,9 @@ export async function postRescheduleRequest(db: SupabaseClient, requestId: strin
     const id = await claimEvent(db, m.id, team.id, `rs:${r.id}`)
     if (id === null) continue
     try {
-      const msg = await sendMessage(team.channelId, rescheduleRequestMessage(m, r, team.id, siteUrl))
+      // Ping the whole roster in its own channel: the opponent has to answer, the requester's team should know.
+      const roster = await loadRosterDiscordIds(db, team.id)
+      const msg = await sendMessage(team.channelId, withMentions(rescheduleRequestMessage(m, r, team.id, siteUrl), roster))
       await recordEvent(db, id, team.channelId, msg.id)
     } catch (err) {
       await releaseEvent(db, id)
@@ -76,7 +78,8 @@ export async function finishRescheduleRequest(db: SupabaseClient, requestId: str
     const id = await claimEvent(db, m.id, team.id, `rs_done:${r.id}`)
     if (id === null) continue
     try {
-      const msg = await sendMessage(team.channelId, rescheduleMessage(m, r.status, r.teamId, r.proposedAt, siteUrl))
+      const roster = await loadRosterDiscordIds(db, team.id)
+      const msg = await sendMessage(team.channelId, withMentions(rescheduleMessage(m, r.status, r.teamId, r.proposedAt, siteUrl), roster))
       await recordEvent(db, id, team.channelId, msg.id)
     } catch (err) {
       await releaseEvent(db, id)

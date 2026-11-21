@@ -25,12 +25,14 @@ function deny() {
   emit('review', denying.value.id, false, note.value.trim() || null)
   open.value = false
 }
+/** Rule 3.5: a team needs 4 players before it can be approved (the database enforces it too). */
+const MIN_PLAYERS = 4
 const created = (iso: string) => new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 </script>
 
 <template>
   <div>
-    <UiEmptyState v-if="pending.length === 0" title="No teams waiting" description="New teams show up here for approval." />
+    <UiEmptyState v-if="pending.length === 0" title="No teams waiting" description="New teams show up here. Admins are pinged in #admin-only once a team has 4 players." />
     <ul v-else class="flex flex-col gap-3">
       <li v-for="t in pending" :key="t.id" class="flex flex-wrap items-center gap-4 rounded-lg border border-line bg-surface p-4">
         <TeamLogo :tag="t.tag" :name="t.name" decorative />
@@ -38,12 +40,22 @@ const created = (iso: string) => new Date(iso).toLocaleDateString(undefined, { m
           <RouterLink :to="`/teams/${t.id}`" class="font-medium hover:text-gold">{{ t.name }}</RouterLink>
           <p class="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted">
             <UiBadge variant="outline">{{ t.tag }}</UiBadge>
-            Captain {{ t.captainName }} · <span class="tnum">{{ t.rosterSize }}</span> players · registered {{ created(t.createdAt) }}
+            Captain {{ t.captainName }} · <span class="tnum">{{ t.rosterSize }}</span> {{ t.rosterSize === 1 ? 'player' : 'players' }} · registered {{ created(t.createdAt) }}
+            <UiBadge :variant="t.rosterSize >= MIN_PLAYERS ? 'win' : 'neutral'">
+              {{ t.rosterSize >= MIN_PLAYERS ? 'Ready to review' : `Building roster (${t.rosterSize}/${MIN_PLAYERS})` }}
+            </UiBadge>
           </p>
         </div>
         <div class="flex gap-2">
           <UiButton size="sm" variant="danger" :disabled="busy" @click="askDeny(t)">Deny<span class="sr-only"> {{ t.name }}</span></UiButton>
-          <UiButton size="sm" :disabled="busy" @click="emit('review', t.id, true, null)">Approve<span class="sr-only"> {{ t.name }}</span></UiButton>
+          <UiButton
+            size="sm"
+            :disabled="busy || t.rosterSize < MIN_PLAYERS"
+            :title="t.rosterSize < MIN_PLAYERS ? `Needs ${MIN_PLAYERS} players to be approved` : undefined"
+            @click="emit('review', t.id, true, null)"
+          >
+            Approve<span class="sr-only"> {{ t.name }}</span>
+          </UiButton>
         </div>
       </li>
     </ul>

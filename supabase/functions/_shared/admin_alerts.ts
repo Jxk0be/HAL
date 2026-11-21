@@ -23,10 +23,11 @@ function alert(title: string, description: string, url: string): MessagePayload 
   return { embeds: [halEmbed({ title, description, url, color: HAL_LOSS })] }
 }
 
-export function teamPendingAlert(team: { name: string; tag: string; captain: string }, siteUrl: string): MessagePayload {
+/** Sent when a pending team reaches 4 players (rule 3.5: no approval below 4). */
+export function teamPendingAlert(team: { name: string; tag: string; captain: string; players: number }, siteUrl: string): MessagePayload {
   return alert(
-    `Team to approve: ${team.name} [${team.tag}]`,
-    `Created by ${team.captain}. New teams stay pending until an admin approves them (rule 3.5).\n[Review on Season](${siteUrl}/admin/season)`,
+    `Team ready to approve: ${team.name} [${team.tag}]`,
+    `${team.players} players, captain ${team.captain}. Approve or deny it on Season → Team approvals (rule 3.5).\n[Team approvals](${siteUrl}/admin/season)`,
     `${siteUrl}/admin/season`,
   )
 }

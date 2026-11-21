@@ -45,7 +45,7 @@ Effective: November 20, 2026
 
 **3.4** Teams can only be created while season signups are open. The player who creates a team becomes its captain and first starter.
 
-**3.5** New teams are listed as pending until an admin approves them. Only approved teams are scheduled.
+**3.5** New teams are listed as pending until an admin approves them. A team needs at least 4 players on its roster before it can be approved. Only approved teams are scheduled.
 
 **3.6** Every player who logs in is listed as a free agent until they join a team. Captains add players by inviting them from the website. A player joins the roster only by accepting an invite. Invites expire after 7 days, and accepting one invite cancels all of that player's other invites for the season.
 

@@ -301,14 +301,17 @@ async function handleOutbox(ctx: Ctx, row: { id: number; type: string; payload: 
       if (!ctx.channels.admin) return
       const { data: t } = await ctx.db
         .from('teams')
-        .select('name, tag, status, captain:profiles!teams_captain_id_fkey(discord_username, activision_id)')
+        .select('name, tag, status, captain:profiles!teams_captain_id_fkey(discord_username, activision_id), members:team_members(left_at, is_emergency)')
         .eq('id', String(p.team_id))
         .maybeSingle()
       if (!t || t.status !== 'pending') return // approved or removed since
       // deno-lint-ignore no-explicit-any
+      const players = ((t as any).members ?? []).filter((x: { left_at: string | null; is_emergency: boolean }) => !x.left_at && !x.is_emergency).length
+      if (players < 4) return // dropped below 4 before the alert went out
+      // deno-lint-ignore no-explicit-any
       const cap = (t as any).captain
       await sendMessage(ctx.channels.admin, withAdminPing(
-        teamPendingAlert({ name: t.name, tag: t.tag, captain: cap?.discord_username ?? cap?.activision_id ?? 'a player' }, ctx.siteUrl),
+        teamPendingAlert({ name: t.name, tag: t.tag, captain: cap?.discord_username ?? cap?.activision_id ?? 'a player', players }, ctx.siteUrl),
         ctx.adminRole,
       ))
       bump(ctx, 'admin_alert')

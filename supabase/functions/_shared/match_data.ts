@@ -70,6 +70,18 @@ export interface ChannelSettings {
   admin: string | null
 }
 
+/** Discord ids of a team's current roster (emergency subs excluded), for whole-team pings. */
+export async function loadRosterDiscordIds(db: SupabaseClient, teamId: string): Promise<string[]> {
+  const { data } = await db
+    .from('team_members')
+    .select('profile:profiles(discord_id)')
+    .eq('team_id', teamId)
+    .is('left_at', null)
+    .eq('is_emergency', false)
+  // deno-lint-ignore no-explicit-any
+  return (data ?? []).map((r: any) => r.profile?.discord_id as string | null).filter((x): x is string => Boolean(x))
+}
+
 /** The HAL Admin role id (stored by discord-sync in app_settings.discord), for admin pings. */
 export async function loadAdminRoleId(db: SupabaseClient): Promise<string | null> {
   const { data } = await db.from('app_settings').select('value').eq('key', 'discord').maybeSingle()

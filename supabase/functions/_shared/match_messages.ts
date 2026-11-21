@@ -235,6 +235,21 @@ export function rescheduleMessage(m: MsgMatch, event: RescheduleEvent, requestin
   }
 }
 
+/**
+ * @mentions a team's players on a post so the whole roster is notified. Only these users can be
+ * pinged (no roles, no @everyone); Discord allows up to 100.
+ */
+export function withMentions(payload: MessagePayload, discordIds: string[]): MessagePayload {
+  const ids = [...new Set(discordIds)].slice(0, 100)
+  if (!ids.length) return payload
+  return {
+    ...payload,
+    content: `${ids.map((id) => `<@${id}>`).join(' ')}${payload.content ? `
+${payload.content}` : ''}`,
+    allowed_mentions: { parse: [], users: ids },
+  }
+}
+
 export const rescheduleButtons = (requestId: string) => ({
   type: 1,
   components: [
