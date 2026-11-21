@@ -1,3 +1,4 @@
+import { watchDebounced } from '@vueuse/core'
 import { ref, watch, type MaybeRefOrGetter, toValue } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useRealtime } from './useRealtime'
@@ -161,10 +162,15 @@ export function useAuditLog(pageSize = 30) {
   const total = ref(0)
   const loading = ref(true)
   const table = ref<string>('')
+  /** Actor name search; 'bot' matches the HAL bot (system) entries. */
+  const actor = ref('')
   async function load() {
     loading.value = true
     let q = supabase.from('audit_log_public').select('*', { count: 'exact' })
     if (table.value) q = q.eq('table_name', table.value)
+    const who = actor.value.trim().replace(/[%_,()]/g, '')
+    if (/^(hal )?bot$|^system$/i.test(who)) q = q.eq('actor_role', 'system')
+    else if (who.length >= 2) q = q.ilike('actor_name', `%${who}%`)
     const { data, count } = await q.order('id', { ascending: false }).range(page.value * pageSize, page.value * pageSize + pageSize - 1)
     rows.value = data ?? []
     total.value = count ?? 0
@@ -174,6 +180,10 @@ export function useAuditLog(pageSize = 30) {
     page.value = 0
     void load()
   })
+  watchDebounced(actor, () => {
+    page.value = 0
+    void load()
+  }, { debounce: 300 })
   watch(page, load, { immediate: true })
-  return { rows, page, total, table, loading, pages: () => Math.max(1, Math.ceil(total.value / pageSize)) }
+  return { rows, page, total, table, actor, loading, pages: () => Math.max(1, Math.ceil(total.value / pageSize)) }
 }

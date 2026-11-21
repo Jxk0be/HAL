@@ -1,37 +1,43 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
-import UiBadge from '@/components/ui/UiBadge.vue'
+import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import { useAdminOverview } from '@/composables/useAdmin'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
+const { overview, loading } = useAdminOverview()
 
-const sections = computed(() =>
-  [
-    { to: '/admin/season', title: 'Season & schedule', body: 'Season settings, team approvals, divisions, modes and maps, schedule and playoffs.', ready: true, show: auth.isAdmin },
-    { to: '/admin/discord', title: 'Discord sync', body: 'Resync team roles and channels; see sync errors.', ready: true, show: auth.isOwner },
-    { to: '/admin/mismatches', title: 'Mismatch queue', body: 'Stats where the two captains disagree.', ready: false, show: auth.isAdmin },
-    { to: '/admin/disputes', title: 'Disputes', body: 'Open disputes and their evidence.', ready: false, show: auth.isAdmin },
-    { to: '/admin/rosters', title: 'Roster approvals', body: 'Emergency sub requests.', ready: false, show: auth.isAdmin },
-    { to: '/admin/content', title: 'Content', body: 'Edit any match, result, team or free agent post.', ready: false, show: auth.isAdmin },
-    { to: '/admin/roles', title: 'User roles', body: 'Grant and revoke staff roles.', ready: false, show: auth.isOwner },
-  ].filter((s) => s.show),
-)
+const tiles = computed(() => {
+  const o = overview.value
+  if (!o) return []
+  return [
+    { label: 'Matches with mismatches', value: o.open_mismatch_matches, hint: `${o.open_mismatch_fields} fields to settle`, to: '/admin/mismatches', alert: o.open_mismatch_matches > 0 },
+    { label: 'Open disputes', value: o.open_disputes, hint: 'Reason, evidence, decision', to: '/admin/disputes', alert: o.open_disputes > 0 },
+    { label: 'Roster requests', value: o.pending_roster_requests, hint: 'Emergency subs and fixes', to: '/admin/rosters', alert: o.pending_roster_requests > 0 },
+    { label: 'Teams to approve', value: o.pending_teams, hint: 'Season → Team approvals', to: '/admin/season', alert: o.pending_teams > 0 },
+    { label: 'Unreported 24h+', value: o.unreported_past_24h, hint: 'No accepted result yet', to: '/admin/content', alert: o.unreported_past_24h > 0 },
+    { label: 'Matches this week', value: o.matches_this_week, hint: 'Monday to Sunday, Eastern', to: '/matches', alert: false },
+  ]
+})
 </script>
 
 <template>
   <div>
-    <PageHeader eyebrow="Staff" title="Admin" description="League operations. Staff never act on matches or teams they play on; the database enforces it." />
-    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+    <PageHeader eyebrow="Staff" title="Overview" description="What needs attention. Staff never act on matches or teams they play on; the database enforces it." />
+    <div class="px-4 py-8 sm:px-6">
       <p v-if="!auth.isAdmin" class="text-sm text-muted">Casters manage broadcasts from match pages.</p>
-      <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <li v-for="s in sections" :key="s.to">
-          <RouterLink :to="s.to" class="group flex h-full flex-col rounded-lg border border-line bg-surface p-5 transition-colors hover:border-gold-dim">
-            <span class="flex items-center justify-between gap-2">
-              <span class="font-heading text-xl group-hover:text-gold">{{ s.title }}</span>
-              <UiBadge v-if="!s.ready">Soon</UiBadge>
-            </span>
-            <span class="mt-2 text-sm text-muted">{{ s.body }}</span>
+      <UiSkeleton v-else-if="loading" :lines="4" />
+      <ul v-else class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <li v-for="t in tiles" :key="t.label">
+          <RouterLink
+            :to="t.to"
+            class="group flex h-full flex-col rounded-lg border bg-surface p-5 transition-colors hover:border-gold-dim focus-visible:outline-2 focus-visible:outline-gold"
+            :class="t.alert ? 'border-gold-dim' : 'border-line'"
+          >
+            <span class="eyebrow text-muted">{{ t.label }}</span>
+            <span class="tnum mt-2 font-heading text-4xl" :class="t.alert ? 'text-gold' : ''">{{ t.value }}</span>
+            <span class="mt-1 text-sm text-muted group-hover:text-text">{{ t.hint }}</span>
           </RouterLink>
         </li>
       </ul>

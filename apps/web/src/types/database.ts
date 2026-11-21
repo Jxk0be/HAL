@@ -2167,6 +2167,21 @@ export type Database = {
       }
     }
     Functions: {
+      admin_clear_result: { Args: { p_match_id: string }; Returns: undefined }
+      admin_forfeit: {
+        Args: { p_forfeit_team_id: string; p_match_id: string }
+        Returns: undefined
+      }
+      admin_mismatch_queue: { Args: never; Returns: Json }
+      admin_overview: { Args: never; Returns: Json }
+      admin_set_result: {
+        Args: { p_maps: Json; p_match_id: string }
+        Returns: undefined
+      }
+      apply_map_resolutions: {
+        Args: { p_match_map_id: string }
+        Returns: undefined
+      }
       apply_reports: {
         Args: {
           p_away: Database["public"]["Tables"]["report_submissions"]["Row"]
@@ -2210,6 +2225,10 @@ export type Database = {
         Returns: string
       }
       auto_confirm_reports: { Args: never; Returns: number }
+      ban_player: {
+        Args: { p_reason: string; p_until: string; p_user_id: string }
+        Returns: undefined
+      }
       can_staff_match: { Args: { p_match_id: string }; Returns: boolean }
       can_staff_match_for: {
         Args: { p_match_id: string; p_user_id: string }
@@ -2365,10 +2384,15 @@ export type Database = {
         Returns: number
       }
       request_my_discord_sync: { Args: never; Returns: boolean }
+      resolve_mismatch: {
+        Args: { p_choice: string; p_mismatch_id: string; p_value?: string }
+        Returns: Json
+      }
       respond_to_invite: {
         Args: { p_accept: boolean; p_invite_id: string }
         Returns: undefined
       }
+      series_from_maps: { Args: { p_match_id: string }; Returns: Json }
       set_broadcast: {
         Args: { p_live: boolean; p_match_id: string; p_url?: string }
         Returns: undefined

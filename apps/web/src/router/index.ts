@@ -117,54 +117,22 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Reschedule Requests', eyebrow: 'Captain', description: 'Propose or answer a new match time.', buildStep: 16, requiresAuth: true, player: true },
   },
 
-  // Admin
+  // Admin: one shell with a sidebar; children inherit requiresAuth and narrow 'staff'.
   {
     path: '/admin',
-    name: 'admin',
-    component: () => import('@/views/admin/AdminHomeView.vue'),
-    meta: { title: 'Admin', requiresAuth: true, staff: 'any' },
-  },
-  {
-    path: '/admin/mismatches',
-    name: 'admin-mismatches',
-    component: Placeholder,
-    meta: { title: 'Mismatch Queue', eyebrow: 'Admin', description: 'Stats where the two captains disagree.', buildStep: 15, requiresAuth: true, staff: 'admin' },
-  },
-  {
-    path: '/admin/disputes',
-    name: 'admin-disputes',
-    component: Placeholder,
-    meta: { title: 'Disputes', eyebrow: 'Admin', description: 'Open disputes and their evidence.', buildStep: 15, requiresAuth: true, staff: 'admin' },
-  },
-  {
-    path: '/admin/rosters',
-    name: 'admin-rosters',
-    component: Placeholder,
-    meta: { title: 'Roster Approvals', eyebrow: 'Admin', description: 'Emergency sub requests and roster fixes.', buildStep: 15, requiresAuth: true, staff: 'admin' },
-  },
-  {
-    path: '/admin/season',
-    name: 'admin-season',
-    component: () => import('@/views/admin/AdminSeasonView.vue'),
-    meta: { title: 'Season & Schedule', requiresAuth: true, staff: 'admin' },
-  },
-  {
-    path: '/admin/content',
-    name: 'admin-content',
-    component: Placeholder,
-    meta: { title: 'Content Management', eyebrow: 'Admin', description: 'Add, edit or remove any match, result, team or free agent post.', buildStep: 15, requiresAuth: true, staff: 'admin' },
-  },
-  {
-    path: '/admin/roles',
-    name: 'admin-roles',
-    component: Placeholder,
-    meta: { title: 'User Roles', eyebrow: 'Owner', description: 'Grant and revoke staff roles.', buildStep: 15, requiresAuth: true, staff: 'owner' },
-  },
-  {
-    path: '/admin/discord',
-    name: 'admin-discord',
-    component: () => import('@/views/admin/AdminDiscordView.vue'),
-    meta: { title: 'Discord sync', requiresAuth: true, staff: 'owner' },
+    component: () => import('@/views/admin/AdminLayout.vue'),
+    meta: { requiresAuth: true, staff: 'any' },
+    children: [
+      { path: '', name: 'admin', component: () => import('@/views/admin/AdminHomeView.vue'), meta: { title: 'Admin' } },
+      { path: 'mismatches', name: 'admin-mismatches', component: () => import('@/views/admin/AdminMismatchesView.vue'), meta: { title: 'Mismatch Queue', staff: 'admin' } },
+      { path: 'mismatches/:matchId', name: 'admin-mismatch', component: () => import('@/views/admin/AdminMismatchDetailView.vue'), meta: { title: 'Settle mismatches', staff: 'admin' } },
+      { path: 'disputes', name: 'admin-disputes', component: () => import('@/views/admin/AdminDisputesView.vue'), meta: { title: 'Disputes', staff: 'admin' } },
+      { path: 'rosters', name: 'admin-rosters', component: () => import('@/views/admin/AdminRostersView.vue'), meta: { title: 'Roster Approvals', staff: 'admin' } },
+      { path: 'season', name: 'admin-season', component: () => import('@/views/admin/AdminSeasonView.vue'), meta: { title: 'Season & Schedule', staff: 'admin' } },
+      { path: 'content', name: 'admin-content', component: () => import('@/views/admin/AdminContentView.vue'), meta: { title: 'Content', staff: 'admin' } },
+      { path: 'roles', name: 'admin-roles', component: () => import('@/views/admin/AdminRolesView.vue'), meta: { title: 'User Roles', staff: 'owner' } },
+      { path: 'discord', name: 'admin-discord', component: () => import('@/views/admin/AdminDiscordView.vue'), meta: { title: 'Discord sync', staff: 'owner' } },
+    ],
   },
 
   {

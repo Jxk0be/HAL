@@ -98,7 +98,7 @@ export function useSeasonMatches(seasonId: MaybeRefOrGetter<string | null | unde
   /** Edit one match (recused: RLS hides matches involving the editor's own team). */
   async function updateMatch(
     matchId: string,
-    patch: { week?: number; home_team_id?: string; away_team_id?: string; scheduled_at?: string; default_at?: string },
+    patch: { week?: number; home_team_id?: string; away_team_id?: string; scheduled_at?: string; default_at?: string; status?: AdminMatch['status'] },
   ): Promise<Result> {
     busy.value = true
     const { data, error } = await supabase.from('matches').update(patch).eq('id', matchId).select('id')

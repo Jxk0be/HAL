@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import PageHeader from '@/components/layout/PageHeader.vue'
+import UiInput from '@/components/ui/UiInput.vue'
 import UiSelect from '@/components/ui/UiSelect.vue'
 import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
@@ -8,13 +9,15 @@ import UiBadge from '@/components/ui/UiBadge.vue'
 import { useAuditLog } from '@/composables/useStats'
 
 const log = useAuditLog()
-const { rows, page, total, table, loading } = log
+const { rows, page, total, table, actor, loading } = log
 
 const tableOptions = [
   { value: '', label: 'Everything' },
   { value: 'matches', label: 'Matches' },
   { value: 'match_maps', label: 'Map results' },
   { value: 'player_map_stats', label: 'Stats' },
+  { value: 'stat_mismatches', label: 'Mismatch decisions' },
+  { value: 'roster_requests', label: 'Roster requests' },
   { value: 'teams', label: 'Teams' },
   { value: 'team_members', label: 'Rosters' },
   { value: 'penalties', label: 'Penalties' },
@@ -34,8 +37,9 @@ const when = (iso: string | null) =>
       description="Every action taken by league staff or the HAL bot, in public. Private details are never shown."
     />
     <div class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6">
-      <div class="max-w-xs">
-        <UiSelect v-model="table" label="Show" :options="tableOptions" />
+      <div class="flex flex-wrap gap-3">
+        <div class="w-full sm:w-56"><UiSelect v-model="table" label="Show" :options="tableOptions" /></div>
+        <div class="w-full sm:w-56"><UiInput v-model="actor" label="By" placeholder="Staff name, or bot" autocomplete="off" /></div>
       </div>
       <UiSkeleton v-if="loading" :lines="10" />
       <UiEmptyState v-else-if="rows.length === 0" title="Nothing logged yet" description="Staff actions appear here as they happen." />
