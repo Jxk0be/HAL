@@ -5,12 +5,14 @@
  *  - Postgres triggers via pg_net (header x-hal-sync-secret = Vault discord_sync_secret)
  *    actions: team_sync, team_removed, user_sync (team_approved/team_renamed/member_joined/
  *    member_left/staff_role_changed/free_agent_changed are accepted as aliases).
- *  - The owner's "Resync Discord" button (Supabase user JWT; owner only): full_resync.
+ *  - The owner's buttons on Admin → Discord (Supabase user JWT; owner only): full_resync, and
+ *    post_guides (posts or refreshes the pinned channel guides).
  *
  * Deployed with verify_jwt off because pg_net can't send a JWT; both paths authenticate here.
  * Secrets: DISCORD_BOT_TOKEN, DISCORD_APP_ID (= the bot's user id), DISCORD_GUILD_ID.
  */
 import { adminClient } from '../_shared/supabase.ts'
+import { postAllGuides } from './guides.ts'
 import { emptyStats, ensureSettings, fullResync, logError, removeTeamDiscord, syncTeam, syncUser, type SyncEnv } from './sync.ts'
 
 declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void } | undefined
@@ -31,6 +33,9 @@ const ALIASES: Record<string, string> = {
   staff_role_changed: 'user_sync',
   free_agent_changed: 'user_sync',
 }
+
+/** Actions the owner can run from the site (everything else is trigger-only). */
+const OWNER_ACTIONS = ['full_resync', 'post_guides']
 
 let cachedSecret: { value: string | null; at: number } | null = null
 async function syncSecret(): Promise<string | null> {
@@ -74,7 +79,7 @@ Deno.serve(async (req) => {
   const expected = await syncSecret()
   const internal = Boolean(secret && expected && safeEqual(secret, expected))
   if (!internal) {
-    if (action !== 'full_resync' || !(await isOwnerRequest(req))) return json({ error: 'unauthorized' }, 401)
+    if (!OWNER_ACTIONS.includes(action) || !(await isOwnerRequest(req))) return json({ error: 'unauthorized' }, 401)
   }
 
   const guildId = Deno.env.get('DISCORD_GUILD_ID')
@@ -86,6 +91,16 @@ Deno.serve(async (req) => {
   if (action === 'full_resync') {
     try {
       const stats = await fullResync(env)
+      return json({ ok: true, stats })
+    } catch (err) {
+      await logError(env.db, action, body, err)
+      return json({ ok: false, error: err instanceof Error ? err.message : String(err) }, 500)
+    }
+  }
+
+  if (action === 'post_guides') {
+    try {
+      const stats = await postAllGuides(env.db)
       return json({ ok: true, stats })
     } catch (err) {
       await logError(env.db, action, body, err)

@@ -10,6 +10,13 @@ export interface SyncStats {
   errors: number
 }
 
+export interface GuideStats {
+  posted: number
+  updated: number
+  notPinned: number
+  failed: number
+}
+
 export interface SyncError {
   id: number
   action: string
@@ -50,8 +57,27 @@ export function useDiscordSync() {
     return { ok: true, stats: data.stats }
   }
 
+  const postingGuides = ref(false)
+  const guideStats = ref<GuideStats | null>(null)
+
+  /** Posts (or refreshes in place) the pinned "how this channel works" guides. */
+  async function postGuides(): Promise<{ ok: true; stats: GuideStats } | { ok: false; message: string }> {
+    postingGuides.value = true
+    const { data, error } = await supabase.functions.invoke<{ ok: boolean; stats?: GuideStats; error?: string }>(
+      'discord-sync',
+      { body: { action: 'post_guides' } },
+    )
+    postingGuides.value = false
+    await loadErrors()
+    if (error || !data?.ok || !data.stats) {
+      return { ok: false, message: data?.error ?? "Couldn't post the guides. Check the errors below." }
+    }
+    guideStats.value = data.stats
+    return { ok: true, stats: data.stats }
+  }
+
   void loadErrors()
-  return { running, lastStats, errors, loadingErrors, resync, reloadErrors: loadErrors }
+  return { running, lastStats, errors, loadingErrors, resync, reloadErrors: loadErrors, postingGuides, guideStats, postGuides }
 }
 
 export interface BotChannels {

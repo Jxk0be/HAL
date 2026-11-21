@@ -34,6 +34,7 @@ import {
   type DiscordSettings,
   type FixedRoles,
 } from './plan.ts'
+import { postTeamGuide } from './guides.ts'
 
 const ACTIVE = ['signups', 'regular', 'playoffs']
 const REASON = 'HAL role sync'
@@ -259,6 +260,7 @@ export async function syncTeam(
         REASON,
       )
     ).id
+    await postTeamGuide(db, channelId)
   }
 
   if (channelId !== team.discord_channel_id) {

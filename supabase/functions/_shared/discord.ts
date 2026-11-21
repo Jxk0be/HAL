@@ -111,6 +111,10 @@ export const editMessage = (channelId: string, messageId: string, payload: Messa
 export const deleteMessage = (channelId: string, messageId: string) =>
   discordRequest('DELETE', `/channels/${channelId}/messages/${messageId}`)
 
+/** Pins a message (needs Pin Messages / Manage Messages in that channel). */
+export const pinMessage = (channelId: string, messageId: string, reason?: string) =>
+  discordRequest('PUT', `/channels/${channelId}/pins/${messageId}`, { reason })
+
 /** Opens (or reuses) a DM channel with a user. Fails with 50007 if they don't accept DMs. */
 export const createDmChannel = (userId: string) =>
   discordRequest<{ id: string }>('POST', '/users/@me/channels', { body: { recipient_id: userId } })

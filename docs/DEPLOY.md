@@ -73,7 +73,7 @@ Channel IDs for `#lfg-free-agents`, `#results`, `#announcements`, `#disputes` an
 4. **Discord Developer Portal → HAL:**
    - General Information → **Interactions Endpoint URL**: `https://lluwzpwiybvgnsimpwey.supabase.co/functions/v1/discord-interactions` (Discord sends a test request; it must save without errors).
    - OAuth2 → Redirects: `https://lluwzpwiybvgnsimpwey.supabase.co/auth/v1/callback` (Supabase's Discord login callback; already set if login works locally).
-5. **Slash commands:** `pnpm commands:register` (from the repo root, with `.env` filled in). It should print `/ping, /link, /lfg, /reschedule, /report, /dispute`.
+5. **Slash commands:** `pnpm commands:register` (from the repo root, with `.env` filled in). It should print `/ping, /link, /help, /lfg, /reschedule, /report, /dispute`.
 6. **Owner:** log in on the live site with Discord, then run `supabase/snippets/make_owner.sql` in the SQL editor for your account (already done for the current project).
 7. **Channels:** Admin → Discord → Channels: paste the five channel IDs. Then press **Resync Discord** once.
 8. **Check:** Admin → Health shows no errors and every scheduled job as `succeeded` after a few minutes. In Discord, `/ping` answers "HAL bot online."

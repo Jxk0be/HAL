@@ -9,12 +9,21 @@ import { useToast } from '@/composables/useToast'
 import { site } from '@/config/site'
 
 const toast = useToast()
-const { running, lastStats, errors, loadingErrors, resync, reloadErrors } = useDiscordSync()
+const { running, lastStats, errors, loadingErrors, resync, reloadErrors, postingGuides, guideStats, postGuides } = useDiscordSync()
 
 async function run() {
   const result = await resync()
   if (result.ok) toast.success('Discord is in sync with the league.')
   else toast.error(result.message)
+}
+
+async function runGuides() {
+  const r = await postGuides()
+  if (!r.ok) return toast.error(r.message)
+  const { posted, updated, failed } = r.stats
+  const done = `Guides: ${posted} posted, ${updated} refreshed.`
+  if (failed) toast.error(`${done} ${failed} failed; see the errors.`)
+  else toast.success(done)
 }
 
 const statRows = [
@@ -61,6 +70,21 @@ const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyl
         <p v-if="lastStats && lastStats.notInServer > 0" class="mt-3 text-xs text-muted">
           Players who haven't joined the Discord server yet get their roles automatically the next time they
           log in to the site after joining.
+        </p>
+      </UiCard>
+      <UiCard eyebrow="Help" title="Channel guides">
+        <p class="text-sm text-muted">
+          Posts a pinned "how this channel works" message, with the commands that work there, in #lfg, #results,
+          #disputes, the staff channel and every team channel. Running it again edits the same messages, so do it
+          after the bot's commands or the channel IDs below change. New team channels get theirs automatically.
+        </p>
+        <UiButton class="mt-5" variant="secondary" :loading="postingGuides" @click="runGuides">Post channel guides</UiButton>
+        <p v-if="guideStats" class="mt-4 text-xs text-muted">
+          {{ guideStats.posted }} posted · {{ guideStats.updated }} refreshed<template v-if="guideStats.failed"> · {{ guideStats.failed }} failed</template>
+        </p>
+        <p v-if="guideStats && guideStats.notPinned > 0" class="mt-2 text-xs text-muted">
+          {{ guideStats.notPinned }} couldn't be pinned. Give the bot's role <strong>Pin Messages</strong> (or Manage Messages) in
+          those channels and pin them by hand, or delete them and post again.
         </p>
       </UiCard>
       <UiCard eyebrow="Bot posts" title="Channels">
