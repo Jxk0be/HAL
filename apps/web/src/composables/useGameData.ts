@@ -24,6 +24,7 @@ export function useGameData() {
   const legal = ref(new Set<string>())
   const loading = ref(true)
   const busy = ref(false)
+  const TAKEN = 'That name is already in the list.'
 
   async function load() {
     loading.value = true
@@ -47,8 +48,41 @@ export function useGameData() {
     return { ok: true }
   }
 
-  const TAKEN = 'That name is already in the list.'
+  /**
+   * Adds a map to a mode's pool by name. Reuses an existing map with that name (reactivating it if
+   * it was retired), otherwise creates it, so one map can be in several modes.
+   */
+  async function addMapToMode(modeId: string, rawName: string): Promise<Result> {
+    const name = rawName.trim()
+    if (!name) return { ok: false, message: 'Enter a map name.' }
+    busy.value = true
+    try {
+      const existing = maps.value.find((m) => m.name.toLowerCase() === name.toLowerCase())
+      let mapId = existing?.id
+      if (!mapId) {
+        const { data, error } = await supabase.from('maps').insert({ name }).select('id').single()
+        if (error || !data) return { ok: false, message: dbErrorMessage(error, undefined, TAKEN) }
+        mapId = data.id
+      } else if (existing && !existing.active) {
+        const { error } = await supabase.from('maps').update({ active: true }).eq('id', mapId)
+        if (error) return { ok: false, message: dbErrorMessage(error) }
+      }
+      if (legal.value.has(`${mapId}:${modeId}`)) return { ok: false, message: `${existing?.name ?? name} is already in this mode.` }
+      const { error } = await supabase.from('map_modes').insert({ map_id: mapId, mode_id: modeId })
+      if (error) return { ok: false, message: dbErrorMessage(error, undefined, 'That map is already in this mode.') }
+      return { ok: true }
+    } finally {
+      busy.value = false
+      await load()
+    }
+  }
+
+  /** Maps in a mode's pool, alphabetical. */
+  const mapsInMode = (modeId: string) => maps.value.filter((m) => legal.value.has(`${m.id}:${modeId}`))
+
   return {
+    addMapToMode,
+    mapsInMode,
     modes,
     maps,
     legal,

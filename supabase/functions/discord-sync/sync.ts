@@ -16,6 +16,7 @@ import {
   getGuildMember,
   getGuildRoles,
   removeMemberRole,
+  setRolePositions,
   UNKNOWN_CHANNEL,
   UNKNOWN_MEMBER,
   UNKNOWN_ROLE,
@@ -29,6 +30,7 @@ import {
   TEAM_ROLE_COLOR,
   teamChannelName,
   teamChannelOverwrites,
+  teamRolePlacement,
   type DiscordSettings,
   type FixedRoles,
 } from './plan.ts'
@@ -186,7 +188,7 @@ export async function syncTeam(
   teamId: string,
   settings: DiscordSettings,
   stats: SyncStats,
-  opts: { syncMembers?: boolean; guildRoles?: GuildRole[]; channelIds?: Set<string> } = {},
+  opts: { syncMembers?: boolean; guildRoles?: GuildRole[]; channelNames?: Map<string, string> } = {},
 ): Promise<void> {
   const { db, guildId } = env
   const { data: team } = await db
@@ -210,6 +212,7 @@ export async function syncTeam(
   // Role: reuse if it still exists, rename if needed, otherwise create.
   const roles = opts.guildRoles ?? (await getGuildRoles(guildId))
   let roleId = team.discord_role_id && roles.some((r) => r.id === team.discord_role_id) ? team.discord_role_id : null
+  const created = !roleId
   if (roleId) {
     const role = roles.find((r) => r.id === roleId)
     if (role && role.name !== team.name) await editRole(guildId, roleId, { name: team.name }, REASON)
@@ -219,8 +222,18 @@ export async function syncTeam(
     await db.from('teams').update({ discord_role_id: roleId }).eq('id', teamId)
   }
 
+  // Keep team roles between Player and Captain (Discord creates new roles at the bottom).
+  // Cosmetic only, so a failure is logged and the sync carries on.
+  try {
+    const current = created ? await getGuildRoles(guildId) : roles
+    const moves = teamRolePlacement(current, roleId, settings.roles.player, settings.roles.captain)
+    if (moves.length) await setRolePositions(guildId, moves, REASON)
+  } catch (err) {
+    await logError(db, 'role_position', { team_id: teamId }, err)
+  }
+
   // Channel: reuse if it still exists (and refresh name and permissions), otherwise create.
-  const channelIds = opts.channelIds ?? new Set((await getGuildChannels(guildId)).map((c) => c.id))
+  const channelNames = opts.channelNames ?? new Map((await getGuildChannels(guildId)).map((c) => [c.id, c.name]))
   const overwrites = teamChannelOverwrites({
     guildId,
     teamRoleId: roleId,
@@ -228,9 +241,11 @@ export async function syncTeam(
     botUserId: env.botUserId,
   })
   const name = teamChannelName(team.tag, team.name)
-  let channelId = team.discord_channel_id && channelIds.has(team.discord_channel_id) ? team.discord_channel_id : null
+  let channelId = team.discord_channel_id && channelNames.has(team.discord_channel_id) ? team.discord_channel_id : null
   if (channelId) {
-    await editChannel(channelId, { name, parent_id: settings.team_category_id, permission_overwrites: overwrites }, REASON)
+    // Discord allows only 2 renames per channel per 10 minutes, so only send the name when it changed.
+    const rename = channelNames.get(channelId) !== name ? { name } : {}
+    await editChannel(channelId, { ...rename, parent_id: settings.team_category_id, permission_overwrites: overwrites }, REASON)
   } else {
     channelId = (
       await createChannel(
@@ -271,7 +286,7 @@ export async function fullResync(env: SyncEnv): Promise<SyncStats> {
   const stats = emptyStats()
   const guildRoles = await getGuildRoles(guildId)
   const settings = await ensureSettings(env, guildRoles)
-  const channelIds = new Set((await getGuildChannels(guildId)).map((c) => c.id))
+  const channelNames = new Map((await getGuildChannels(guildId)).map((c) => [c.id, c.name]))
 
   // Every team that is live, or that still has Discord ids to clean up.
   const { data: teams } = await db
@@ -282,7 +297,9 @@ export async function fullResync(env: SyncEnv): Promise<SyncStats> {
     const live = t.status === 'approved' && ACTIVE.includes((t.season as any).status)
     if (!live && !t.discord_role_id) continue
     try {
-      await syncTeam(env, t.id, settings, stats, { syncMembers: false, guildRoles, channelIds })
+      // No shared guildRoles here: moving a team role shifts other roles' positions, so each team
+      // reads the current order.
+      await syncTeam(env, t.id, settings, stats, { syncMembers: false, channelNames })
     } catch (err) {
       stats.errors++
       await logError(db, 'team_sync', { team_id: t.id }, err)

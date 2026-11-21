@@ -103,11 +103,13 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'My Team', eyebrow: 'Captain', description: 'Create or manage your team: roster, invites, logo and co-captain.', buildStep: 6, requiresAuth: true, player: true },
   },
   {
-    path: '/my-team/report/:matchId?',
+    // Discord's /report links here with ?prefill=<submission id> (step 21).
+    path: '/report/:matchId',
     name: 'report-match',
-    component: Placeholder,
-    meta: { title: 'Report Match', eyebrow: 'Captain', description: 'Submit the full scoreboard and screenshots.', buildStep: 14, requiresAuth: true, player: true },
+    component: () => import('@/views/ReportMatchView.vue'),
+    meta: { title: 'Report Match', requiresAuth: true, player: true },
   },
+  { path: '/my-team/report/:matchId', redirect: (to) => ({ name: 'report-match', params: to.params, query: to.query }) },
   {
     path: '/my-team/reschedules',
     name: 'reschedules',

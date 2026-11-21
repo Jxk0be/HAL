@@ -49,9 +49,9 @@ describe('ScoreChip', () => {
 })
 
 describe('TeamLogo', () => {
-  it('falls back to the tag when there is no logo', () => {
-    const w = mount(TeamLogo, { props: { tag: 'srph', name: 'Seraphim' } })
-    expect(w.text()).toBe('SRPH')
+  it('falls back to the tag, capitals as typed, when there is no logo', () => {
+    const w = mount(TeamLogo, { props: { tag: 'tV', name: 'Seraphim' } })
+    expect(w.text()).toBe('tV')
     expect(w.attributes('aria-label')).toBe('Seraphim logo')
   })
 })

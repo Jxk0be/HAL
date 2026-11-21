@@ -30,7 +30,7 @@ export function useTeamActions() {
     busy.value = true
     const { data, error } = await supabase
       .from('teams')
-      .insert({ season_id: input.seasonId, name: input.name.trim(), tag: input.tag.trim().toUpperCase(), captain_id: uid })
+      .insert({ season_id: input.seasonId, name: input.name.trim(), tag: input.tag.trim(), captain_id: uid })
       .select('id')
       .single()
     busy.value = false

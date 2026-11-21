@@ -1,5 +1,36 @@
 import { assertEquals } from 'jsr:@std/assert@1'
-import { desiredRoles, roleDiff, teamChannelName, teamChannelOverwrites, type FixedRoles } from './plan.ts'
+import { desiredRoles, roleDiff, teamChannelName, teamChannelOverwrites, teamRolePlacement, type FixedRoles } from './plan.ts'
+
+// Matches the real server: bot 7, admin 6, caster 5, captain 4, player 3, free agent 2, new team role 1.
+const guildRoles = [
+  { id: '100', position: 0 }, // @everyone
+  { id: '107', position: 7 },
+  { id: '106', position: 6 },
+  { id: '105', position: 5 },
+  { id: '104', position: 4 },
+  { id: '103', position: 3 },
+  { id: '102', position: 2 },
+  { id: '101', position: 1 },
+]
+
+Deno.test('a new team role moves directly above Player', () => {
+  assertEquals(teamRolePlacement(guildRoles, '101', '103', '104'), [
+    { id: '102', position: 1 },
+    { id: '103', position: 2 },
+    { id: '101', position: 3 },
+  ])
+})
+
+Deno.test('a team role already between Player and Captain stays put', () => {
+  const placed = guildRoles.map((r) => ({ ...r, position: { '101': 3, '102': 1, '103': 2 }[r.id] ?? r.position }))
+  assertEquals(teamRolePlacement(placed, '101', '103', '104'), [])
+})
+
+Deno.test('a team role above Captain is moved down', () => {
+  const high = guildRoles.map((r) => (r.id === '101' ? { ...r, position: 5 } : r.id === '105' ? { ...r, position: 1 } : r))
+  // order by position: 105(1),102(2),103(3),104(4),101(5),106,107 -> 105,102,103,101,104,106,107
+  assertEquals(teamRolePlacement(high, '101', '103', '104'), [{ id: '101', position: 4 }, { id: '104', position: 5 }])
+})
 
 const fixed: FixedRoles = { captain: 'cap', free_agent: 'fa', admin: 'adm', caster: 'cst', player: 'ply' }
 const base = { teamRoleId: null, isCaptain: false, isFreeAgent: false, profileComplete: true, banned: false, staffRoles: [] }
@@ -27,9 +58,11 @@ Deno.test('roleDiff only removes roles HAL manages', () => {
 })
 
 Deno.test('team channel names', () => {
-  assertEquals(teamChannelName('SRPH', 'Seraphim Esports!'), 'srph-seraphim-esports')
-  assertEquals(teamChannelName('ÉLT', 'Élite'), 'elt-elite')
+  // Matches what Discord stored when tested on the real server.
+  assertEquals(teamChannelName('tV', 'Team Vectorize'), '【𝘁𝗩】𝗧𝗲𝗮𝗺-𝗩𝗲𝗰𝘁𝗼𝗿𝗶𝘇𝗲')
+  assertEquals(teamChannelName('ÉLT', 'Élite 2!'), '【𝗘𝗟𝗧】𝗘𝗹𝗶𝘁𝗲-𝟮')
   assertEquals(teamChannelName('??', '!!'), 'team')
+  assertEquals(teamChannelName('AB', 'x'.repeat(60)).length <= 100, true)
 })
 
 Deno.test('team channel is hidden from everyone but the team, admins and the bot', () => {

@@ -46,7 +46,7 @@ function onFile(e: Event) {
 function submit() {
   touched.value = true
   if (errors.value.name || errors.value.tag || logoError.value) return
-  emit('submit', { name: form.name.trim(), tag: form.tag.trim().toUpperCase(), logo: logo.value })
+  emit('submit', { name: form.name.trim(), tag: form.tag.trim(), logo: logo.value })
 }
 </script>
 
@@ -65,7 +65,7 @@ function submit() {
         label="Tag"
         placeholder="SRPH"
         required
-        hint="2–4 characters"
+        hint="2–4 letters or numbers. Capitals are kept as typed (e.g. tV)."
         :error="touched ? (errors.tag ?? undefined) : undefined"
       />
     </div>

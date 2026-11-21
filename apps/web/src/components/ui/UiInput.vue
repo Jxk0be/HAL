@@ -11,6 +11,8 @@ withDefaults(
     required?: boolean
     disabled?: boolean
     autocomplete?: string
+    /** id of a <datalist> with suggestions. */
+    list?: string
     /** Visually hide the label (still read by screen readers). */
     hideLabel?: boolean
   }>(),
@@ -41,6 +43,7 @@ const id = useId()
         :required="required"
         :disabled="disabled"
         :autocomplete="autocomplete"
+        :list="list"
         :aria-invalid="error ? true : undefined"
         :aria-describedby="error || hint ? `${id}-desc` : undefined"
         class="h-10 w-full rounded-md border bg-surface-2 px-3 text-sm text-text placeholder:text-faint transition-colors focus:border-gold-dim focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-0 disabled:opacity-50"

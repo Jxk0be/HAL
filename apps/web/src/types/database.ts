@@ -687,6 +687,7 @@ export type Database = {
           home_team_id: string
           id: string
           playoff_round: number | null
+          result_source: Database["public"]["Enums"]["result_source"] | null
           scheduled_at: string
           season_id: string
           stage: Database["public"]["Enums"]["match_stage"]
@@ -710,6 +711,7 @@ export type Database = {
           home_team_id: string
           id?: string
           playoff_round?: number | null
+          result_source?: Database["public"]["Enums"]["result_source"] | null
           scheduled_at: string
           season_id: string
           stage?: Database["public"]["Enums"]["match_stage"]
@@ -733,6 +735,7 @@ export type Database = {
           home_team_id?: string
           id?: string
           playoff_round?: number | null
+          result_source?: Database["public"]["Enums"]["result_source"] | null
           scheduled_at?: string
           season_id?: string
           stage?: Database["public"]["Enums"]["match_stage"]
@@ -2164,6 +2167,15 @@ export type Database = {
       }
     }
     Functions: {
+      apply_reports: {
+        Args: {
+          p_away: Database["public"]["Tables"]["report_submissions"]["Row"]
+          p_home: Database["public"]["Tables"]["report_submissions"]["Row"]
+          p_match_id: string
+          p_source: Database["public"]["Enums"]["result_source"]
+        }
+        Returns: Database["public"]["Enums"]["match_status"]
+      }
       audit_log_feed: {
         Args: never
         Returns: {
@@ -2197,6 +2209,7 @@ export type Database = {
         }
         Returns: string
       }
+      auto_confirm_reports: { Args: never; Returns: number }
       can_staff_match: { Args: { p_match_id: string }; Returns: boolean }
       can_staff_match_for: {
         Args: { p_match_id: string; p_user_id: string }
@@ -2208,6 +2221,10 @@ export type Database = {
         Returns: boolean
       }
       cancel_invite: { Args: { p_invite_id: string }; Returns: undefined }
+      compare_reports: {
+        Args: { p_match_id: string }
+        Returns: Database["public"]["Enums"]["match_status"]
+      }
       create_matches: {
         Args: { p_matches: Json; p_replace?: boolean; p_season_id: string }
         Returns: number
@@ -2310,6 +2327,8 @@ export type Database = {
       match_captain_team: { Args: { p_match_id: string }; Returns: string }
       match_of_dispute: { Args: { p_dispute_id: string }; Returns: string }
       match_of_map: { Args: { p_match_map_id: string }; Returns: string }
+      match_settled: { Args: { p_match_id: string }; Returns: boolean }
+      my_match_report_status: { Args: { p_match_id: string }; Returns: Json }
       my_team_ids: { Args: { p_season_id: string }; Returns: string[] }
       player_directory: {
         Args: {
@@ -2341,6 +2360,10 @@ export type Database = {
         Args: { p_team_id: string; p_user_id: string }
         Returns: undefined
       }
+      report_int: {
+        Args: { p: Json; p_key: string; p_label: string; p_max: number }
+        Returns: number
+      }
       request_my_discord_sync: { Args: never; Returns: boolean }
       respond_to_invite: {
         Args: { p_accept: boolean; p_invite_id: string }
@@ -2349,6 +2372,14 @@ export type Database = {
       set_broadcast: {
         Args: { p_live: boolean; p_match_id: string; p_url?: string }
         Returns: undefined
+      }
+      submit_report: {
+        Args: {
+          p_match_id: string
+          p_report: Json
+          p_source?: Database["public"]["Enums"]["submission_source"]
+        }
+        Returns: Database["public"]["Enums"]["match_status"]
       }
       team_open_spots: {
         Args: { p_team_id: string }
@@ -2400,6 +2431,7 @@ export type Database = {
         | "declined"
         | "expired"
         | "cancelled"
+      result_source: "double_entry" | "single_report" | "admin" | "forfeit"
       roster_request_type: "add" | "drop" | "emergency_sub"
       season_status: "draft" | "signups" | "regular" | "playoffs" | "complete"
       staff_role: "owner" | "admin" | "caster"
@@ -2572,6 +2604,7 @@ export const Constants = {
         "expired",
         "cancelled",
       ],
+      result_source: ["double_entry", "single_report", "admin", "forfeit"],
       roster_request_type: ["add", "drop", "emergency_sub"],
       season_status: ["draft", "signups", "regular", "playoffs", "complete"],
       staff_role: ["owner", "admin", "caster"],

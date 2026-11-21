@@ -42,6 +42,6 @@ const sizes = {
       loading="lazy"
       @error="failed = true"
     />
-    <template v-else>{{ tag.toUpperCase() }}</template>
+    <template v-else>{{ tag }}</template>
   </span>
 </template>

@@ -9,12 +9,37 @@ import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import MatchStatus from '@/components/match/MatchStatus.vue'
+import ReportStatusPanel from '@/components/report/ReportStatusPanel.vue'
 import { useMatchDetail } from '@/composables/useMatches'
+import { useReportStatus } from '@/composables/useReport'
+import { useAuthStore } from '@/stores/auth'
 import { site } from '@/config/site'
 
 const route = useRoute()
+const auth = useAuthStore()
 const id = computed(() => (typeof route.params.id === 'string' ? route.params.id : null))
 const { match, maps, screenshots, checkins, dispute, loading } = useMatchDetail(id)
+// Only returned to the two teams and staff.
+const { status: reportStatus } = useReportStatus(id)
+
+const mySide = computed(() => {
+  const m = match.value
+  const t = auth.team
+  if (!m || !t) return null
+  return t.id === m.home.id ? 'home' : t.id === m.away.id ? 'away' : null
+})
+const canReport = computed(() => {
+  const m = match.value
+  const t = auth.team
+  return Boolean(
+    m && t && mySide.value && (t.isCaptain || t.isCoCaptain)
+      && !['confirmed', 'forfeit', 'cancelled'].includes(m.status)
+      && new Date(m.scheduledAt).getTime() <= Date.now(),
+  )
+})
+const iReported = computed(() =>
+  Boolean(reportStatus.value && (mySide.value === 'home' ? reportStatus.value.homeReportedAt : reportStatus.value.awayReportedAt)),
+)
 
 const final = computed(() => match.value?.status === 'confirmed' || match.value?.status === 'forfeit')
 const series = (side: 'home' | 'away') => {
@@ -81,6 +106,17 @@ watch(match, (m) => {
       </section>
 
       <div class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6">
+        <UiCard
+          v-if="reportStatus && !['forfeit', 'cancelled'].includes(match.status)"
+          eyebrow="Teams and staff only"
+          title="Match reports"
+        >
+          <ReportStatusPanel :status="reportStatus" :home-tag="match.home.tag" :away-tag="match.away.tag" :my-team-side="mySide" />
+          <div v-if="canReport" class="mt-4">
+            <UiButton :to="`/report/${match.id}`">{{ iReported ? 'Update your report' : 'Report this match' }}</UiButton>
+          </div>
+        </UiCard>
+
         <UiCard v-if="dispute" eyebrow="Dispute" :title="dispute.status === 'open' ? 'Under review' : 'Resolved'">
           <p class="text-sm text-muted">{{ dispute.reason }}</p>
           <p v-if="dispute.resolution" class="mt-3 text-sm"><strong class="text-gold">Decision:</strong> {{ dispute.resolution }}</p>
@@ -143,7 +179,7 @@ watch(match, (m) => {
 
         <section v-if="screenshots.length" aria-labelledby="shots-title">
           <h2 id="shots-title" class="eyebrow mb-1 text-gold">Screenshots</h2>
-          <p class="mb-3 text-xs text-muted">Visible to the two teams and league staff only.</p>
+          <p class="mb-3 text-xs text-muted">Visible to the two teams and league staff only. Until the result is confirmed, each team sees just its own.</p>
           <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <li v-for="s in screenshots" :key="s.path">
               <a :href="s.url" target="_blank" rel="noopener noreferrer" class="block overflow-hidden rounded-md border border-line hover:border-gold-dim">

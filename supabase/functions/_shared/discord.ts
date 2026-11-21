@@ -48,10 +48,16 @@ export async function discordRequest<T = unknown>(
       headers,
       body: opts.body === undefined ? undefined : JSON.stringify(opts.body),
     })
-    if (res.status === 429 && attempt < 3) {
+    if (res.status === 429) {
       const data = (await res.json().catch(() => ({}))) as { retry_after?: number }
-      await sleep(Math.ceil((data.retry_after ?? 1) * 1000) + 50)
-      continue
+      const wait = data.retry_after ?? 1
+      // Short limits are retried; long ones (e.g. channel renames: 2 per 10 minutes) fail fast so
+      // the function doesn't hang. The error is logged and the next sync tries again.
+      if (attempt < 3 && wait <= 10) {
+        await sleep(Math.ceil(wait * 1000) + 50)
+        continue
+      }
+      throw new DiscordError(429, data, path)
     }
     if (res.status === 204) return undefined as T
     const data = await res.json().catch(() => null)
@@ -190,6 +196,10 @@ export const getGuildMember = (guildId: string, userId: string) =>
 
 export const editRole = (guildId: string, roleId: string, patch: { name?: string; color?: number }, reason?: string) =>
   discordRequest('PATCH', `/guilds/${guildId}/roles/${roleId}`, { body: patch, reason })
+
+/** Bulk-move roles. Only roles below the bot's highest role can be moved. */
+export const setRolePositions = (guildId: string, positions: { id: string; position: number }[], reason?: string) =>
+  discordRequest('PATCH', `/guilds/${guildId}/roles`, { body: positions, reason })
 
 export const editChannel = (
   channelId: string,

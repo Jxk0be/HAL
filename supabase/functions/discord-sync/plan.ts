@@ -58,15 +58,39 @@ export function roleDiff(
   }
 }
 
-/** Team channel name, e.g. "srph-seraphim". */
-export function teamChannelName(tag: string, name: string): string {
-  const slug = `${tag}-${name}`
-    .toLowerCase()
+/**
+ * Mathematical sans-serif bold letters and digits. Discord lowercases ASCII in text channel names
+ * but leaves these alone, so team tags and names keep their capitals.
+ */
+export function boldText(s: string): string {
+  return Array.from(s, (ch) => {
+    const c = ch.codePointAt(0) ?? 0
+    if (c >= 65 && c <= 90) return String.fromCodePoint(0x1d5d4 + c - 65) // A-Z
+    if (c >= 97 && c <= 122) return String.fromCodePoint(0x1d5ee + c - 97) // a-z
+    if (c >= 48 && c <= 57) return String.fromCodePoint(0x1d7ec + c - 48) // 0-9
+    return ch
+  }).join('')
+}
+
+/** ASCII letters, digits and single dashes (accents dropped, case kept). */
+function slug(s: string): string {
+  return s
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/[^A-Za-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
-  return (slug || 'team').slice(0, 90)
+}
+
+/**
+ * Team channel name, e.g. "【𝘁𝗩】𝗧𝗲𝗮𝗺-𝗩𝗲𝗰𝘁𝗼𝗿𝗶𝘇𝗲". Discord strips ASCII [ ] and turns spaces into
+ * dashes, but keeps the 【】 brackets and the bold letters. Bold letters are two UTF-16 units each,
+ * so the name is capped well under Discord's 100-character limit.
+ */
+export function teamChannelName(tag: string, name: string): string {
+  const t = slug(tag)
+  const n = Array.from(slug(name)).slice(0, 40).join('')
+  if (!t && !n) return 'team'
+  return `${t ? `【${boldText(t)}】` : ''}${boldText(n || 'team')}`
 }
 
 /**
@@ -94,6 +118,35 @@ export function teamChannelOverwrites(opts: {
     { id: opts.adminRoleId, type: 0, allow: member },
     { id: opts.botUserId, type: 1, allow: member },
   ]
+}
+
+export interface RolePosition {
+  id: string
+  position: number
+}
+
+/**
+ * Team roles belong between Player and Captain. Returns the role position changes needed to put
+ * `roleId` directly above Player, or [] if it already sits between the two (so resyncs don't
+ * reshuffle teams). Discord creates new roles at the bottom; @everyone (position 0) never moves.
+ */
+export function teamRolePlacement(roles: RolePosition[], roleId: string, playerId: string, captainId: string): RolePosition[] {
+  const pos = (id: string) => roles.find((r) => r.id === id)?.position
+  const role = pos(roleId)
+  const player = pos(playerId)
+  const captain = pos(captainId)
+  if (role === undefined || player === undefined || captain === undefined) return []
+  if (role > player && role < captain) return []
+
+  // Discord orders by position, then by id for ties.
+  const ordered = roles
+    .filter((r) => r.position > 0 && r.id !== roleId)
+    .sort((a, b) => a.position - b.position || (BigInt(a.id) < BigInt(b.id) ? -1 : 1))
+  const at = ordered.findIndex((r) => r.id === playerId)
+  ordered.splice(at + 1, 0, { id: roleId, position: role })
+  return ordered
+    .map((r, i) => ({ id: r.id, position: i + 1 }))
+    .filter((r) => r.position !== roles.find((o) => o.id === r.id)?.position)
 }
 
 /** Fixed role names and colours (created on first full_resync if missing). */

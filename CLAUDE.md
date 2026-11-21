@@ -165,6 +165,9 @@ The step-by-step build plan is `hal-build-guide.html` (kept outside the repo); e
     - The function reads the secret through the service-role-only `discord_sync_secret()`.
   - The function recomputes the desired state each time, so every call is idempotent.
     - `plan.ts` holds the pure rules: `desiredRoles`, `roleDiff` (only removes HAL-managed roles), and team channel names and permissions. `sync.ts` does the I/O.
+    - Team channel names are `【tag】Name` in mathematical sans-serif bold (`boldText`), e.g. 【𝘁𝗩】𝗧𝗲𝗮𝗺-𝗩𝗲𝗰𝘁𝗼𝗿𝗶𝘇𝗲, because Discord lowercases ASCII, turns spaces into dashes and strips [ ]. Tested on the live server.
+    - Discord allows only 2 renames per channel per 10 minutes: the sync sends a name only when it changed, and `discordRequest` throws on any 429 longer than 10s instead of sleeping (logged to `discord_sync_errors`; the next sync retries).
+    - Team tags keep the capitals the captain types (`tV`); the database allows 2–5 letters or digits in any case.
     - Fixed roles (Captain, Player, Free Agent, HAL Admin, HAL Caster) and the "Team Channels" category are created on first use (matched by name if they already exist), with their ids stored in `app_settings.discord`.
     - Team role and channel ids are stored on `teams`. Team channels are visible only to the team role, HAL Admin and the bot.
   - Who gets which role:
@@ -175,7 +178,7 @@ The step-by-step build plan is `hal-build-guide.html` (kept outside the repo); e
   - The audit trigger ignores changes that only touch Discord ids or `discord_synced_at`.
   - pg_net is installed in the `extensions` schema; call it as `net.http_post`.
 - Season admin (step 12):
-  - `/admin/season` has six tabs: Season (only the owner can edit), Team approvals (deny sets `status = removed` plus a `review_note` shown on the captain's My Team page), Divisions (owner), Modes & maps (admins), Schedule and Playoffs (admins).
+  - `/admin/season` has six tabs: Season (only the owner can edit), Team approvals (deny sets `status = removed` plus a `review_note` shown on the captain's My Team page), Divisions (owner), Modes & maps (admins: add a mode, select it, then add its maps; a map name in several modes is one `maps` row linked through `map_modes`, and removing it only unlinks it from that mode), Schedule and Playoffs (admins).
   - Data hooks: `useSeasonAdmin`, `useGameData`, `useSeasonMatches`. Team and match edits that return 0 rows mean the editor is recused, and the hooks report that.
   - Time maths lives in `src/lib/time.ts`: `zonedToUtc` (DST-safe via Intl), `toZoned`, `formatLeagueTime` ("Tue, Jan 12 · 9:00 PM ET"). Don't hand-roll offsets elsewhere.
   - Schedule generator (`src/lib/schedule.ts`): circle-method round robin over weeks × nights rounds. Later cycles rotate, home/away is balanced greedily, odd team counts get byes, and a seeded shuffle drives Regenerate. `playoffPairs` / `bracketOrder` produce 1v8, 4v5, 2v7, 3v6.
@@ -192,8 +195,17 @@ The step-by-step build plan is `hal-build-guide.html` (kept outside the repo); e
   - Realtime: `matches` and `match_maps` are in the `supabase_realtime` publication. `useRealtime(name, tables, cb)` debounces reloads.
   - Data hooks: `useSeasonSchedule` (the whole season's matches, filtered client-side), `useMatchDetail`, `useStandings`, `useLeaderboards`, `useTeamRecord`, `useTeamModeRecords`, `usePlayerStats`, `useAuditLog`, `useDivisions`.
   - Times: show them with `LeagueTime` (the viewer's local time, with Eastern on hover).
-  - Match detail: screenshots come from `report_submissions` (RLS limits them to the two teams and staff) as one-hour signed URLs. Check-ins are visible to the teams and staff only.
+  - Match detail: screenshots come from `report_submissions` as one-hour signed URLs. RLS shows each team only its own until the match is settled, then both teams; staff always. Check-ins are visible to the teams and staff only.
   - Tests: `supabase/tests/stats_test.sql` and `supabase/tests/schedule_test.sql`.
+- Match reporting (step 14):
+  - Form at `/report/:matchId` (`ReportMatchView`, the old `/my-team/report/:id` redirects there). Discord's `/report` (step 21) links with `?prefill=<report_submissions id>`. Captains and co-captains of either team only, from the scheduled time until the match is settled.
+  - Form logic is pure and tested in `src/lib/reporting.ts` (`seriesState`, `mapsNeeded`, `validateReport`, `toPayload`, `fromSubmission`, `parsePastedRow`, `describeMismatch`). Data and uploads go through `useReport()` / `useReportStatus()`. `StatGrid` is the keyboard-first stat table: Enter = next cell, arrows move, pasting a spreadsheet row (or several) fills across and down.
+  - Screenshots are compressed in the browser (`compressImage` in `src/lib/image.ts`, max 1920px, WebP) and stored at `screenshots/matches/{match}/{team}/map{n}-<id>.webp`. Drafts autosave to localStorage per match and team (`hal:report-draft:…`) until the first submit.
+  - Submit only through the `submit_report(match, report jsonb, source)` RPC. It re-checks everything: captain, match time, 3–5 maps, first to 3 with nothing after the decider, no ties, map legal for the mode, at least one uploaded screenshot per map in the team's own folder, and 4 rostered players per team per map. Captains have no direct insert/update on `report_submissions` (staff can update, recused).
+  - Every report insert, update or delete triggers `compare_reports(match)`, which calls `apply_reports(match, home, away, source)`. That rebuilds `match_maps`, `player_map_stats` and `stat_mismatches` from scratch, so it is idempotent. Map differences (played/mode/map/scores) set the match `disputed`. Player-stat differences only mark that map's `stats_status = mismatch` (one `stat_mismatches` row per differing field), and the result is still confirmed. These derived writes skip the audit log (`hal.no_audit`).
+  - Captains never see the opponent's report, screenshots or mismatch values before the match is settled. `stat_mismatches` is staff-only (recused); parties call `my_match_report_status(match)` for which side reported and which fields differ.
+  - 24-hour rule: pg_cron job `hal-auto-confirm-reports` (every 15 min) runs `auto_confirm_reports()`. It accepts a lone report that has screenshots for every map once the match is 24h past `scheduled_at`, sets `matches.result_source = 'single_report'` and writes one 'system' audit entry. `result_source` is `double_entry | single_report | admin | forfeit`.
+  - Tests: `supabase/tests/reporting_test.sql` (25 checks: validation, identical reports, one kill different, map mismatch then correction, privacy, 24-hour rule).
 - Test seasons: only one active season can exist, so tests reuse it (forced to `signups` inside the rolled-back block). `supabase/tests/free_agents_test.sql` covers the board, privacy and posts.
 - Check every page at 375px (no horizontal scroll). Don't put responsive `hidden`/`sm:inline-flex` classes on a component whose root already sets `display`; wrap it in a span instead.
 
