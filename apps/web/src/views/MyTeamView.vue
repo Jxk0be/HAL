@@ -104,6 +104,17 @@ async function leave() {
   toast.show(`You left ${t.name}. You're back on the free agent list.`)
 }
 
+// Disband (captain only)
+const disbandOpen = ref(false)
+async function disband() {
+  const t = team.value
+  if (!t) return
+  const r = await actions.disbandTeam(t.id)
+  disbandOpen.value = false
+  if (!r.ok) return toast.error(r.message)
+  toast.show(`${t.name} is disbanded. Everyone on it, you included, is back on the free agent list.`)
+}
+
 const lockDate = computed(() =>
   rules.value?.roster_lock_at
     ? new Date(rules.value.roster_lock_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
@@ -228,9 +239,10 @@ const lockDate = computed(() =>
             <div v-if="!isCaptain" class="mt-5 border-t border-line pt-4">
               <UiButton variant="danger" size="sm" @click="leaveOpen = true">Leave team</UiButton>
             </div>
-            <p v-else class="mt-5 border-t border-line pt-4 text-xs text-muted">
-              To leave, make another player captain first.
-            </p>
+            <div v-else class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+              <p class="text-xs text-muted">To leave, make another player captain first, or disband the team.</p>
+              <UiButton variant="danger" size="sm" @click="disbandOpen = true">Disband team</UiButton>
+            </div>
           </UiCard>
 
           <div class="flex flex-col gap-6">
@@ -272,6 +284,23 @@ const lockDate = computed(() =>
           <template #footer>
             <UiButton variant="ghost" @click="leaveOpen = false">Stay</UiButton>
             <UiButton variant="danger" :loading="actions.busy.value" @click="leave">Leave team</UiButton>
+          </template>
+        </UiModal>
+
+        <UiModal v-model="disbandOpen" :title="`Disband ${team.name}?`" size="sm">
+          <div class="flex flex-col gap-3 text-sm text-muted">
+            <p>
+              Everyone on the roster, you included, leaves the team and goes back on the free agent list. The team's Discord role and
+              channel are deleted.
+            </p>
+            <p>
+              If the team has already been scheduled for matches, it stays on record as removed and an admin sorts out those matches.
+              This can't be undone, and it's shown on the public audit log.
+            </p>
+          </div>
+          <template #footer>
+            <UiButton variant="ghost" @click="disbandOpen = false">Keep team</UiButton>
+            <UiButton variant="danger" :loading="actions.busy.value" @click="disband">Disband team</UiButton>
           </template>
         </UiModal>
       </div>

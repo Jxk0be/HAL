@@ -74,6 +74,13 @@ export function useTeamActions() {
     return result
   }
 
+  /** Captain only: every player (captain included) becomes a free agent; see disband_team(). */
+  async function disbandTeam(teamId: string) {
+    const result = await run(() => supabase.rpc('disband_team', { p_team_id: teamId }))
+    if (result.ok) await auth.refresh()
+    return result
+  }
+
   const invite = (teamId: string, userId: string, role?: MemberRole) =>
     run(() => supabase.rpc('invite_player', { p_team_id: teamId, p_user_id: userId, p_role: role }))
 
@@ -89,6 +96,7 @@ export function useTeamActions() {
     transferCaptaincy,
     removePlayer,
     leaveTeam,
+    disbandTeam,
     invite,
     cancelInvite,
   }

@@ -2652,6 +2652,8 @@ export type Database = {
         Args: { p_matches: Json; p_replace?: boolean; p_season_id: string }
         Returns: number
       }
+      delete_team_core: { Args: { p_team_id: string }; Returns: Json }
+      disband_team: { Args: { p_team_id: string }; Returns: Json }
       discord_scheduler_tick: { Args: never; Returns: undefined }
       discord_sync_enqueue: {
         Args: { p_action: string; p_payload?: Json }

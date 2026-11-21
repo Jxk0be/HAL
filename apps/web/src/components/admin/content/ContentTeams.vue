@@ -79,7 +79,7 @@ async function confirmDelete() {
       <li v-for="t in filtered" :key="t.id" class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 text-sm" :class="isRecused(t.id) ? 'opacity-70' : ''">
         <span class="min-w-48 flex-1">
           <RouterLink :to="`/teams/${t.id}`" class="font-medium hover:text-gold">{{ t.name }} [{{ t.tag }}]</RouterLink>
-          <span class="block text-xs text-muted">{{ t.rosterSize }} players · {{ t.forfeits }} forfeits</span>
+          <span class="block text-xs text-muted">{{ t.rosterSize }} {{ t.rosterSize === 1 ? 'player' : 'players' }} · {{ t.forfeits }} {{ t.forfeits === 1 ? 'forfeit' : 'forfeits' }}</span>
         </span>
         <UiBadge :variant="t.status === 'approved' ? 'win' : t.status === 'removed' ? 'loss' : 'gold'">{{ t.status }}</UiBadge>
         <RecusedNotice v-if="isRecused(t.id)" />
