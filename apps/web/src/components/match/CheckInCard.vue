@@ -71,7 +71,7 @@ const showForm = computed(() => props.captainOf && open.value && (!mine.value ||
           <fieldset>
             <legend class="font-medium">Pick your 4 players <span class="font-normal text-muted">({{ picked.length }}/4)</span></legend>
             <p v-if="players.length < 4" class="mt-1 text-loss">
-              Only {{ players.length }} eligible players. Players must be on the roster 24 hours before the match; ask an admin about an emergency sub.
+              Only {{ players.length }} eligible players. Players must be on the roster 24 hours before the match; request an emergency sub below.
             </p>
             <ul class="mt-2 grid gap-2 sm:grid-cols-2">
               <li v-for="p in players" :key="p.userId">

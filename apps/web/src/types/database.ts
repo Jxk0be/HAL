@@ -778,6 +778,100 @@ export type Database = {
         }
         Relationships: []
       }
+      match_absences: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          match_id: string
+          reason: string | null
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          match_id: string
+          reason?: string | null
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          match_id?: string
+          reason?: string | null
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_absences_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_absences_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_absences_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_absences_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
+          {
+            foreignKeyName: "match_absences_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_absences_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_absences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_absences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_absences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_maps: {
         Row: {
           away_score: number | null
@@ -1272,6 +1366,86 @@ export type Database = {
           },
         ]
       }
+      player_stat_flags: {
+        Row: {
+          created_at: string
+          flagged_by: string | null
+          id: string
+          note: string | null
+          season_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          flagged_by?: string | null
+          id?: string
+          note?: string | null
+          season_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          flagged_by?: string | null
+          id?: string
+          note?: string | null
+          season_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_stat_flags_flagged_by_fkey"
+            columns: ["flagged_by"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_stat_flags_flagged_by_fkey"
+            columns: ["flagged_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_stat_flags_flagged_by_fkey"
+            columns: ["flagged_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_stat_flags_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_stat_flags_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_stat_flags_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_stat_flags_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           activision_id: string | null
@@ -1599,6 +1773,8 @@ export type Database = {
           id: string
           match_id: string | null
           note: string | null
+          player_confirmed_at: string | null
+          player_declined_at: string | null
           requested_by: string
           reviewed_at: string | null
           reviewed_by: string | null
@@ -1613,6 +1789,8 @@ export type Database = {
           id?: string
           match_id?: string | null
           note?: string | null
+          player_confirmed_at?: string | null
+          player_declined_at?: string | null
           requested_by: string
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -1627,6 +1805,8 @@ export type Database = {
           id?: string
           match_id?: string | null
           note?: string | null
+          player_confirmed_at?: string | null
+          player_declined_at?: string | null
           requested_by?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -2603,6 +2783,10 @@ export type Database = {
         Returns: string
       }
       auto_confirm_reports: { Args: never; Returns: number }
+      available_players: {
+        Args: { p_match_id: string; p_team_id: string }
+        Returns: number
+      }
       ban_player: {
         Args: { p_reason: string; p_until: string; p_user_id: string }
         Returns: undefined
@@ -2613,6 +2797,10 @@ export type Database = {
           caster: string
           match_id: string
         }[]
+      }
+      can_flag_player_stats: {
+        Args: { p_season_id: string; p_user_id: string }
+        Returns: boolean
       }
       can_staff_match: { Args: { p_match_id: string }; Returns: boolean }
       can_staff_match_for: {
@@ -2893,6 +3081,17 @@ export type Database = {
           week: number
         }[]
       }
+      request_emergency_sub: {
+        Args: {
+          p_match_id: string
+          p_note?: string
+          p_out_ids?: string[]
+          p_reason?: string
+          p_team_id: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       request_my_discord_sync: { Args: never; Returns: boolean }
       request_reschedule: {
         Args: { p_match_id: string; p_proposed_at: string }
@@ -2918,6 +3117,14 @@ export type Database = {
         Args: { p_choice: string; p_mismatch_id: string; p_value?: string }
         Returns: Json
       }
+      respond_emergency_sub: {
+        Args: { p_accept: boolean; p_request_id: string }
+        Returns: Json
+      }
+      respond_emergency_sub_as: {
+        Args: { p_accept: boolean; p_actor: string; p_request_id: string }
+        Returns: Json
+      }
       respond_reschedule: {
         Args: { p_accept: boolean; p_request_id: string }
         Returns: undefined
@@ -2929,6 +3136,25 @@ export type Database = {
       respond_to_invite: {
         Args: { p_accept: boolean; p_invite_id: string }
         Returns: undefined
+      }
+      season_leaderboard: {
+        Args: { p_season_id: string }
+        Returns: {
+          activision_id: string
+          avatar_url: string
+          avg_score: number
+          deaths: number
+          incomplete: boolean
+          incomplete_reason: string
+          kd: number
+          kills: number
+          maps_played: number
+          plus_minus: number
+          team_id: string
+          team_name: string
+          team_tag: string
+          user_id: string
+        }[]
       }
       series_from_maps: { Args: { p_match_id: string }; Returns: Json }
       set_broadcast: {

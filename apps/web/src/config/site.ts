@@ -14,6 +14,7 @@ export const mainNav = [
   { label: 'Home', to: '/' },
   { label: 'Matches', to: '/matches' },
   { label: 'Standings', to: '/standings' },
+  { label: 'Leaderboard', to: '/leaderboard' },
   { label: 'Teams', to: '/teams' },
   { label: 'Players', to: '/players' },
   { label: 'Free Agents', to: '/free-agents' },

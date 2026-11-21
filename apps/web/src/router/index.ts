@@ -28,6 +28,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Standings' },
   },
   {
+    path: '/leaderboard',
+    name: 'leaderboard',
+    component: () => import('@/views/LeaderboardView.vue'),
+    meta: { title: 'Leaderboard' },
+  },
+  {
     path: '/teams',
     name: 'teams',
     component: () => import('@/views/TeamsView.vue'),

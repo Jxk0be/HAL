@@ -70,6 +70,13 @@ export interface ChannelSettings {
   admin: string | null
 }
 
+/** The HAL Admin role id (stored by discord-sync in app_settings.discord), for admin pings. */
+export async function loadAdminRoleId(db: SupabaseClient): Promise<string | null> {
+  const { data } = await db.from('app_settings').select('value').eq('key', 'discord').maybeSingle()
+  // deno-lint-ignore no-explicit-any
+  return ((data?.value as any)?.roles?.admin as string | undefined) ?? null
+}
+
 export async function loadChannels(db: SupabaseClient): Promise<ChannelSettings> {
   const { data } = await db.from('app_settings').select('value').eq('key', 'discord_channels').maybeSingle()
   const v = (data?.value ?? {}) as Partial<Record<keyof ChannelSettings, string>>

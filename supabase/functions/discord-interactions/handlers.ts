@@ -6,6 +6,7 @@ import { rescheduleAutocomplete, rescheduleButton, rescheduleCommand } from './r
 import { reportAutocomplete, reportCommand, reportModal } from './report.ts'
 import { disputeAutocomplete, disputeCommand, disputeModal } from './dispute.ts'
 import { helpCommand } from './help.ts'
+import { esubButton } from './esub.ts'
 
 /**
  * Command, component, modal and autocomplete handlers. Later steps register more here:
@@ -51,6 +52,7 @@ export const registry: Registry = {
     checkin: checkinHandler,
     lfg: lfgButton,
     reschedule: rescheduleButton,
+    esub: esubButton,
   },
   modals: {
     lfg: lfgModalHandler,

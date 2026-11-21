@@ -30,10 +30,10 @@ async function review(q: RosterRequestRow, approve: boolean) {
 
 <template>
   <div>
-    <PageHeader eyebrow="Admin" title="Roster approvals" description="Pending emergency subs and roster fixes. An approved emergency sub joins the roster for that one match only." />
+    <PageHeader eyebrow="Admin" title="Roster approvals" description="Pending emergency subs and roster fixes. The free agent accepts first, then you approve; an approved emergency sub plays that one match only." />
     <div class="px-4 py-8 sm:px-6">
       <UiSkeleton v-if="loading" :lines="5" />
-      <UiEmptyState v-else-if="!rows.length" title="No pending requests" description="Captains request emergency subs from their My Team page." />
+      <UiEmptyState v-else-if="!rows.length" title="No pending requests" description="Captains request emergency subs from the match page." />
       <ul v-else class="flex flex-col gap-3">
         <li v-for="q in rows" :key="q.id" class="rounded-lg border border-line bg-surface p-4" :class="recused(q) ? 'opacity-70' : ''">
           <div class="flex flex-wrap items-start justify-between gap-3">
@@ -53,8 +53,15 @@ async function review(q: RosterRequestRow, approve: boolean) {
                 Changes {{ q.team.changesUsed }}/{{ q.team.maxChanges }}
               </UiBadge>
               <UiBadge :variant="locked(q) ? 'loss' : 'win'">{{ locked(q) ? 'Rosters locked' : 'Rosters open' }}</UiBadge>
+              <UiBadge v-if="q.type === 'emergency_sub'" :variant="q.playerAccepted ? 'win' : 'neutral'">
+                {{ q.playerAccepted ? 'Player accepted' : 'Waiting for the player' }}
+              </UiBadge>
             </span>
           </div>
+          <p v-if="q.out.length" class="mt-2 text-sm">
+            <span class="text-muted">Out for this match:</span>
+            <template v-for="(o, i) in q.out" :key="i">{{ i ? ', ' : ' ' }}<strong>{{ o.name }}</strong><template v-if="o.reason"> ({{ o.reason }})</template></template>
+          </p>
           <p v-if="q.note" class="mt-2 text-sm">{{ q.note }}</p>
           <div class="mt-3 border-t border-line pt-3">
             <RecusedNotice v-if="recused(q)" />
@@ -63,7 +70,7 @@ async function review(q: RosterRequestRow, approve: boolean) {
                 <span class="text-muted">Note for the captain (optional)</span>
                 <input v-model="notes[q.id]" class="h-9 rounded-md border border-line-strong bg-surface-2 px-2 text-sm focus-visible:outline-2 focus-visible:outline-gold" />
               </label>
-              <UiButton size="sm" :disabled="busy" @click="review(q, true)">Approve</UiButton>
+              <UiButton size="sm" :disabled="busy || !q.playerAccepted" :title="q.playerAccepted ? undefined : 'The player has to accept first'" @click="review(q, true)">Approve</UiButton>
               <UiButton size="sm" variant="danger" :disabled="busy" @click="review(q, false)">Deny</UiButton>
             </div>
             <div v-if="!recused(q)" class="mt-2"><PublicLogNotice /></div>

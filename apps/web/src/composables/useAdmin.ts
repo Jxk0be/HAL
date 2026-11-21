@@ -322,6 +322,10 @@ export interface RosterRequestRow {
   team: { id: string; name: string; tag: string; changesUsed: number; maxChanges: number; lockAt: string | null }
   player: string
   userId: string
+  /** Emergency subs: the free agent has agreed (admins can approve only then). Always true for other types. */
+  playerAccepted: boolean
+  /** Emergency subs: players the captain marked out for that match, with the reason. */
+  out: { name: string; reason: string | null }[]
   match: { id: string; week: number; scheduledAt: string; home: QueueTeam; away: QueueTeam } | null
 }
 
@@ -334,10 +338,21 @@ export function useRosterRequests() {
     const { data } = await supabase
       .from('roster_requests')
       .select(
-        'id, type, note, created_at, user_id, team:teams(id, name, tag, roster_changes_used, season:seasons(max_roster_changes, roster_lock_at)), player:profiles!roster_requests_user_id_fkey(discord_username, activision_id), match:matches(id, week, scheduled_at, home:teams!matches_home_team_id_fkey(id, name, tag), away:teams!matches_away_team_id_fkey(id, name, tag))',
+        'id, type, note, created_at, user_id, player_confirmed_at, team:teams(id, name, tag, roster_changes_used, season:seasons(max_roster_changes, roster_lock_at)), player:profiles!roster_requests_user_id_fkey(discord_username, activision_id), match:matches(id, week, scheduled_at, home:teams!matches_home_team_id_fkey(id, name, tag), away:teams!matches_away_team_id_fkey(id, name, tag))',
       )
       .eq('status', 'pending')
       .order('created_at')
+    const matchIds = [...new Set((data ?? []).map((r) => r.match?.id).filter((x): x is string => Boolean(x)))]
+    const { data: absences } = matchIds.length
+      ? await supabase
+          .from('match_absences')
+          .select('match_id, team_id, reason, player:profiles!match_absences_user_id_fkey(activision_id, discord_username)')
+          .in('match_id', matchIds)
+      : { data: [] }
+    const outFor = (matchId: string | undefined, teamId: string) =>
+      (absences ?? [])
+        .filter((a) => a.match_id === matchId && a.team_id === teamId)
+        .map((a) => ({ name: a.player?.activision_id ?? a.player?.discord_username ?? 'Player', reason: a.reason }))
     rows.value = (data ?? [])
       .filter((r) => r.team)
       .map((r) => ({
@@ -346,6 +361,8 @@ export function useRosterRequests() {
         note: r.note,
         createdAt: r.created_at,
         userId: r.user_id,
+        playerAccepted: r.type !== 'emergency_sub' || Boolean(r.player_confirmed_at),
+        out: r.type === 'emergency_sub' ? outFor(r.match?.id, r.team!.id) : [],
         team: {
           id: r.team!.id,
           name: r.team!.name,
@@ -574,6 +591,8 @@ export interface ContentPlayer {
   activisionId: string | null
   bannedUntil: string | null
   team: { id: string; tag: string } | null
+  /** Admin "incomplete data" flag on this season's leaderboard (note may be empty). */
+  statsFlag: { note: string | null } | null
 }
 
 export function useContentPlayers() {
@@ -581,19 +600,35 @@ export function useContentPlayers() {
   const loading = ref(false)
   const busy = ref(false)
   let lastQuery = ''
+  const seasonId = ref<string | null>(null)
+  const flags = ref(new Map<string, string | null>())
+
+  async function loadFlags() {
+    if (!seasonId.value) {
+      const { data } = await supabase.from('seasons').select('id').in('status', ['signups', 'regular', 'playoffs']).maybeSingle()
+      seasonId.value = data?.id ?? null
+    }
+    if (!seasonId.value) return
+    const { data } = await supabase.from('player_stat_flags').select('user_id, note').eq('season_id', seasonId.value)
+    flags.value = new Map((data ?? []).map((f) => [f.user_id, f.note]))
+  }
 
   async function search(q: string) {
     lastQuery = q
     const term = q.trim().replace(/[%_,()]/g, '')
     loading.value = true
+    await loadFlags()
     let query = supabase
       .from('profiles')
       .select('id, discord_username, activision_id, banned_until, members:team_members(left_at, is_emergency, team:teams(id, tag))')
       .order('discord_username')
       .limit(30)
+    const flagged = [...flags.value.keys()]
     query = term.length >= 2
       ? query.or(`discord_username.ilike.%${term}%,activision_id.ilike.%${term}%`)
-      : query.not('banned_until', 'is', null)
+      : flagged.length
+        ? query.or(`banned_until.not.is.null,id.in.(${flagged.join(',')})`)
+        : query.not('banned_until', 'is', null)
     const { data } = await query
     players.value = (data ?? []).map((p) => {
       const m = p.members.find((x) => !x.left_at && !x.is_emergency)
@@ -603,6 +638,7 @@ export function useContentPlayers() {
         activisionId: p.activision_id,
         bannedUntil: p.banned_until,
         team: m?.team ? { id: m.team.id, tag: m.team.tag } : null,
+        statsFlag: flags.value.has(p.id) ? { note: flags.value.get(p.id) ?? null } : null,
       }
     })
     loading.value = false
@@ -616,8 +652,37 @@ export function useContentPlayers() {
     return r
   }
 
+  /** Mark a player's stats as incomplete on this season's leaderboard (or update the note). */
+  async function flagStats(userId: string, note: string): Promise<Result> {
+    if (!seasonId.value) return { ok: false, message: 'There is no active season.' }
+    busy.value = true
+    const { error } = await supabase
+      .from('player_stat_flags')
+      .upsert({ season_id: seasonId.value, user_id: userId, note: note.trim() || null }, { onConflict: 'season_id,user_id' })
+    busy.value = false
+    if (error) return { ok: false, message: dbErrorMessage(error, "Couldn't save. You can't flag yourself or a teammate.") }
+    await search(lastQuery)
+    return { ok: true, value: undefined }
+  }
+
+  async function clearStatsFlag(userId: string): Promise<Result> {
+    if (!seasonId.value) return { ok: false, message: 'There is no active season.' }
+    busy.value = true
+    const { data, error } = await supabase
+      .from('player_stat_flags')
+      .delete()
+      .eq('season_id', seasonId.value)
+      .eq('user_id', userId)
+      .select('id')
+    busy.value = false
+    if (error) return { ok: false, message: dbErrorMessage(error) }
+    if (!data?.length) return { ok: false, message: "Recused: you can't change your own or a teammate's stats flag." }
+    await search(lastQuery)
+    return { ok: true, value: undefined }
+  }
+
   void search('')
-  return { players, loading, busy, search, ban }
+  return { players, loading, busy, search, ban, flagStats, clearStatsFlag }
 }
 
 /** Name and tag of every team in a season (for pickers and labels). */

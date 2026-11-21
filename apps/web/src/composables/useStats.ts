@@ -1,8 +1,11 @@
 import { watchDebounced } from '@vueuse/core'
-import { ref, watch, type MaybeRefOrGetter, toValue } from 'vue'
+import { computed, ref, watch, type MaybeRefOrGetter, toValue } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useRealtime } from './useRealtime'
 import type { Database } from '@/types/database'
+import { topBy, type LeaderboardKey, type LeaderboardRow } from '@/lib/leaderboard'
+
+export type { LeaderboardKey, LeaderboardRow }
 
 export type StandingRow = Database['public']['Functions']['division_standings']['Returns'][number]
 export type PlayerStatRow = Database['public']['Views']['player_season_stats_v']['Row']
@@ -46,32 +49,58 @@ export function useDivisions(seasonId: MaybeRefOrGetter<string | null | undefine
   return { divisions }
 }
 
-export type LeaderboardKey = 'kd' | 'kills' | 'avg_score'
-
-/** Top qualified players (≥40% of their team's maps) for each leaderboard. */
-export function useLeaderboards(seasonId: MaybeRefOrGetter<string | null | undefined>, limit = 10) {
-  const boards = ref<Record<LeaderboardKey, PlayerStatRow[]>>({ kd: [], kills: [], avg_score: [] })
+/**
+ * Every player on a season's leaderboard (season_leaderboard(): anyone with confirmed stats, a
+ * confirmed check-in or an admin "incomplete data" flag), live-updated as results confirm.
+ */
+export function useSeasonLeaderboard(seasonId: MaybeRefOrGetter<string | null | undefined>) {
+  const rows = ref<LeaderboardRow[]>([])
   const loading = ref(true)
+  const error = ref<string | null>(null)
   async function load() {
     const s = toValue(seasonId)
     if (!s) {
+      rows.value = []
       loading.value = false
       return
     }
-    const q = (col: LeaderboardKey) =>
-      supabase
-        .from('player_season_stats_v')
-        .select('*')
-        .eq('season_id', s)
-        .eq('qualifies', true)
-        .order(col, { ascending: false, nullsFirst: false })
-        .limit(limit)
-    const [kd, kills, avg] = await Promise.all([q('kd'), q('kills'), q('avg_score')])
-    boards.value = { kd: kd.data ?? [], kills: kills.data ?? [], avg_score: avg.data ?? [] }
+    const { data, error: err } = await supabase.rpc('season_leaderboard', { p_season_id: s })
+    // Generated types mark every column non-null; kd, avg_score and the team can be null.
+    rows.value = (data ?? []) as unknown as LeaderboardRow[]
+    error.value = err ? 'Could not load the leaderboard.' : null
     loading.value = false
   }
+  useRealtime('leaderboard', [{ table: 'matches' }], () => void load(), 1500)
   watch(() => toValue(seasonId), load, { immediate: true })
-  return { boards, loading, reload: load }
+  return { rows, loading, error, reload: load }
+}
+
+/** Top players for each stat (no minimum maps). */
+export function useLeaderboards(seasonId: MaybeRefOrGetter<string | null | undefined>, limit = 10) {
+  const { rows, loading } = useSeasonLeaderboard(seasonId)
+  const boards = computed<Record<LeaderboardKey, LeaderboardRow[]>>(() => ({
+    kd: topBy(rows.value, 'kd', limit),
+    kills: topBy(rows.value, 'kills', limit),
+    avg_score: topBy(rows.value, 'avg_score', limit),
+  }))
+  return { boards, loading }
+}
+
+/** Seasons that have started or are open, newest first (for the season picker). */
+export function useLeaderboardSeasons() {
+  const seasons = ref<{ id: string; name: string; status: string }[]>([])
+  const loading = ref(true)
+  async function load() {
+    const { data } = await supabase
+      .from('seasons')
+      .select('id, name, status, created_at')
+      .neq('status', 'draft')
+      .order('created_at', { ascending: false })
+    seasons.value = (data ?? []).map((x) => ({ id: x.id, name: x.name, status: x.status }))
+    loading.value = false
+  }
+  void load()
+  return { seasons, loading }
 }
 
 /** One player's season line (all their seasons, newest first). */

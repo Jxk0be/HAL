@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import UiAvatar from '@/components/ui/UiAvatar.vue'
-import type { PlayerStatRow } from '@/composables/useStats'
+import type { LeaderboardRow } from '@/lib/leaderboard'
 
 defineProps<{
   title: string
-  rows: PlayerStatRow[]
-  value: (r: PlayerStatRow) => string
+  rows: LeaderboardRow[]
+  value: (r: LeaderboardRow) => string
 }>()
 </script>
 
@@ -17,10 +17,11 @@ defineProps<{
         <span class="tnum w-5 font-mono" :class="i === 0 ? 'text-gold' : 'text-muted'">{{ i + 1 }}</span>
         <UiAvatar :src="r.avatar_url" :name="r.activision_id" size="xs" decorative />
         <RouterLink :to="`/players/${r.user_id}`" class="min-w-0 flex-1 truncate hover:text-gold">{{ r.activision_id }}</RouterLink>
+        <span v-if="r.incomplete" class="text-xs text-gold" :title="r.incomplete_reason ?? undefined">*<span class="sr-only"> incomplete data</span></span>
         <span v-if="r.team_tag" class="text-xs text-muted">{{ r.team_tag }}</span>
         <span class="tnum font-heading text-base" :class="i === 0 ? 'text-gold' : ''">{{ value(r) }}</span>
       </li>
     </ol>
-    <p v-else class="px-4 py-6 text-sm text-muted">No qualified players yet.</p>
+    <p v-else class="px-4 py-6 text-sm text-muted">No stats yet.</p>
   </section>
 </template>

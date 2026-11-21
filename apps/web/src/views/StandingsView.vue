@@ -47,7 +47,9 @@ const anyTies = computed(() => rows.value.some((r) => r.needs_admin_decision))
 
         <section aria-labelledby="leaders-title">
           <h2 id="leaders-title" class="eyebrow mb-1 text-gold">Leaderboards</h2>
-          <p class="mb-4 text-xs text-muted">To qualify, a player must have played at least 40% of their team's maps.</p>
+          <p class="mb-4 text-xs text-muted">
+            Top 10 for each stat. <RouterLink to="/leaderboard" class="text-gold hover:text-gold-strong">Full leaderboard →</RouterLink>
+          </p>
           <div class="grid gap-4 md:grid-cols-3">
             <StatLeaderboard title="K/D" :rows="boards.kd" :value="(r) => (r.kd ?? 0).toFixed(2)" />
             <StatLeaderboard title="Kills" :rows="boards.kills" :value="(r) => String(r.kills ?? 0)" />

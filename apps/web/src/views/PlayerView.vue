@@ -96,7 +96,6 @@ const statSlots = computed(() => {
             <p class="mt-2 text-xs text-muted">
               <template v-if="current">
                 {{ current.kills }} kills, {{ current.deaths }} deaths across {{ current.maps_played }} maps.
-                <template v-if="!current.qualifies">Not yet on the leaderboards (needs 40% of the team's maps).</template>
               </template>
               <template v-else>Stats fill in once matches are confirmed.</template>
             </p>

@@ -13,6 +13,7 @@ import ReportStatusPanel from '@/components/report/ReportStatusPanel.vue'
 import DisputePanel from '@/components/match/DisputePanel.vue'
 import RescheduleCard from '@/components/match/RescheduleCard.vue'
 import CheckInCard from '@/components/match/CheckInCard.vue'
+import EmergencySubCard from '@/components/match/EmergencySubCard.vue'
 import { useMatchDetail } from '@/composables/useMatches'
 import { useReportStatus } from '@/composables/useReport'
 import { useAuthStore } from '@/stores/auth'
@@ -135,6 +136,8 @@ watch(match, (m) => {
         <RescheduleCard :match="match" :captain-of="captainOf" @changed="reload()" />
 
         <CheckInCard :match="match" :checkins="checkins" :captain-of="captainOf" @changed="reload()" />
+
+        <EmergencySubCard :match="match" :captain-of="captainOf" />
 
         <section aria-labelledby="maps-title">
           <h2 id="maps-title" class="eyebrow mb-3 text-gold">Maps</h2>

@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import ProfileForm from '@/components/profile/ProfileForm.vue'
 import InvitesCard from '@/components/profile/InvitesCard.vue'
+import EmergencySubInvitesCard from '@/components/profile/EmergencySubInvitesCard.vue'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
@@ -89,6 +90,7 @@ const roleLabel = computed(() => {
       <!-- Edit -->
       <div class="flex flex-col gap-6">
         <InvitesCard />
+        <EmergencySubInvitesCard />
         <UiCard eyebrow="Player details" title="Edit profile">
           <ProfileForm
             v-if="auth.profile"

@@ -67,7 +67,7 @@ Effective: November 20, 2026
 
 **4.2** Subs must be on the roster at least 24 hours before a match to play in it. This applies to every player: anyone who joins a roster less than 24 hours before a match is not eligible for that match.
 
-**4.3** Emergency sub: if a team has fewer than 4 eligible players for a match, the captain may ask an admin to approve one free agent for that match only. The emergency sub does not join the roster and does not use a roster change.
+**4.3** Emergency sub: if a team has fewer than 4 players available for a match (eligible under 4.2 and able to play), the captain marks which players are out and may request a free agent for that match only, on the match page. A team may use at most 2 emergency subs in a match, and no more than it is short. The free agent must accept the request, and then an admin must approve it. Players marked out cannot play in that match once an emergency sub is approved. The emergency sub does not join the roster, stays a free agent, and does not use a roster change.
 
 **4.4** Emergency subs must be free agents (not on any team this season) and meet every rule in Section 2.
 

@@ -16,6 +16,7 @@ import { editMessage, sendMessage, type MessagePayload } from '../_shared/discor
 import {
   claimEvent,
   findEvent,
+  loadAdminRoleId,
   loadChannels,
   loadMatch,
   MATCH_COLUMNS,
@@ -40,6 +41,8 @@ import { dueKinds, scanWindow, type Kind } from './plan.ts'
 import { deleteLfgMessage, publishLfg } from '../_shared/lfg_sync.ts'
 import { finishRescheduleRequest, postRescheduleRequest } from '../_shared/reschedule_flow.ts'
 import { closeDisputeThread, ensureDisputeThread, postDisputeComment, reopenDisputeThread } from '../_shared/dispute_flow.ts'
+import { handleEsubEvent } from '../_shared/esub_flow.ts'
+import { disputeAlert, mismatchAlert, teamPendingAlert, unreportedAlert, withAdminPing } from '../_shared/admin_alerts.ts'
 
 const HANDLED = [
   'match_result',
@@ -56,6 +59,12 @@ const HANDLED = [
   'dispute_reopened',
   'lfg_changed',
   'lfg_deleted',
+  'emergency_sub_requested',
+  'emergency_sub_accepted',
+  'emergency_sub_declined',
+  'emergency_sub_reviewed',
+  'team_pending',
+  'mismatch_opened',
 ]
 const MAX_ATTEMPTS = 5
 
@@ -66,6 +75,8 @@ interface Ctx {
   db: SupabaseClient
   siteUrl: string
   channels: ChannelSettings
+  /** HAL Admin role id: every admin alert pings it. */
+  adminRole: string | null
   stats: Record<string, number>
 }
 
@@ -136,10 +147,29 @@ async function matchPosts(ctx: Ctx, now: number) {
     }
     if (missing.length && ctx.channels.admin) {
       try {
-        await postOnce(ctx, m.id, null, 'checkin_missing_admin', ctx.channels.admin, adminMissingCheckinMessage(m, missing, ctx.siteUrl))
+        await postOnce(ctx, m.id, null, 'checkin_missing_admin', ctx.channels.admin, withAdminPing(adminMissingCheckinMessage(m, missing, ctx.siteUrl), ctx.adminRole))
       } catch (err) {
         await logError(ctx, 'checkin_missing_admin', { match_id: m.id }, err)
       }
+    }
+  }
+}
+
+/** Matches that started over 24h ago (up to a week) with no result: an admin has to act. */
+async function unreportedAlerts(ctx: Ctx, now: number) {
+  if (!ctx.channels.admin) return
+  const { data, error } = await ctx.db
+    .from('matches')
+    .select(MATCH_COLUMNS)
+    .in('status', ['scheduled', 'checkin_open', 'live', 'awaiting_reports'])
+    .lt('scheduled_at', new Date(now - 24 * 3600_000).toISOString())
+    .gte('scheduled_at', new Date(now - 7 * 24 * 3600_000).toISOString())
+  if (error) throw error
+  for (const m of (data ?? []).map(toBotMatch)) {
+    try {
+      await postOnce(ctx, m.id, null, 'unreported_admin', ctx.channels.admin, withAdminPing(unreportedAlert(m, ctx.siteUrl), ctx.adminRole))
+    } catch (err) {
+      await logError(ctx, 'unreported_admin', { match_id: m.id }, err)
     }
   }
 }
@@ -243,24 +273,54 @@ async function handleOutbox(ctx: Ctx, row: { id: number; type: string; payload: 
     case 'dispute_reopened':
       await reopenDisputeThread(ctx.db, String(p.dispute_id))
       return
+    case 'emergency_sub_requested':
+    case 'emergency_sub_accepted':
+    case 'emergency_sub_declined':
+    case 'emergency_sub_reviewed':
+      await handleEsubEvent(ctx.db, row.type, String(p.request_id), ctx.siteUrl)
+      bump(ctx, 'esub')
+      return
     case 'lfg_deleted':
       await deleteLfgMessage(p.channel_id as string | null, p.message_id as string | null)
       bump(ctx, 'lfg')
       return
     case 'dispute_opened': {
-      // Private thread in #disputes (once; /dispute may already have made it).
-      if (ctx.channels.disputes) {
-        await ensureDisputeThread(ctx.db, String(p.dispute_id), ctx.channels.disputes, ctx.siteUrl)
-        bump(ctx, 'dispute')
-        return
-      }
+      // Private thread in #disputes (once; /dispute may already have made it), plus a ping in #admin-only.
+      const threadId = ctx.channels.disputes
+        ? await ensureDisputeThread(ctx.db, String(p.dispute_id), ctx.channels.disputes, ctx.siteUrl)
+        : null
+      bump(ctx, 'dispute')
       if (!ctx.channels.admin) return
       const m = await loadMatch(ctx.db, matchId)
       if (!m) return
-      await sendMessage(ctx.channels.admin, {
-        allowed_mentions: { parse: [] },
-        content: `New **${String(p.category)}** dispute on ${m.home.tag} vs ${m.away.tag} (week ${m.week}): ${ctx.siteUrl}/admin/disputes`,
-      })
+      await postOnce(ctx, m.id, null, `dispute_admin:${String(p.dispute_id)}`, ctx.channels.admin,
+        withAdminPing(disputeAlert(m, String(p.category), ctx.siteUrl, threadId), ctx.adminRole))
+      return
+    }
+    case 'team_pending': {
+      if (!ctx.channels.admin) return
+      const { data: t } = await ctx.db
+        .from('teams')
+        .select('name, tag, status, captain:profiles!teams_captain_id_fkey(discord_username, activision_id)')
+        .eq('id', String(p.team_id))
+        .maybeSingle()
+      if (!t || t.status !== 'pending') return // approved or removed since
+      // deno-lint-ignore no-explicit-any
+      const cap = (t as any).captain
+      await sendMessage(ctx.channels.admin, withAdminPing(
+        teamPendingAlert({ name: t.name, tag: t.tag, captain: cap?.discord_username ?? cap?.activision_id ?? 'a player' }, ctx.siteUrl),
+        ctx.adminRole,
+      ))
+      bump(ctx, 'admin_alert')
+      return
+    }
+    case 'mismatch_opened': {
+      if (!ctx.channels.admin) return
+      const m = await loadMatch(ctx.db, matchId)
+      if (!m) return
+      // One alert per match (reports can add mismatches in several batches).
+      await postOnce(ctx, m.id, null, 'mismatch_admin', ctx.channels.admin,
+        withAdminPing(mismatchAlert(m, Number(p.fields ?? 1), ctx.siteUrl), ctx.adminRole))
       return
     }
   }
@@ -318,12 +378,18 @@ Deno.serve(async (req) => {
     db,
     siteUrl: (Deno.env.get('SITE_URL') ?? 'http://localhost:5174').replace(/\/+$/, ''),
     channels: await loadChannels(db),
+    adminRole: await loadAdminRoleId(db),
     stats: {},
   }
   try {
     await matchPosts(ctx, Date.now())
   } catch (err) {
     await logError(ctx, 'match_posts', {}, err)
+  }
+  try {
+    await unreportedAlerts(ctx, Date.now())
+  } catch (err) {
+    await logError(ctx, 'unreported_admin', {}, err)
   }
   try {
     await drainOutbox(ctx)

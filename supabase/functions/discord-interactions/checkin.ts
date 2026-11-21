@@ -30,7 +30,7 @@ export const checkinHandler: Handler = {
       const players = (data ?? []) as { user_id: string; name: string; is_emergency: boolean }[]
       if (players.length < 4) {
         return ephemeral(
-          `Only ${players.length} of your players are eligible (on the roster 24 hours before the match, or an approved emergency sub). Ask an admin about an emergency sub.`,
+          `Only ${players.length} of your players are eligible (on the roster 24 hours before the match, or an approved emergency sub). Request an emergency sub on the match page: ${deps.siteUrl}/matches/${matchId}`,
           'error',
         )
       }
