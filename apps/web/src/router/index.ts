@@ -61,8 +61,8 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/rules',
     name: 'rules',
-    component: Placeholder,
-    meta: { title: 'Rules', eyebrow: 'Rulebook', description: 'The HAL rulebook: format, eligibility, match day, reporting and integrity.', buildStep: 9 },
+    component: () => import('@/views/RulesView.vue'),
+    meta: { title: 'Rules' },
   },
   {
     path: '/audit-log',
@@ -182,7 +182,12 @@ export const router = createRouter({
   routes,
   scrollBehavior(to, _from, saved) {
     if (saved) return saved
-    if (to.hash) return { el: to.hash, top: 80 }
+    // The Rules page scrolls to its own anchors (ids like "4.2" aren't valid CSS selectors).
+    if (to.name === 'rules' && to.hash) return false
+    if (to.hash) {
+      const id = decodeURIComponent(to.hash.slice(1))
+      return document.getElementById(id) ? { el: `#${CSS.escape(id)}`, top: 80 } : { top: 0 }
+    }
     return { top: 0 }
   },
 })

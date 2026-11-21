@@ -21,10 +21,10 @@ const showSetup = computed(
 </script>
 
 <template>
-  <div v-if="auth.isBanned" role="status" class="border-b border-loss/30 bg-loss-soft">
+  <div v-if="auth.isBanned" role="status" class="border-b border-loss/30 bg-loss-soft print:hidden">
     <p class="mx-auto max-w-7xl px-4 py-2.5 text-sm text-loss sm:px-6">{{ bannedText }}</p>
   </div>
-  <div v-else-if="showSetup" class="border-b border-gold-dim/40 bg-gold-soft">
+  <div v-else-if="showSetup" class="border-b border-gold-dim/40 bg-gold-soft print:hidden">
     <p class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2.5 text-sm sm:px-6">
       <span>Finish your player profile to join or create a team.</span>
       <RouterLink to="/onboarding" class="font-heading tracking-wider text-gold hover:text-gold-strong">

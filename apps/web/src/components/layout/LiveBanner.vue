@@ -11,7 +11,7 @@ defineProps<{
 </script>
 
 <template>
-  <div v-if="broadcast" class="border-b border-loss/30 bg-loss-soft">
+  <div v-if="broadcast" class="border-b border-loss/30 bg-loss-soft print:hidden">
     <div class="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 text-sm sm:px-6">
       <UiBadge variant="live">Live</UiBadge>
       <p class="truncate">{{ broadcast.title }}</p>

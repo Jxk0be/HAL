@@ -6,7 +6,7 @@ const year = new Date().getFullYear()
 </script>
 
 <template>
-  <footer class="mt-24 border-t border-line">
+  <footer class="mt-24 border-t border-line print:hidden">
     <div class="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1fr_auto]">
       <div>
         <HalWordmark :size="32" />

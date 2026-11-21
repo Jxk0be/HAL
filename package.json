@@ -9,7 +9,9 @@
     "typecheck": "pnpm --filter web typecheck",
     "lint": "pnpm --filter web lint",
     "test": "pnpm --filter web test",
-    "db:types": "supabase gen types typescript --project-id lluwzpwiybvgnsimpwey --schema public > apps/web/src/types/database.ts"
+    "db:types": "supabase gen types typescript --project-id lluwzpwiybvgnsimpwey --schema public > apps/web/src/types/database.ts",
+    "commands:register": "pnpm --filter scripts exec tsx register-commands.ts",
+    "test:functions": "npx -y deno@2.1.4 test --no-check=remote --allow-env supabase/functions"
   },
   "devDependencies": {
     "supabase": "^3.1.0"

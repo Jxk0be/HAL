@@ -9,3 +9,6 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+/** Last commit touching rules/rulebook.md at build time (see vite.config.ts). */
+declare const __RULEBOOK_COMMIT__: { date: string; message: string } | null

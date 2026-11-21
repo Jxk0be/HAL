@@ -27,7 +27,7 @@ function isActive(to: string) {
 </script>
 
 <template>
-  <header class="sticky top-0 z-30 border-b border-line bg-bg/90 backdrop-blur-md">
+  <header class="sticky top-0 z-30 border-b border-line bg-bg/90 backdrop-blur-md print:hidden">
     <div class="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
       <RouterLink to="/" class="shrink-0 rounded-sm" aria-label="Heaven's Arena League home">
         <span class="hidden sm:block"><HalWordmark :size="34" decorative /></span>

@@ -12,7 +12,7 @@ const accents = {
 
 <template>
   <div
-    class="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col items-end gap-2 sm:inset-x-auto sm:right-6 sm:bottom-6"
+    class="pointer-events-none fixed inset-x-4 bottom-4 z-50 print:hidden flex flex-col items-end gap-2 sm:inset-x-auto sm:right-6 sm:bottom-6"
   >
     <!-- Polite region for info/success; errors are announced assertively. -->
     <div aria-live="polite" class="contents">

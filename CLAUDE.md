@@ -141,6 +141,23 @@ The step-by-step build plan is `hal-build-guide.html` (kept outside the repo); e
   - `preferred_role` is one of `AR`, `SMG`, `Flex`. Posting needs a complete profile and no team, and lists you as a free agent (`free_agent_posts_guard`).
   - Joining a team deactivates your post. Staff can take down or delete any post (audited).
   - Use `useMyFreeAgentPost`, `useFreeAgentModeration` and `useOpenSpots`. Captains see "Invite to team" on board cards while `team_open_spots` reports an open spot.
+- Rules page (`/rules`, step 9):
+  - `useRulebook()` loads `rules/rulebook.md` from raw.githubusercontent.com, caches it in sessionStorage for 10 minutes, and falls back to the copy bundled at build time (`?raw` import). The "last updated" date comes from the GitHub commits API, falling back to `__RULEBOOK_COMMIT__`, which `vite.config.ts` reads from git at build time.
+  - While the repo is private, visitors get the bundled copy and the history link 404s.
+  - `parseRulebook()` (`src/lib/rulebook.ts`) turns the markdown into sections, rules (`**N.N**`), callouts (`> [!IMPORTANT]`/`> [!NOTE]`), and lists attached to the rule before them. Only inline fragments become HTML, sanitised with DOMPurify (strong, em, a, code, br, s).
+  - Keep the rulebook in that format; the parser test checks the real file has 15 sections and rule 4.2.
+  - Anchors: sections are `/rules#4`, rules are `/rules#4.2`. Those ids aren't valid CSS selectors, so the router skips hash scrolling for `rules` and `RulesView` scrolls with `getElementById`. Use `CSS.escape` for any other hash.
+  - Print: `print:hidden` on site chrome, plus a print block in `main.css`.
+  - The production CSP (deploy step) must allow `raw.githubusercontent.com` and `api.github.com` in `connect-src`.
+- Discord bot (step 10):
+  - The `discord-interactions` Edge Function is deployed with `verify_jwt: false`; the Ed25519 signature check is the authentication. Secrets: `DISCORD_PUBLIC_KEY`, `DISCORD_BOT_TOKEN`, `DISCORD_APP_ID`, `DISCORD_GUILD_ID`, `SITE_URL`.
+  - `_shared/interactions.ts` is a pure router. Handlers live in `discord-interactions/handlers.ts`: commands by name, components and modals by the first part of `custom_id` (`feature:action:id`).
+  - Handlers return a `Reply`. Use `{ kind: 'deferred', work }` for anything that might take more than about 2 seconds; the router answers with type 5 (commands, modals) or type 6 (components) and edits the original reply in `EdgeRuntime.waitUntil`. Mentions are off unless a payload sets `allowed_mentions`.
+  - Handlers get the linked HAL `profile` (looked up by `profiles.discord_id`). Unlinked users get a "log in on the site" reply unless the handler is `public`.
+  - The service-role client bypasses RLS, so re-check every permission with `permissionsFor(db, userId)` (`_shared/permissions.ts`). It calls the service-role-only `*_for(user_id, …)` SQL helpers, which mirror the RLS helpers, including recusal via `can_staff_match_for`.
+  - Discord REST calls go through `_shared/discord.ts`, which retries on 429. Embeds use `halEmbed()` (gold bar, HAL footer).
+  - Slash commands are defined only in `_shared/commands.ts`. Register them with `pnpm commands:register`. Deno tests run with `pnpm test:functions`.
+  - Deploying with the Supabase MCP: pass the entrypoint plus every `../_shared/*.ts` it imports as files.
 - Test seasons: only one active season can exist, so tests reuse it (forced to `signups` inside the rolled-back block). `supabase/tests/free_agents_test.sql` covers the board, privacy and posts.
 - Check every page at 375px (no horizontal scroll). Don't put responsive `hidden`/`sm:inline-flex` classes on a component whose root already sets `display`; wrap it in a span instead.
 
