@@ -14,6 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcement_posts: {
+        Row: {
+          discord_channel_id: string | null
+          discord_message_id: string | null
+          id: string
+          key: string
+          occurrence: string
+          posted_at: string
+          posted_by: string | null
+          season_id: string
+        }
+        Insert: {
+          discord_channel_id?: string | null
+          discord_message_id?: string | null
+          id?: string
+          key: string
+          occurrence: string
+          posted_at?: string
+          posted_by?: string | null
+          season_id: string
+        }
+        Update: {
+          discord_channel_id?: string | null
+          discord_message_id?: string | null
+          id?: string
+          key?: string
+          occurrence?: string
+          posted_at?: string
+          posted_by?: string | null
+          season_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcement_posts_posted_by_fkey"
+            columns: ["posted_by"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcement_posts_posted_by_fkey"
+            columns: ["posted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcement_posts_posted_by_fkey"
+            columns: ["posted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcement_posts_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      announcement_settings: {
+        Row: {
+          auto: boolean
+          key: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          auto?: boolean
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          auto?: boolean
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcement_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcement_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "announcement_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_settings: {
         Row: {
           key: string

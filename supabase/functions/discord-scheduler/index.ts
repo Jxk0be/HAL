@@ -42,6 +42,7 @@ import { deleteLfgMessage, publishLfg } from '../_shared/lfg_sync.ts'
 import { finishRescheduleRequest, postRescheduleRequest } from '../_shared/reschedule_flow.ts'
 import { closeDisputeThread, ensureDisputeThread, postDisputeComment, reopenDisputeThread } from '../_shared/dispute_flow.ts'
 import { handleEsubEvent } from '../_shared/esub_flow.ts'
+import { runAutoAnnouncements } from '../_shared/announcement_flow.ts'
 import { disputeAlert, mismatchAlert, teamPendingAlert, unreportedAlert, withAdminPing } from '../_shared/admin_alerts.ts'
 
 const HANDLED = [
@@ -388,6 +389,12 @@ Deno.serve(async (req) => {
     await matchPosts(ctx, Date.now())
   } catch (err) {
     await logError(ctx, 'match_posts', {}, err)
+  }
+  try {
+    const n = await runAutoAnnouncements(ctx.db, ctx.siteUrl)
+    if (n) ctx.stats.announcements = n
+  } catch (err) {
+    await logError(ctx, 'announcements', {}, err)
   }
   try {
     await unreportedAlerts(ctx, Date.now())

@@ -7,12 +7,15 @@
  *    member_left/staff_role_changed/free_agent_changed are accepted as aliases).
  *  - The owner's buttons on Admin → Discord (Supabase user JWT; owner only): full_resync, and
  *    post_guides (posts or refreshes the pinned channel guides).
+ *  - Any admin from Admin → Announcements: announcements_preview, announcement_post.
  *
  * Deployed with verify_jwt off because pg_net can't send a JWT; both paths authenticate here.
  * Secrets: DISCORD_BOT_TOKEN, DISCORD_APP_ID (= the bot's user id), DISCORD_GUILD_ID.
  */
 import { adminClient } from '../_shared/supabase.ts'
-import { postAllGuides } from './guides.ts'
+import { postAllGuides, siteUrl } from './guides.ts'
+import { postAnnouncementNow, previewAnnouncements } from '../_shared/announcement_flow.ts'
+import type { AnnouncementKey } from '../_shared/announcements.ts'
 import { emptyStats, ensureSettings, fullResync, logError, removeTeamDiscord, syncTeam, syncUser, type SyncEnv } from './sync.ts'
 
 declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void } | undefined
@@ -36,6 +39,8 @@ const ALIASES: Record<string, string> = {
 
 /** Actions the owner can run from the site (everything else is trigger-only). */
 const OWNER_ACTIONS = ['full_resync', 'post_guides']
+/** Actions any admin (or the owner) can run from Admin → Announcements. */
+const ADMIN_ACTIONS = ['announcements_preview', 'announcement_post']
 
 let cachedSecret: { value: string | null; at: number } | null = null
 async function syncSecret(): Promise<string | null> {
@@ -53,14 +58,17 @@ function safeEqual(a: string, b: string): boolean {
   return diff === 0
 }
 
-async function isOwnerRequest(req: Request): Promise<boolean> {
+/** The signed-in caller's user id when they are the owner (or, with adminOk, any admin). */
+async function staffCaller(req: Request, adminOk: boolean): Promise<string | null> {
   const jwt = req.headers.get('Authorization')?.replace(/^Bearer\s+/i, '')
-  if (!jwt) return false
+  if (!jwt) return null
   const db = adminClient()
   const { data } = await db.auth.getUser(jwt)
-  if (!data.user) return false
-  const { data: isOwner } = await db.rpc('has_role_for', { p_user_id: data.user.id, p_role: 'owner' })
-  return isOwner === true
+  if (!data.user) return null
+  const { data: ok } = adminOk
+    ? await db.rpc('is_admin_for', { p_user_id: data.user.id })
+    : await db.rpc('has_role_for', { p_user_id: data.user.id, p_role: 'owner' })
+  return ok === true ? data.user.id : null
 }
 
 Deno.serve(async (req) => {
@@ -78,8 +86,29 @@ Deno.serve(async (req) => {
   const secret = req.headers.get('x-hal-sync-secret')
   const expected = await syncSecret()
   const internal = Boolean(secret && expected && safeEqual(secret, expected))
+  let caller: string | null = null
   if (!internal) {
-    if (!OWNER_ACTIONS.includes(action) || !(await isOwnerRequest(req))) return json({ error: 'unauthorized' }, 401)
+    const allowed = OWNER_ACTIONS.includes(action) || ADMIN_ACTIONS.includes(action)
+    caller = allowed ? await staffCaller(req, ADMIN_ACTIONS.includes(action)) : null
+    if (!caller) return json({ error: 'unauthorized' }, 401)
+  }
+
+  // Admin → Announcements: preview every season announcement, or post one now.
+  if (action === 'announcements_preview') {
+    return json({ ok: true, ...(await previewAnnouncements(adminClient(), siteUrl())) })
+  }
+  if (action === 'announcement_post') {
+    try {
+      const error = await postAnnouncementNow(adminClient(), String(body.key) as AnnouncementKey, {
+        by: caller ?? '',
+        everyone: body.everyone === true,
+        siteUrl: siteUrl(),
+      })
+      return json(error ? { ok: false, error } : { ok: true }, error ? 400 : 200)
+    } catch (err) {
+      await logError(adminClient(), action, body, err)
+      return json({ ok: false, error: err instanceof Error ? err.message : String(err) }, 500)
+    }
   }
 
   const guildId = Deno.env.get('DISCORD_GUILD_ID')

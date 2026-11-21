@@ -14,6 +14,7 @@ const links = computed(() =>
     { to: '/admin/rosters', label: 'Roster approvals', show: auth.isAdmin },
     { to: '/admin/content', label: 'Content', show: auth.isAdmin },
     { to: '/admin/season', label: 'Season & schedule', show: auth.isAdmin },
+    { to: '/admin/announcements', label: 'Announcements', show: auth.isAdmin },
     { to: '/admin/health', label: 'Health', show: auth.isAdmin },
     { to: '/admin/discord', label: 'Discord sync', show: auth.isOwner },
     { to: '/admin/roles', label: 'User roles', show: auth.isOwner },

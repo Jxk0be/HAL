@@ -133,6 +133,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'season', name: 'admin-season', component: () => import('@/views/admin/AdminSeasonView.vue'), meta: { title: 'Season & Schedule', staff: 'admin' } },
       { path: 'content', name: 'admin-content', component: () => import('@/views/admin/AdminContentView.vue'), meta: { title: 'Content', staff: 'admin' } },
       { path: 'roles', name: 'admin-roles', component: () => import('@/views/admin/AdminRolesView.vue'), meta: { title: 'User Roles', staff: 'owner' } },
+      { path: 'announcements', name: 'admin-announcements', component: () => import('@/views/admin/AdminAnnouncementsView.vue'), meta: { title: 'Announcements', staff: 'admin' } },
       { path: 'health', name: 'admin-health', component: () => import('@/views/admin/AdminHealthView.vue'), meta: { title: 'Health', staff: 'admin' } },
       { path: 'discord', name: 'admin-discord', component: () => import('@/views/admin/AdminDiscordView.vue'), meta: { title: 'Discord sync', staff: 'owner' } },
     ],
