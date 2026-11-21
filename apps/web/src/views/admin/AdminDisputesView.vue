@@ -120,12 +120,14 @@ async function issuePenalty() {
                 </p>
               </div>
               <span class="flex flex-wrap gap-2">
+                <UiBadge variant="outline">{{ r.category }}</UiBadge>
                 <UiBadge :variant="r.status === 'open' ? 'loss' : 'win'">{{ r.status }}</UiBadge>
                 <UiBadge variant="outline">Match: {{ r.match.status }}</UiBadge>
               </span>
             </div>
 
             <p class="mt-3 text-sm whitespace-pre-line">{{ r.reason }}</p>
+            <p class="mt-1 text-xs text-muted">Discuss it with both captains on the <RouterLink :to="`/matches/${r.matchId}`" class="text-gold hover:text-gold-strong">match page</RouterLink>.</p>
 
             <div v-if="r.evidence.length" class="mt-3 flex flex-col gap-2">
               <p class="eyebrow text-muted">Evidence</p>

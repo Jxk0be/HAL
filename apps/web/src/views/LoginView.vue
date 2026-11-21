@@ -33,7 +33,7 @@ async function login() {
 
 <template>
   <div class="mx-auto flex max-w-md flex-col items-center px-4 py-20 text-center sm:py-28">
-    <HalWordmark :size="56" compact />
+    <HalWordmark :size="140" />
     <h1 class="mt-8 font-heading text-4xl">Log in to HAL</h1>
     <p class="mt-3 text-muted">
       HAL uses your Discord account. Signing in puts you on the free agent list so captains can

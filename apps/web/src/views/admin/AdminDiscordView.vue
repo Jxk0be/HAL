@@ -3,6 +3,7 @@ import PageHeader from '@/components/layout/PageHeader.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiCard from '@/components/ui/UiCard.vue'
 import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import BotChannelsForm from '@/components/admin/BotChannelsForm.vue'
 import { useDiscordSync } from '@/composables/useDiscordSync'
 import { useToast } from '@/composables/useToast'
 import { site } from '@/config/site'
@@ -40,7 +41,8 @@ const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyl
       </template>
     </PageHeader>
 
-    <div class="mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[22rem_1fr]">
+    <div class="mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[22rem_1fr] lg:items-start">
+      <div class="flex flex-col gap-6">
       <UiCard eyebrow="Repair" title="Resync Discord">
         <p class="text-sm text-muted">
           Rebuilds every team role and channel and every member's roles from the database. Use it if
@@ -61,8 +63,12 @@ const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyl
           log in to the site after joining.
         </p>
       </UiCard>
+      <UiCard eyebrow="Bot posts" title="Channels">
+        <BotChannelsForm />
+      </UiCard>
+      </div>
 
-      <UiCard eyebrow="Last 20" title="Sync errors">
+      <UiCard eyebrow="Last 20" title="Bot and sync errors">
         <template #actions>
           <UiButton size="sm" variant="ghost" @click="reloadErrors">Refresh</UiButton>
         </template>

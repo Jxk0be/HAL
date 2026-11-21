@@ -10,15 +10,19 @@ import TeamLogo from '@/components/ui/TeamLogo.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import MatchStatus from '@/components/match/MatchStatus.vue'
 import ReportStatusPanel from '@/components/report/ReportStatusPanel.vue'
+import DisputePanel from '@/components/match/DisputePanel.vue'
+import RescheduleCard from '@/components/match/RescheduleCard.vue'
+import CheckInCard from '@/components/match/CheckInCard.vue'
 import { useMatchDetail } from '@/composables/useMatches'
 import { useReportStatus } from '@/composables/useReport'
 import { useAuthStore } from '@/stores/auth'
 import { site } from '@/config/site'
+import { streamPlatform } from '@/lib/broadcast'
 
 const route = useRoute()
 const auth = useAuthStore()
 const id = computed(() => (typeof route.params.id === 'string' ? route.params.id : null))
-const { match, maps, screenshots, checkins, dispute, loading } = useMatchDetail(id)
+const { match, maps, screenshots, checkins, dispute, loading, reload } = useMatchDetail(id)
 // Only returned to the two teams and staff.
 const { status: reportStatus } = useReportStatus(id)
 
@@ -37,6 +41,10 @@ const canReport = computed(() => {
       && new Date(m.scheduledAt).getTime() <= Date.now(),
   )
 })
+/** The viewer's team when they captain or co-captain one side of this match. */
+const captainOf = computed(() => (mySide.value && (auth.team?.isCaptain || auth.team?.isCoCaptain) ? (auth.team?.id ?? null) : null))
+/** Staff who can act here (not on either team). */
+const neutralStaff = computed(() => auth.isAdmin && !mySide.value)
 const iReported = computed(() =>
   Boolean(reportStatus.value && (mySide.value === 'home' ? reportStatus.value.homeReportedAt : reportStatus.value.awayReportedAt)),
 )
@@ -97,7 +105,8 @@ watch(match, (m) => {
             </RouterLink>
           </div>
           <div class="mt-6 flex flex-wrap justify-center gap-2">
-            <UiButton v-if="match.broadcastLive && match.broadcastUrl" :href="match.broadcastUrl">Watch live</UiButton>
+            <UiButton v-if="match.broadcastLive && match.broadcastUrl" :href="match.broadcastUrl">LIVE · Watch on {{ streamPlatform(match.broadcastUrl) }}</UiButton>
+            <UiButton v-else-if="match.broadcastUrl" :href="match.broadcastUrl" variant="secondary">Watch broadcast</UiButton>
             <UiBadge v-if="match.scheduledAt !== match.defaultAt" variant="outline">
               Rescheduled from&nbsp;<LeagueTime :iso="match.defaultAt" />
             </UiBadge>
@@ -117,18 +126,15 @@ watch(match, (m) => {
           </div>
         </UiCard>
 
-        <UiCard v-if="dispute" eyebrow="Dispute" :title="dispute.status === 'open' ? 'Under review' : 'Resolved'">
+        <DisputePanel v-if="auth.isSignedIn" :match="match" :captain-of="captainOf" :staff="neutralStaff" @changed="reload()" />
+        <UiCard v-else-if="dispute" eyebrow="Dispute" :title="dispute.status === 'open' ? 'Under review' : 'Resolved'">
           <p class="text-sm text-muted">{{ dispute.reason }}</p>
           <p v-if="dispute.resolution" class="mt-3 text-sm"><strong class="text-gold">Decision:</strong> {{ dispute.resolution }}</p>
         </UiCard>
 
-        <UiCard v-if="checkins.length" eyebrow="Teams and staff only" title="Check-ins">
-          <ul class="flex flex-col gap-1 text-sm">
-            <li v-for="c in checkins" :key="c.teamId">
-              {{ teamName(c.teamId) }} checked in <span class="tnum">{{ c.players }}</span> players at <LeagueTime :iso="c.at" />
-            </li>
-          </ul>
-        </UiCard>
+        <RescheduleCard :match="match" :captain-of="captainOf" @changed="reload()" />
+
+        <CheckInCard :match="match" :checkins="checkins" :captain-of="captainOf" @changed="reload()" />
 
         <section aria-labelledby="maps-title">
           <h2 id="maps-title" class="eyebrow mb-3 text-gold">Maps</h2>

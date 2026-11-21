@@ -11,12 +11,15 @@ import { site } from '@/config/site'
 import { homeContent as c } from '@/content/home'
 import { currentWeek, useSeasonSchedule } from '@/composables/useMatches'
 import { useLeaderboards, useStandings } from '@/composables/useStats'
+import { useLiveBroadcasts } from '@/composables/useBroadcasts'
+import { streamPlatform } from '@/lib/broadcast'
 import { formatLeagueTime, toZoned } from '@/lib/time'
 
 const { season, matches, loading } = useSeasonSchedule()
 const seasonId = computed(() => season.value?.id)
 const { rows: standings } = useStandings(seasonId, () => null)
 const { boards } = useLeaderboards(seasonId, 1)
+const { live } = useLiveBroadcasts()
 
 const now = Date.now()
 const week = computed(() => (matches.value.length ? currentWeek(matches.value, now) : null))
@@ -59,11 +62,12 @@ const leaders = computed(() =>
     <!-- Hero -->
     <section class="relative overflow-hidden border-b border-line" aria-labelledby="home-title">
       <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div class="absolute top-24 right-0 hidden h-[420px] w-[420px] border border-gold-dim/25 lg:block" />
-        <div class="absolute top-32 right-8 hidden h-[420px] w-[420px] border border-gold-dim/10 lg:block" />
+        <!-- Soft halo glow behind the logo -->
+        <div class="absolute top-1/2 right-[8%] hidden size-[520px] -translate-y-1/2 rounded-full bg-gold/10 blur-3xl lg:block" />
       </div>
       <div class="relative mx-auto grid max-w-7xl gap-12 px-4 pt-16 pb-20 sm:px-6 sm:pt-24 lg:grid-cols-[1.2fr_1fr] lg:items-center">
         <div>
+          <div class="mb-8 flex justify-center lg:hidden"><HalWordmark :size="150" decorative /></div>
           <UiBadge variant="gold">
             <template v-if="season && inSeason && week">{{ season.name }} · Week {{ week }}</template>
             <template v-else-if="season">{{ season.name }} · {{ season.status === 'signups' ? 'Signups open' : season.status }}</template>
@@ -77,11 +81,28 @@ const leaders = computed(() =>
             <UiButton :to="inSeason ? '/matches' : '/rules'" variant="secondary" size="lg">{{ inSeason ? 'See the schedule' : 'Read the rules' }}</UiButton>
           </div>
         </div>
-        <div class="hidden justify-center lg:flex"><HalWordmark :size="220" compact decorative /></div>
+        <div class="relative hidden justify-center lg:flex"><HalWordmark :size="330" decorative /></div>
       </div>
     </section>
 
     <div class="mx-auto flex max-w-7xl flex-col gap-14 px-4 py-14 sm:px-6">
+      <!-- Live now -->
+      <section v-if="live.length" aria-labelledby="live-title">
+        <h2 id="live-title" class="mb-4 flex items-center gap-2 font-heading text-2xl">
+          <span class="size-2.5 animate-pulse rounded-full bg-live motion-reduce:animate-none" aria-hidden="true" />
+          Live now
+        </h2>
+        <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <li v-for="b in live" :key="b.matchId" class="flex items-center gap-3 rounded-lg border border-gold-dim bg-surface p-4">
+            <span class="min-w-0 flex-1">
+              <RouterLink :to="`/matches/${b.matchId}`" class="block truncate font-heading text-lg hover:text-gold">{{ b.homeTag }} vs {{ b.awayTag }}</RouterLink>
+              <span class="block truncate text-xs text-muted">Cast by {{ b.caster }} on {{ streamPlatform(b.url) }}</span>
+            </span>
+            <UiButton :href="b.url" size="sm">Watch<span class="sr-only"> {{ b.homeName }} vs {{ b.awayName }}</span></UiButton>
+          </li>
+        </ul>
+      </section>
+
       <!-- Next match night -->
       <section v-if="loading || nextNight" aria-labelledby="next-title">
         <UiSkeleton v-if="loading" :lines="3" />

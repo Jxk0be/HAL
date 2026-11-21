@@ -8,11 +8,13 @@ const auth = useAuthStore()
 const links = computed(() =>
   [
     { to: '/admin', label: 'Overview', show: auth.isStaff, exact: true },
+    { to: '/admin/casting', label: 'Casting desk', show: auth.isCaster || auth.isAdmin },
     { to: '/admin/mismatches', label: 'Mismatch queue', show: auth.isAdmin },
     { to: '/admin/disputes', label: 'Disputes', show: auth.isAdmin },
     { to: '/admin/rosters', label: 'Roster approvals', show: auth.isAdmin },
     { to: '/admin/content', label: 'Content', show: auth.isAdmin },
     { to: '/admin/season', label: 'Season & schedule', show: auth.isAdmin },
+    { to: '/admin/health', label: 'Health', show: auth.isAdmin },
     { to: '/admin/discord', label: 'Discord sync', show: auth.isOwner },
     { to: '/admin/roles', label: 'User roles', show: auth.isOwner },
   ].filter((l) => l.show),

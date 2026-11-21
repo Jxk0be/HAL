@@ -108,6 +108,13 @@ export const sendMessage = (channelId: string, payload: MessagePayload) =>
 export const editMessage = (channelId: string, messageId: string, payload: MessagePayload) =>
   discordRequest('PATCH', `/channels/${channelId}/messages/${messageId}`, { body: payload })
 
+export const deleteMessage = (channelId: string, messageId: string) =>
+  discordRequest('DELETE', `/channels/${channelId}/messages/${messageId}`)
+
+/** Opens (or reuses) a DM channel with a user. Fails with 50007 if they don't accept DMs. */
+export const createDmChannel = (userId: string) =>
+  discordRequest<{ id: string }>('POST', '/users/@me/channels', { body: { recipient_id: userId } })
+
 // ---- Interaction responses (no bot token: authorised by the interaction token) ----
 export const editOriginalResponse = (appId: string, token: string, payload: MessagePayload) =>
   discordRequest('PATCH', `/webhooks/${appId}/${token}/messages/@original`, { body: payload, auth: false })
@@ -157,6 +164,10 @@ export const createPrivateThread = (channelId: string, name: string, reason?: st
 export const addThreadMember = (threadId: string, userId: string) =>
   discordRequest('PUT', `/channels/${threadId}/thread-members/${userId}`)
 
+/** Archive/lock (or reopen) a thread. */
+export const updateThread = (threadId: string, patch: { archived?: boolean; locked?: boolean }, reason?: string) =>
+  discordRequest('PATCH', `/channels/${threadId}`, { body: patch, reason })
+
 // ---- Reads and edits used by role sync -------------------------------------
 export interface GuildRole {
   id: string
@@ -178,6 +189,8 @@ export interface GuildMember {
 export const UNKNOWN_MEMBER = 10007
 export const UNKNOWN_ROLE = 10011
 export const UNKNOWN_CHANNEL = 10003
+export const UNKNOWN_MESSAGE = 10008
+export const CANNOT_DM = 50007
 
 export function discordErrorCode(err: unknown): number | null {
   if (err instanceof DiscordError && err.body && typeof err.body === 'object' && 'code' in err.body) {

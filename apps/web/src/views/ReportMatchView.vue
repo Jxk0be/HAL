@@ -20,7 +20,7 @@ const matchId = computed(() => (typeof route.params.matchId === 'string' ? route
 const prefillId = computed(() => (typeof route.query.prefill === 'string' ? route.query.prefill : null))
 
 const r = useReport(matchId, prefillId)
-const { match, myTeamId, roster, maps, sides, status, submittedAt, restoredDraft, previews, loading, submitting, uploading } = r
+const { match, myTeamId, roster, maps, sides, status, submittedAt, restoredDraft, fromDiscord, previews, loading, submitting, uploading } = r
 const game = useGameData()
 onMounted(() => void game.load())
 
@@ -173,6 +173,9 @@ function discard() {
       </UiEmptyState>
 
       <form v-else class="mt-6 flex flex-col gap-6" novalidate @submit.prevent="submit">
+        <div v-if="fromDiscord" class="rounded-md border border-gold-dim bg-gold-soft px-4 py-3 text-sm">
+          Maps and screenshots came from your <strong>/report</strong> in Discord. Check them, enter the player stats and submit to finish your report.
+        </div>
         <div v-if="restoredDraft" class="flex flex-wrap items-center justify-between gap-3 rounded-md border border-gold-dim bg-gold-soft px-4 py-3 text-sm">
           <span>Restored your unsent draft from this device.</span>
           <UiButton size="sm" variant="ghost" @click="discard">Discard draft</UiButton>

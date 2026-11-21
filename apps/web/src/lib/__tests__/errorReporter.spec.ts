@@ -1,0 +1,10 @@
+import { describe, expect, it } from 'vitest'
+import { describeError } from '../errorReporter'
+
+describe('describeError', () => {
+  it('names errors, keeps strings and serialises the rest', () => {
+    expect(describeError(new TypeError('x is undefined')).message).toBe('TypeError: x is undefined')
+    expect(describeError('boom')).toEqual({ message: 'boom', stack: null })
+    expect(describeError({ code: 42 }).message).toBe('{"code":42}')
+  })
+})

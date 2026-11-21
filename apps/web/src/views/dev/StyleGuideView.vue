@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
-import LiveBanner from '@/components/layout/LiveBanner.vue'
 import HalWordmark from '@/components/brand/HalWordmark.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiCard from '@/components/ui/UiCard.vue'
@@ -69,9 +68,9 @@ const swatches = [
       <section aria-labelledby="sg-brand">
         <h2 id="sg-brand" class="eyebrow mb-4 text-gold">Brand</h2>
         <div class="flex flex-wrap items-center gap-10 rounded-lg border border-line bg-surface p-6">
-          <HalWordmark :size="48" />
-          <HalWordmark :size="48" compact />
-          <HalWordmark :size="28" />
+          <HalWordmark :size="120" />
+          <HalWordmark :size="64" />
+          <HalWordmark :size="46" />
         </div>
       </section>
 
@@ -214,9 +213,7 @@ const swatches = [
 
       <section aria-labelledby="sg-banner">
         <h2 id="sg-banner" class="eyebrow mb-4 text-gold">Live banner</h2>
-        <div class="overflow-hidden rounded-lg border border-line">
-          <LiveBanner :broadcast="{ title: 'Seraphim vs Gatekeepers · Week 3', url: 'https://twitch.tv' }" />
-        </div>
+        <p class="text-sm text-muted">The banner shows at the top of every page while a caster is live (see /admin/casting). It reads real data, so it isn't previewed here.</p>
       </section>
     </div>
 

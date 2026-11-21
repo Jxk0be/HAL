@@ -151,12 +151,12 @@ export function teamRolePlacement(roles: RolePosition[], roleId: string, playerI
 
 /** Fixed role names and colours (created on first full_resync if missing). */
 export const FIXED_ROLE_SPECS: Record<keyof FixedRoles, { name: string; color: number }> = {
-  admin: { name: 'HAL Admin', color: 0xd4af37 },
+  admin: { name: 'HAL Admin', color: 0xf8b800 },
   caster: { name: 'HAL Caster', color: 0x8fb8ff },
-  captain: { name: 'Captain', color: 0xe6c55a },
+  captain: { name: 'Captain', color: 0xffd23f },
   player: { name: 'Player', color: 0x9b978d },
   free_agent: { name: 'Free Agent', color: 0x4fb07c },
 }
 
-export const TEAM_ROLE_COLOR = 0xb8a06a
+export const TEAM_ROLE_COLOR = 0xc99400
 export const TEAM_CATEGORY_NAME = 'Team Channels'

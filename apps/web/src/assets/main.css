@@ -19,11 +19,11 @@
   --color-muted: #a29d92;
   --color-faint: #6f6b64;
 
-  /* Accent */
-  --color-gold: #d4af37;
-  --color-gold-strong: #e6c55a;
-  --color-gold-dim: #8f7726;
-  --color-gold-soft: rgb(212 175 55 / 0.1);
+  /* Accent: the gold of the HAL logo (outline and halo) */
+  --color-gold: #f8b800;
+  --color-gold-strong: #ffd23f;
+  --color-gold-dim: #9a7300;
+  --color-gold-soft: rgb(248 184 0 / 0.1);
   --color-on-gold: #0b0b0d;
 
   /* Status (sparingly) */
@@ -135,7 +135,7 @@
   }
 
   ::selection {
-    background: rgb(212 175 55 / 0.35);
+    background: rgb(248 184 0 / 0.35);
   }
 
   a {

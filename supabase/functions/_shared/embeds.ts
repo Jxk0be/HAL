@@ -1,7 +1,7 @@
 import type { Embed } from './discord.ts'
 
-/** HAL gold (#D4AF37) as a Discord colour integer. */
-export const HAL_GOLD = 0xd4af37
+/** HAL gold from the logo (#F8B800) as a Discord colour integer. */
+export const HAL_GOLD = 0xf8b800
 export const HAL_WIN = 0x4fb07c
 export const HAL_LOSS = 0xe0695b
 

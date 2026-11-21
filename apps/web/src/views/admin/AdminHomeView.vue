@@ -26,7 +26,7 @@ const tiles = computed(() => {
   <div>
     <PageHeader eyebrow="Staff" title="Overview" description="What needs attention. Staff never act on matches or teams they play on; the database enforces it." />
     <div class="px-4 py-8 sm:px-6">
-      <p v-if="!auth.isAdmin" class="text-sm text-muted">Casters manage broadcasts from match pages.</p>
+      <p v-if="!auth.isAdmin" class="text-sm text-muted">Casters: claim matches and go live from the <RouterLink to="/admin/casting" class="text-gold hover:text-gold-strong">casting desk</RouterLink>.</p>
       <UiSkeleton v-else-if="loading" :lines="4" />
       <ul v-else class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <li v-for="t in tiles" :key="t.label">

@@ -1,5 +1,10 @@
 import { ephemeral, type Registry } from '../_shared/interactions.ts'
 import { halEmbed } from '../_shared/embeds.ts'
+import { checkinHandler } from './checkin.ts'
+import { lfgButton, lfgCommand, lfgModalHandler } from './lfg.ts'
+import { rescheduleAutocomplete, rescheduleButton, rescheduleCommand } from './reschedule.ts'
+import { reportAutocomplete, reportCommand, reportModal } from './report.ts'
+import { disputeAutocomplete, disputeCommand, disputeModal } from './dispute.ts'
 
 /**
  * Command, component, modal and autocomplete handlers. Later steps register more here:
@@ -35,8 +40,24 @@ export const registry: Registry = {
         }
       },
     },
+    lfg: lfgCommand,
+    reschedule: rescheduleCommand,
+    report: reportCommand,
+    dispute: disputeCommand,
   },
-  components: {},
-  modals: {},
-  autocomplete: {},
+  components: {
+    checkin: checkinHandler,
+    lfg: lfgButton,
+    reschedule: rescheduleButton,
+  },
+  modals: {
+    lfg: lfgModalHandler,
+    report: reportModal,
+    dispute: disputeModal,
+  },
+  autocomplete: {
+    reschedule: rescheduleAutocomplete,
+    report: reportAutocomplete,
+    dispute: disputeAutocomplete,
+  },
 }

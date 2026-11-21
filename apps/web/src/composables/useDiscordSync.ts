@@ -53,3 +53,41 @@ export function useDiscordSync() {
   void loadErrors()
   return { running, lastStats, errors, loadingErrors, resync, reloadErrors: loadErrors }
 }
+
+export interface BotChannels {
+  lfg: string
+  disputes: string
+  results: string
+  announcements: string
+  admin: string
+}
+
+/** Channel IDs the bot posts to (#results, #announcements, #admin-only). Owner edits. */
+export function useBotChannels() {
+  const channels = ref<BotChannels>({ lfg: '', disputes: '', results: '', announcements: '', admin: '' })
+  const loading = ref(true)
+  const saving = ref(false)
+
+  async function load() {
+    const { data } = await supabase.from('app_settings').select('value').eq('key', 'discord_channels').maybeSingle()
+    const v = (data?.value ?? {}) as Partial<BotChannels>
+    channels.value = { lfg: v.lfg ?? '', disputes: v.disputes ?? '', results: v.results ?? '', announcements: v.announcements ?? '', admin: v.admin ?? '' }
+    loading.value = false
+  }
+
+  async function save(next: BotChannels): Promise<{ ok: true } | { ok: false; message: string }> {
+    const clean = Object.fromEntries(Object.entries(next).map(([k, v]) => [k, v.trim()])) as unknown as BotChannels
+    if (Object.values(clean).some((v) => v && !/^\d{17,20}$/.test(v))) {
+      return { ok: false, message: 'Channel IDs are 17 to 20 digits. In Discord, turn on Developer Mode, then right-click a channel → Copy Channel ID.' }
+    }
+    saving.value = true
+    const { error } = await supabase.from('app_settings').upsert({ key: 'discord_channels', value: { ...clean } })
+    saving.value = false
+    if (error) return { ok: false, message: "Couldn't save. Only the owner can change these." }
+    channels.value = clean
+    return { ok: true }
+  }
+
+  void load()
+  return { channels, loading, saving, save }
+}

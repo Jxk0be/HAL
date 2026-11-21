@@ -4,7 +4,6 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import { site } from '@/config/site'
 
-const Placeholder = () => import('@/views/PlaceholderView.vue')
 
 const routes: RouteRecordRaw[] = [
   { path: '/', name: 'home', component: () => import('@/views/HomeView.vue'), meta: { title: 'Home' } },
@@ -110,12 +109,8 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Report Match', requiresAuth: true, player: true },
   },
   { path: '/my-team/report/:matchId', redirect: (to) => ({ name: 'report-match', params: to.params, query: to.query }) },
-  {
-    path: '/my-team/reschedules',
-    name: 'reschedules',
-    component: Placeholder,
-    meta: { title: 'Reschedule Requests', eyebrow: 'Captain', description: 'Propose or answer a new match time.', buildStep: 16, requiresAuth: true, player: true },
-  },
+  // Reschedule requests live on the match page and in My Team's Requests panel.
+  { path: '/my-team/reschedules', redirect: { name: 'my-team' } },
 
   // Admin: one shell with a sidebar; children inherit requiresAuth and narrow 'staff'.
   {
@@ -124,6 +119,7 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true, staff: 'any' },
     children: [
       { path: '', name: 'admin', component: () => import('@/views/admin/AdminHomeView.vue'), meta: { title: 'Admin' } },
+      { path: 'casting', name: 'admin-casting', component: () => import('@/views/admin/AdminCastingView.vue'), meta: { title: 'Casting desk' } },
       { path: 'mismatches', name: 'admin-mismatches', component: () => import('@/views/admin/AdminMismatchesView.vue'), meta: { title: 'Mismatch Queue', staff: 'admin' } },
       { path: 'mismatches/:matchId', name: 'admin-mismatch', component: () => import('@/views/admin/AdminMismatchDetailView.vue'), meta: { title: 'Settle mismatches', staff: 'admin' } },
       { path: 'disputes', name: 'admin-disputes', component: () => import('@/views/admin/AdminDisputesView.vue'), meta: { title: 'Disputes', staff: 'admin' } },
@@ -131,6 +127,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'season', name: 'admin-season', component: () => import('@/views/admin/AdminSeasonView.vue'), meta: { title: 'Season & Schedule', staff: 'admin' } },
       { path: 'content', name: 'admin-content', component: () => import('@/views/admin/AdminContentView.vue'), meta: { title: 'Content', staff: 'admin' } },
       { path: 'roles', name: 'admin-roles', component: () => import('@/views/admin/AdminRolesView.vue'), meta: { title: 'User Roles', staff: 'owner' } },
+      { path: 'health', name: 'admin-health', component: () => import('@/views/admin/AdminHealthView.vue'), meta: { title: 'Health', staff: 'admin' } },
       { path: 'discord', name: 'admin-discord', component: () => import('@/views/admin/AdminDiscordView.vue'), meta: { title: 'Discord sync', staff: 'owner' } },
     ],
   },

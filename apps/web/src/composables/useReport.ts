@@ -5,6 +5,7 @@ import { compressImage } from '@/lib/image'
 import { playerName } from '@/lib/players'
 import {
   emptyMap,
+  emptyRows,
   fromSubmission,
   screenshotPath,
   toPayload,
@@ -87,6 +88,8 @@ export function useReport(matchId: MaybeRefOrGetter<string | null | undefined>, 
   const maps = ref<ReportMap[]>([])
   const submittedAt = ref<string | null>(null)
   const restoredDraft = ref(false)
+  /** The form was prefilled from a Discord /report draft. */
+  const fromDiscord = ref(false)
   const previews = ref<Record<string, string>>({})
   const loading = ref(true)
   const submitting = ref(false)
@@ -129,15 +132,17 @@ export function useReport(matchId: MaybeRefOrGetter<string | null | undefined>, 
     }
 
     const prefill = toValue(prefillId)
-    const [{ data: members }, { data: checkins }, { data: mine }] = await Promise.all([
+    const [{ data: members }, { data: checkins }, { data: mine }, { data: discordDraft }] = await Promise.all([
       supabase
         .from('team_members')
         .select('user_id, team_id, role, left_at, is_emergency, emergency_match_id, profile:profiles(discord_username, activision_id)')
         .in('team_id', [s.homeTeamId, s.awayTeamId]),
       supabase.from('checkins').select('team_id, player_ids').eq('match_id', id),
+      supabase.from('report_submissions').select('id, maps, player_stats, screenshot_paths, submitted_at').eq('match_id', id).eq('team_id', myTeamId.value).maybeSingle(),
+      // ?prefill=<id>: maps and screenshots saved by Discord's /report (step 21).
       prefill
-        ? supabase.from('report_submissions').select('id, maps, player_stats, screenshot_paths, submitted_at').eq('id', prefill).eq('match_id', id).maybeSingle()
-        : supabase.from('report_submissions').select('id, maps, player_stats, screenshot_paths, submitted_at').eq('match_id', id).eq('team_id', myTeamId.value).maybeSingle(),
+        ? supabase.from('report_drafts').select('id, maps, screenshot_paths').eq('id', prefill).eq('match_id', id).maybeSingle()
+        : Promise.resolve({ data: null }),
     ])
 
     const scheduled = match.value.scheduledAt
@@ -157,10 +162,19 @@ export function useReport(matchId: MaybeRefOrGetter<string | null | undefined>, 
       return checked?.length ? checked : roster.value.filter((r) => r.teamId === teamId).slice(0, 4).map((r) => r.userId)
     }
 
-    submittedAt.value = prefill ? null : (mine?.submitted_at ?? null)
-    const draft = readDraft(id, myTeamId.value)
+    submittedAt.value = mine?.submitted_at ?? null
+    fromDiscord.value = Boolean(discordDraft)
+    const draft = discordDraft ? null : readDraft(id, myTeamId.value)
     restoredDraft.value = Boolean(draft)
-    if (draft) maps.value = draft
+    if (discordDraft) {
+      // Maps and screenshots from Discord; the line-up comes from check-in or the roster.
+      const home = lineup(s.homeTeamId)
+      const away = lineup(s.awayTeamId)
+      maps.value = fromSubmission({ maps: discordDraft.maps, player_stats: [], screenshot_paths: discordDraft.screenshot_paths }, s).map((m) => ({
+        ...m,
+        players: emptyRows(s, home, away),
+      }))
+    } else if (draft) maps.value = draft
     else if (mine) maps.value = fromSubmission(mine, s)
     else {
       const home = lineup(s.homeTeamId)
@@ -226,6 +240,7 @@ export function useReport(matchId: MaybeRefOrGetter<string | null | undefined>, 
     const { data, error } = await supabase.rpc('submit_report', {
       p_match_id: id,
       p_report: toPayload(maps.value) as unknown as Json,
+      p_source: fromDiscord.value ? 'discord' : 'site',
     })
     submitting.value = false
     if (error) return { ok: false, message: dbErrorMessage(error, 'Could not submit the report. Please try again.') }
@@ -246,6 +261,7 @@ export function useReport(matchId: MaybeRefOrGetter<string | null | undefined>, 
     status,
     submittedAt,
     restoredDraft,
+    fromDiscord,
     previews,
     loading,
     submitting,

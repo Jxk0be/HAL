@@ -30,8 +30,7 @@ function isActive(to: string) {
   <header class="sticky top-0 z-30 border-b border-line bg-bg/90 backdrop-blur-md print:hidden">
     <div class="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
       <RouterLink to="/" class="shrink-0 rounded-sm" aria-label="Heaven's Arena League home">
-        <span class="hidden sm:block"><HalWordmark :size="34" decorative /></span>
-        <span class="block sm:hidden"><HalWordmark :size="34" compact decorative /></span>
+        <HalWordmark :size="46" decorative />
       </RouterLink>
 
       <nav aria-label="Main" class="ml-4 hidden flex-1 lg:block">
@@ -84,7 +83,7 @@ function isActive(to: string) {
     >
       <div class="flex h-full flex-col">
         <div class="flex h-16 items-center justify-between border-b border-line px-4">
-          <HalWordmark :size="30" decorative />
+          <HalWordmark :size="40" decorative />
           <button
             type="button"
             class="grid size-10 place-items-center rounded-md hover:bg-surface-2"

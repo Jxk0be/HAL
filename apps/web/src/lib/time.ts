@@ -90,3 +90,14 @@ export function formatLocalTime(iso: string): string {
     minute: '2-digit',
   }).format(new Date(iso))
 }
+
+/** The league week containing `iso`: Monday 00:00 to the next Monday 00:00 (exclusive) in `tz`. */
+export function leagueWeekBounds(iso: string, tz: string = LEAGUE_TZ): { start: Date; end: Date } {
+  const monday = mondayOf(toZoned(iso, tz).date)
+  return { start: zonedToUtc(monday, '00:00', tz), end: zonedToUtc(addDays(monday, 7), '00:00', tz) }
+}
+
+/** The viewer's own time zone (for date-time pickers). */
+export function localTimeZone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone
+}

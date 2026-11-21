@@ -18,7 +18,7 @@ void useAuthStore().init()
     Skip to content
   </a>
   <div class="flex min-h-dvh flex-col">
-    <LiveBanner :broadcast="null" />
+    <LiveBanner />
     <AppHeader />
     <AccountNotice />
     <main id="main" tabindex="-1" class="flex-1 focus:outline-none">

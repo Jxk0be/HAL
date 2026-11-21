@@ -55,7 +55,16 @@ const label = computed(() => {
         rel="noopener noreferrer"
         class="relative z-10 rounded-md bg-gold px-3 py-1 font-heading text-xs tracking-wider text-on-gold hover:bg-gold-strong"
       >
-        Watch<span class="sr-only"> live (opens in a new tab)</span>
+        <span class="text-loss" aria-hidden="true">●</span> LIVE · Watch<span class="sr-only"> live (opens in a new tab)</span>
+      </a>
+      <a
+        v-else-if="match.broadcastUrl && !compact"
+        :href="match.broadcastUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="relative z-10 text-xs text-muted hover:text-gold"
+      >
+        Watch broadcast<span class="sr-only"> of {{ match.home.name }} vs {{ match.away.name }} (opens in a new tab)</span>
       </a>
     </div>
   </article>

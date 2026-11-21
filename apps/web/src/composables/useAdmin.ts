@@ -241,6 +241,7 @@ export interface DisputeRow {
   id: string
   matchId: string
   teamId: string
+  category: string
   reason: string
   status: 'open' | 'resolved'
   resolution: string | null
@@ -261,7 +262,7 @@ export function useDisputes() {
     const { data } = await supabase
       .from('disputes')
       .select(
-        'id, match_id, team_id, reason, status, resolution, resolved_at, created_at, opener:profiles!disputes_opened_by_fkey(discord_username, activision_id), match:matches(week, scheduled_at, status, home:teams!matches_home_team_id_fkey(id, name, tag), away:teams!matches_away_team_id_fkey(id, name, tag)), evidence:dispute_evidence(id, url, storage_path, note)',
+        'id, match_id, team_id, category, reason, status, resolution, resolved_at, created_at, opener:profiles!disputes_opened_by_fkey(discord_username, activision_id), match:matches(week, scheduled_at, status, home:teams!matches_home_team_id_fkey(id, name, tag), away:teams!matches_away_team_id_fkey(id, name, tag)), evidence:dispute_evidence(id, url, storage_path, note)',
       )
       .order('status')
       .order('created_at', { ascending: false })
@@ -275,6 +276,7 @@ export function useDisputes() {
         id: d.id,
         matchId: d.match_id,
         teamId: d.team_id,
+        category: d.category,
         reason: d.reason,
         status: d.status,
         resolution: d.resolution,
@@ -627,4 +629,30 @@ export async function loadResultMaps(matchId: string): Promise<ResultMap[]> {
     .eq('match_id', matchId)
     .order('map_number')
   return (data ?? []).map((m) => ({ mode_id: m.mode_id, map_id: m.map_id, home_score: m.home_score, away_score: m.away_score }))
+}
+
+// ---- Health ----------------------------------------------------------------------
+export interface AdminHealth {
+  client_errors_24h: number
+  bot_errors_24h: number
+  outbox_waiting: number
+  outbox_failing: number
+  outbox_oldest: string | null
+  client_errors: { id: number; at: string; message: string; url: string | null; stack: string | null; release: string | null }[]
+  bot_errors: { id: number; at: string; action: string; error: string }[]
+  cron: { job: string; schedule: string; active: boolean; last_status: string | null; last_run: string | null }[]
+}
+
+/** Site errors, bot errors, the Discord outbox backlog and scheduled jobs (admins). */
+export function useAdminHealth() {
+  const health = ref<AdminHealth | null>(null)
+  const loading = ref(true)
+  async function load() {
+    loading.value = true
+    const { data } = await supabase.rpc('admin_health')
+    health.value = (data as unknown as AdminHealth) ?? null
+    loading.value = false
+  }
+  void load()
+  return { health, loading, reload: load }
 }

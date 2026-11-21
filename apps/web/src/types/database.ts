@@ -90,6 +90,58 @@ export type Database = {
           },
         ]
       }
+      bot_events: {
+        Row: {
+          discord_channel_id: string | null
+          discord_message_id: string | null
+          id: number
+          kind: string
+          match_id: string | null
+          sent_at: string
+          team_id: string | null
+        }
+        Insert: {
+          discord_channel_id?: string | null
+          discord_message_id?: string | null
+          id?: never
+          kind: string
+          match_id?: string | null
+          sent_at?: string
+          team_id?: string | null
+        }
+        Update: {
+          discord_channel_id?: string | null
+          discord_message_id?: string | null
+          id?: never
+          kind?: string
+          match_id?: string | null
+          sent_at?: string
+          team_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bot_events_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
+          {
+            foreignKeyName: "bot_events_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bot_events_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       checkins: {
         Row: {
           captain_id: string
@@ -169,6 +221,64 @@ export type Database = {
           },
         ]
       }
+      client_errors: {
+        Row: {
+          created_at: string
+          id: number
+          message: string
+          release: string | null
+          session_id: string | null
+          stack: string | null
+          url: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          message: string
+          release?: string | null
+          session_id?: string | null
+          stack?: string | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          message?: string
+          release?: string | null
+          session_id?: string | null
+          stack?: string | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_errors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_errors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_errors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       discord_sync_errors: {
         Row: {
           action: string
@@ -192,6 +302,66 @@ export type Database = {
           payload?: Json | null
         }
         Relationships: []
+      }
+      dispute_comments: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          dispute_id: string
+          id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          dispute_id: string
+          id?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          dispute_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispute_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispute_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispute_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispute_comments_dispute_id_fkey"
+            columns: ["dispute_id"]
+            isOneToOne: false
+            referencedRelation: "disputes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispute_comments_dispute_id_fkey"
+            columns: ["dispute_id"]
+            isOneToOne: false
+            referencedRelation: "disputes_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dispute_evidence: {
         Row: {
@@ -261,10 +431,14 @@ export type Database = {
       }
       disputes: {
         Row: {
+          category: Database["public"]["Enums"]["dispute_category"]
           created_at: string
           discord_thread_id: string | null
           id: string
           match_id: string
+          match_status_before:
+            | Database["public"]["Enums"]["match_status"]
+            | null
           opened_by: string
           reason: string
           resolution: string | null
@@ -275,10 +449,14 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category?: Database["public"]["Enums"]["dispute_category"]
           created_at?: string
           discord_thread_id?: string | null
           id?: string
           match_id: string
+          match_status_before?:
+            | Database["public"]["Enums"]["match_status"]
+            | null
           opened_by: string
           reason: string
           resolution?: string | null
@@ -289,10 +467,14 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category?: Database["public"]["Enums"]["dispute_category"]
           created_at?: string
           discord_thread_id?: string | null
           id?: string
           match_id?: string
+          match_status_before?:
+            | Database["public"]["Enums"]["match_status"]
+            | null
           opened_by?: string
           reason?: string
           resolution?: string | null
@@ -408,6 +590,7 @@ export type Database = {
           active: boolean
           availability: string | null
           created_at: string
+          discord_channel_id: string | null
           discord_message_id: string | null
           id: string
           note: string | null
@@ -421,6 +604,7 @@ export type Database = {
           active?: boolean
           availability?: string | null
           created_at?: string
+          discord_channel_id?: string | null
           discord_message_id?: string | null
           id?: string
           note?: string | null
@@ -434,6 +618,7 @@ export type Database = {
           active?: boolean
           availability?: string | null
           created_at?: string
+          discord_channel_id?: string | null
           discord_message_id?: string | null
           id?: string
           note?: string | null
@@ -677,6 +862,7 @@ export type Database = {
           away_team_id: string
           broadcast_by: string | null
           broadcast_live: boolean
+          broadcast_started_at: string | null
           broadcast_url: string | null
           confirmed_at: string | null
           created_at: string
@@ -701,6 +887,7 @@ export type Database = {
           away_team_id: string
           broadcast_by?: string | null
           broadcast_live?: boolean
+          broadcast_started_at?: string | null
           broadcast_url?: string | null
           confirmed_at?: string | null
           created_at?: string
@@ -725,6 +912,7 @@ export type Database = {
           away_team_id?: string
           broadcast_by?: string | null
           broadcast_live?: boolean
+          broadcast_started_at?: string | null
           broadcast_url?: string | null
           confirmed_at?: string | null
           created_at?: string
@@ -809,6 +997,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications_outbox: {
+        Row: {
+          attempts: number
+          created_at: string
+          id: number
+          last_error: string | null
+          payload: Json
+          sent_at: string | null
+          type: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          id?: never
+          last_error?: string | null
+          payload?: Json
+          sent_at?: string | null
+          type: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          id?: never
+          last_error?: string | null
+          payload?: Json
+          sent_at?: string | null
+          type?: string
+        }
+        Relationships: []
       }
       penalties: {
         Row: {
@@ -906,6 +1124,78 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pending_discord_disputes: {
+        Row: {
+          attachment: Json | null
+          created_at: string
+          discord_user_id: string
+          match_id: string
+        }
+        Insert: {
+          attachment?: Json | null
+          created_at?: string
+          discord_user_id: string
+          match_id: string
+        }
+        Update: {
+          attachment?: Json | null
+          created_at?: string
+          discord_user_id?: string
+          match_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_discord_disputes_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
+          {
+            foreignKeyName: "pending_discord_disputes_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pending_discord_reports: {
+        Row: {
+          attachments: Json
+          created_at: string
+          discord_user_id: string
+          match_id: string
+        }
+        Insert: {
+          attachments?: Json
+          created_at?: string
+          discord_user_id: string
+          match_id: string
+        }
+        Update: {
+          attachments?: Json
+          created_at?: string
+          discord_user_id?: string
+          match_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_discord_reports_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
+          {
+            foreignKeyName: "pending_discord_reports_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
             referencedColumns: ["id"]
           },
         ]
@@ -1029,6 +1319,85 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      report_drafts: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          maps: Json
+          match_id: string
+          screenshot_paths: string[]
+          source: Database["public"]["Enums"]["submission_source"]
+          team_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          maps?: Json
+          match_id: string
+          screenshot_paths?: string[]
+          source?: Database["public"]["Enums"]["submission_source"]
+          team_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          maps?: Json
+          match_id?: string
+          screenshot_paths?: string[]
+          source?: Database["public"]["Enums"]["submission_source"]
+          team_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_drafts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_drafts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_drafts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_drafts_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
+          {
+            foreignKeyName: "report_drafts_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_drafts_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       report_submissions: {
         Row: {
@@ -1894,6 +2263,7 @@ export type Database = {
       }
       disputes_public: {
         Row: {
+          category: Database["public"]["Enums"]["dispute_category"] | null
           created_at: string | null
           id: string | null
           match_id: string | null
@@ -1906,6 +2276,7 @@ export type Database = {
           team_id: string | null
         }
         Insert: {
+          category?: Database["public"]["Enums"]["dispute_category"] | null
           created_at?: string | null
           id?: string | null
           match_id?: string | null
@@ -1918,6 +2289,7 @@ export type Database = {
           team_id?: string | null
         }
         Update: {
+          category?: Database["public"]["Enums"]["dispute_category"] | null
           created_at?: string | null
           id?: string | null
           match_id?: string | null
@@ -2167,11 +2539,16 @@ export type Database = {
       }
     }
     Functions: {
+      add_dispute_comment: {
+        Args: { p_body: string; p_dispute_id: string }
+        Returns: string
+      }
       admin_clear_result: { Args: { p_match_id: string }; Returns: undefined }
       admin_forfeit: {
         Args: { p_forfeit_team_id: string; p_match_id: string }
         Returns: undefined
       }
+      admin_health: { Args: never; Returns: Json }
       admin_mismatch_queue: { Args: never; Returns: Json }
       admin_overview: { Args: never; Returns: Json }
       admin_set_result: {
@@ -2229,6 +2606,13 @@ export type Database = {
         Args: { p_reason: string; p_until: string; p_user_id: string }
         Returns: undefined
       }
+      broadcast_casters: {
+        Args: { p_match_ids: string[] }
+        Returns: {
+          caster: string
+          match_id: string
+        }[]
+      }
       can_staff_match: { Args: { p_match_id: string }; Returns: boolean }
       can_staff_match_for: {
         Args: { p_match_id: string; p_user_id: string }
@@ -2240,6 +2624,25 @@ export type Database = {
         Returns: boolean
       }
       cancel_invite: { Args: { p_invite_id: string }; Returns: undefined }
+      cancel_reschedule: { Args: { p_request_id: string }; Returns: undefined }
+      captain_team_for: { Args: { p_user_id: string }; Returns: string }
+      check_in: {
+        Args: { p_match_id: string; p_player_ids: string[] }
+        Returns: Json
+      }
+      check_in_as: {
+        Args: {
+          p_match_id: string
+          p_player_ids: string[]
+          p_source?: Database["public"]["Enums"]["submission_source"]
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      claim_broadcast: {
+        Args: { p_claim: boolean; p_match_id: string }
+        Returns: undefined
+      }
       compare_reports: {
         Args: { p_match_id: string }
         Returns: Database["public"]["Enums"]["match_status"]
@@ -2248,11 +2651,23 @@ export type Database = {
         Args: { p_matches: Json; p_replace?: boolean; p_season_id: string }
         Returns: number
       }
+      discord_scheduler_tick: { Args: never; Returns: undefined }
       discord_sync_enqueue: {
         Args: { p_action: string; p_payload?: Json }
         Returns: undefined
       }
       discord_sync_secret: { Args: never; Returns: string }
+      disputable_matches_for: {
+        Args: { p_actor: string }
+        Returns: {
+          match_id: string
+          opponent_tag: string
+          scheduled_at: string
+          team_id: string
+          week: number
+        }[]
+      }
+      dispute_thread_people: { Args: { p_dispute_id: string }; Returns: Json }
       division_standings: {
         Args: { p_division_id?: string; p_season_id: string }
         Returns: {
@@ -2273,6 +2688,19 @@ export type Database = {
           wins: number
         }[]
       }
+      eligible_checkin_players: {
+        Args: { p_match_id: string; p_team_id: string }
+        Returns: {
+          is_emergency: boolean
+          name: string
+          user_id: string
+        }[]
+      }
+      enqueue_notification: {
+        Args: { p_payload: Json; p_type: string }
+        Returns: undefined
+      }
+      expire_reschedule_requests: { Args: never; Returns: number }
       free_agent_board: {
         Args: {
           p_limit?: number
@@ -2314,6 +2742,15 @@ export type Database = {
         }
         Returns: string
       }
+      invite_player_as: {
+        Args: {
+          p_actor: string
+          p_role?: Database["public"]["Enums"]["member_role"]
+          p_team_id: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       is_admin: { Args: never; Returns: boolean }
       is_admin_for: { Args: { p_user_id: string }; Returns: boolean }
       is_captain_in_match: {
@@ -2341,14 +2778,72 @@ export type Database = {
       is_profile_complete: { Args: { p_user_id: string }; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
       is_staff_for: { Args: { p_user_id: string }; Returns: boolean }
+      is_stream_url: { Args: { p_url: string }; Returns: boolean }
       leave_team: { Args: { p_team_id: string }; Returns: undefined }
+      lfg_remove_as: { Args: { p_user_id: string }; Returns: Json }
+      lfg_set_message: {
+        Args: { p_channel_id: string; p_message_id: string; p_post_id: string }
+        Returns: undefined
+      }
+      lfg_upsert_as: {
+        Args: {
+          p_availability: string
+          p_note: string
+          p_role: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       like_pattern: { Args: { p: string }; Returns: string }
+      live_broadcasts: {
+        Args: never
+        Returns: {
+          away_name: string
+          away_tag: string
+          caster: string
+          home_name: string
+          home_tag: string
+          match_id: string
+          started_at: string
+          url: string
+        }[]
+      }
+      log_client_error: {
+        Args: {
+          p_message: string
+          p_release?: string
+          p_session_id?: string
+          p_stack?: string
+          p_url?: string
+          p_user_agent?: string
+        }
+        Returns: boolean
+      }
       match_captain_team: { Args: { p_match_id: string }; Returns: string }
       match_of_dispute: { Args: { p_dispute_id: string }; Returns: string }
       match_of_map: { Args: { p_match_map_id: string }; Returns: string }
       match_settled: { Args: { p_match_id: string }; Returns: boolean }
       my_match_report_status: { Args: { p_match_id: string }; Returns: Json }
       my_team_ids: { Args: { p_season_id: string }; Returns: string[] }
+      open_dispute: {
+        Args: {
+          p_category: Database["public"]["Enums"]["dispute_category"]
+          p_description: string
+          p_evidence?: Json
+          p_match_id: string
+        }
+        Returns: string
+      }
+      open_dispute_as: {
+        Args: {
+          p_actor: string
+          p_category: Database["public"]["Enums"]["dispute_category"]
+          p_description: string
+          p_evidence?: Json
+          p_match_id: string
+        }
+        Returns: string
+      }
       player_directory: {
         Args: {
           p_limit?: number
@@ -2383,10 +2878,50 @@ export type Database = {
         Args: { p: Json; p_key: string; p_label: string; p_max: number }
         Returns: number
       }
+      reportable_matches_for: {
+        Args: { p_actor: string }
+        Returns: {
+          away_tag: string
+          home_tag: string
+          match_id: string
+          opponent_tag: string
+          scheduled_at: string
+          team_id: string
+          week: number
+        }[]
+      }
       request_my_discord_sync: { Args: never; Returns: boolean }
+      request_reschedule: {
+        Args: { p_match_id: string; p_proposed_at: string }
+        Returns: string
+      }
+      request_reschedule_as: {
+        Args: { p_actor: string; p_match_id: string; p_proposed_at: string }
+        Returns: string
+      }
+      reschedulable_matches_for: {
+        Args: { p_actor: string }
+        Returns: {
+          default_at: string
+          match_id: string
+          opponent_name: string
+          opponent_tag: string
+          scheduled_at: string
+          timezone: string
+          week: number
+        }[]
+      }
       resolve_mismatch: {
         Args: { p_choice: string; p_mismatch_id: string; p_value?: string }
         Returns: Json
+      }
+      respond_reschedule: {
+        Args: { p_accept: boolean; p_request_id: string }
+        Returns: undefined
+      }
+      respond_reschedule_as: {
+        Args: { p_accept: boolean; p_actor: string; p_request_id: string }
+        Returns: Database["public"]["Enums"]["reschedule_status"]
       }
       respond_to_invite: {
         Args: { p_accept: boolean; p_invite_id: string }
@@ -2420,6 +2955,13 @@ export type Database = {
       try_uuid: { Args: { p: string }; Returns: string }
     }
     Enums: {
+      dispute_category:
+        | "score"
+        | "stats"
+        | "conduct"
+        | "cheating"
+        | "eligibility"
+        | "other"
       dispute_status: "open" | "resolved"
       invite_status:
         | "pending"
@@ -2589,6 +3131,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      dispute_category: [
+        "score",
+        "stats",
+        "conduct",
+        "cheating",
+        "eligibility",
+        "other",
+      ],
       dispute_status: ["open", "resolved"],
       invite_status: [
         "pending",

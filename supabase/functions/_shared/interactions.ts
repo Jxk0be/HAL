@@ -36,6 +36,14 @@ export interface DiscordUser {
   global_name?: string | null
 }
 
+export interface DiscordAttachment {
+  id: string
+  url: string
+  filename: string
+  size: number
+  content_type?: string
+}
+
 export interface Interaction {
   id: string
   application_id: string
@@ -51,6 +59,8 @@ export interface Interaction {
     custom_id?: string
     values?: string[]
     components?: unknown[]
+    /** Attachments (and other objects) referenced by command options, keyed by id. */
+    resolved?: { attachments?: Record<string, DiscordAttachment> }
   }
   message?: { id: string }
 }
@@ -89,7 +99,11 @@ export type Reply =
   | { kind: 'update'; payload: MessagePayload }
   | { kind: 'modal'; data: Record<string, unknown> }
   | { kind: 'autocomplete'; choices: { name: string; value: string }[] }
-  | { kind: 'deferred'; ephemeral?: boolean; work: () => Promise<MessagePayload> }
+  /**
+   * Answer later. On a button or select, the default edits the message it is attached to;
+   * newMessage: true sends a new (optionally ephemeral) reply instead.
+   */
+  | { kind: 'deferred'; ephemeral?: boolean; newMessage?: boolean; work: () => Promise<MessagePayload> }
 
 export interface Handler {
   /** Works without a linked HAL profile (e.g. /ping). */
@@ -142,7 +156,7 @@ function toResponse(reply: Reply, i: Interaction, deps: Deps): RouteResult {
     case 'autocomplete':
       return { response: { type: ResponseType.AUTOCOMPLETE_RESULT, data: { choices: reply.choices.slice(0, 25) } } }
     case 'deferred': {
-      const isComponent = i.type === InteractionType.MESSAGE_COMPONENT
+      const updatesMessage = i.type === InteractionType.MESSAGE_COMPONENT && !reply.newMessage
       const background = (async () => {
         let payload: MessagePayload
         try {
@@ -154,7 +168,7 @@ function toResponse(reply: Reply, i: Interaction, deps: Deps): RouteResult {
         await deps.editOriginal(i.application_id, i.token, { allowed_mentions: { parse: [] }, ...payload })
       })()
       return {
-        response: isComponent
+        response: updatesMessage
           ? { type: ResponseType.DEFERRED_UPDATE_MESSAGE }
           : { type: ResponseType.DEFERRED_CHANNEL_MESSAGE, data: reply.ephemeral ? { flags: EPHEMERAL } : {} },
         background,

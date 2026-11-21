@@ -32,10 +32,11 @@ export interface MatchCardData {
   forfeitTeamId: string | null
   broadcastLive: boolean
   broadcastUrl: string | null
+  confirmedAt: string | null
 }
 
 export const MATCH_SELECT =
-  'id, season_id, division_id, week, stage, playoff_round, status, scheduled_at, default_at, home_series, away_series, winner_team_id, forfeit_team_id, broadcast_live, broadcast_url, home:teams!matches_home_team_id_fkey(id, name, tag, logo_url), away:teams!matches_away_team_id_fkey(id, name, tag, logo_url)'
+  'id, season_id, division_id, week, stage, playoff_round, status, scheduled_at, default_at, home_series, away_series, winner_team_id, forfeit_team_id, broadcast_live, broadcast_url, confirmed_at, home:teams!matches_home_team_id_fkey(id, name, tag, logo_url), away:teams!matches_away_team_id_fkey(id, name, tag, logo_url)'
 
 type MatchRow = {
   id: string
@@ -53,6 +54,7 @@ type MatchRow = {
   forfeit_team_id: string | null
   broadcast_live: boolean
   broadcast_url: string | null
+  confirmed_at: string | null
   home: { id: string; name: string; tag: string; logo_url: string | null }
   away: { id: string; name: string; tag: string; logo_url: string | null }
 }
@@ -77,6 +79,7 @@ export function toMatchCard(m: MatchRow): MatchCardData {
     forfeitTeamId: m.forfeit_team_id,
     broadcastLive: m.broadcast_live,
     broadcastUrl: m.broadcast_url,
+    confirmedAt: m.confirmed_at,
   }
 }
 
@@ -141,7 +144,7 @@ export function useMatchDetail(id: MaybeRefOrGetter<string | null | undefined>) 
   const match = ref<MatchCardData | null>(null)
   const maps = ref<MatchMapDetail[]>([])
   const screenshots = ref<{ path: string; url: string; teamId: string }[]>([])
-  const checkins = ref<{ teamId: string; at: string; players: number }[]>([])
+  const checkins = ref<{ teamId: string; at: string; players: number; names: string[]; source: string }[]>([])
   const dispute = ref<{ status: string; reason: string; resolution: string | null } | null>(null)
   const loading = ref(true)
 
@@ -164,8 +167,8 @@ export function useMatchDetail(id: MaybeRefOrGetter<string | null | undefined>) 
         ? supabase.from('report_submissions').select('team_id, screenshot_paths').eq('match_id', matchId)
         : Promise.resolve({ data: [] as { team_id: string; screenshot_paths: string[] }[] }),
       auth.isSignedIn
-        ? supabase.from('checkins').select('team_id, checked_in_at, player_ids').eq('match_id', matchId)
-        : Promise.resolve({ data: [] as { team_id: string; checked_in_at: string; player_ids: string[] }[] }),
+        ? supabase.from('checkins').select('team_id, checked_in_at, player_ids, source').eq('match_id', matchId)
+        : Promise.resolve({ data: [] as { team_id: string; checked_in_at: string; player_ids: string[]; source: string }[] }),
       supabase.from('disputes_public').select('status, reason, resolution').eq('match_id', matchId).order('created_at', { ascending: false }).limit(1),
     ])
 
@@ -208,7 +211,15 @@ export function useMatchDetail(id: MaybeRefOrGetter<string | null | undefined>) 
     } else {
       screenshots.value = []
     }
-    checkins.value = (ci ?? []).map((c) => ({ teamId: c.team_id, at: c.checked_in_at, players: c.player_ids.length }))
+    const ciIds = [...new Set((ci ?? []).flatMap((c) => c.player_ids))]
+    const { data: ciPeople } = ciIds.length
+      ? await supabase.from('profiles').select('id, discord_username, activision_id').in('id', ciIds)
+      : { data: [] as { id: string; discord_username: string | null; activision_id: string | null }[] }
+    const ciName = (id: string) => {
+      const p = (ciPeople ?? []).find((x) => x.id === id)
+      return playerName({ discordUsername: p?.discord_username, activisionId: p?.activision_id })
+    }
+    checkins.value = (ci ?? []).map((c) => ({ teamId: c.team_id, at: c.checked_in_at, players: c.player_ids.length, names: c.player_ids.map(ciName), source: c.source }))
     dispute.value = d?.[0] ? { status: d[0].status ?? 'open', reason: d[0].reason ?? '', resolution: d[0].resolution } : null
     loading.value = false
   }

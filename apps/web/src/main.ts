@@ -5,6 +5,9 @@ import '@fontsource/barlow-condensed/600.css'
 import '@fontsource/barlow-condensed/700.css'
 import App from './App.vue'
 import { router } from './router'
+import { installErrorReporter } from './lib/errorReporter'
 import './assets/main.css'
 
-createApp(App).use(createPinia()).use(router).mount('#app')
+const app = createApp(App).use(createPinia()).use(router)
+installErrorReporter(app, router)
+app.mount('#app')
