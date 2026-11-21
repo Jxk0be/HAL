@@ -10,8 +10,8 @@ type ProfileRow = Database['public']['Tables']['profiles']['Row']
 
 /** Every profile column except discord_id (hidden from the API by column privileges). */
 export const PROFILE_COLUMNS =
-  'id, discord_username, avatar_url, activision_id, platform, age_confirmed_at, controller_confirmed_at, pov_ack_at, is_free_agent, banned_until, created_at, updated_at'
-export type MyProfile = Omit<ProfileRow, 'discord_id'>
+  'id, discord_username, avatar_url, activision_id, platform, age_confirmed_at, controller_confirmed_at, is_free_agent, banned_until, created_at, updated_at'
+export type MyProfile = Omit<ProfileRow, 'discord_id' | 'discord_synced_at'>
 
 export interface MyTeam {
   id: string
@@ -114,6 +114,12 @@ export const useAuthStore = defineStore('auth', () => {
       return
     }
     await Promise.all([loadRoles(uid), loadProfile(uid), loadTeam(uid)])
+    // Catch up Discord roles for players who joined the server after logging in (throttled to
+    // once per 10 minutes in the database; fire and forget).
+    void supabase.rpc('request_my_discord_sync').then(
+      () => undefined,
+      () => undefined,
+    )
   }
 
   /** Load the current session once; safe to call from guards and components. */

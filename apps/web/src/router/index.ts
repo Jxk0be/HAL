@@ -158,6 +158,12 @@ const routes: RouteRecordRaw[] = [
     component: Placeholder,
     meta: { title: 'User Roles', eyebrow: 'Owner', description: 'Grant and revoke staff roles.', buildStep: 15, requiresAuth: true, staff: 'owner' },
   },
+  {
+    path: '/admin/discord',
+    name: 'admin-discord',
+    component: () => import('@/views/admin/AdminDiscordView.vue'),
+    meta: { title: 'Discord sync', requiresAuth: true, staff: 'owner' },
+  },
 
   {
     path: '/:pathMatch(.*)*',

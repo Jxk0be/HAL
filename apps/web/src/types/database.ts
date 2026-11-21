@@ -162,6 +162,30 @@ export type Database = {
           },
         ]
       }
+      discord_sync_errors: {
+        Row: {
+          action: string
+          created_at: string
+          error: string
+          id: number
+          payload: Json | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          error: string
+          id?: never
+          payload?: Json | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          error?: string
+          id?: never
+          payload?: Json | null
+        }
+        Relationships: []
+      }
       dispute_evidence: {
         Row: {
           added_by: string
@@ -936,11 +960,11 @@ export type Database = {
           controller_confirmed_at: string | null
           created_at: string
           discord_id: string | null
+          discord_synced_at: string | null
           discord_username: string | null
           id: string
           is_free_agent: boolean
           platform: Database["public"]["Enums"]["platform"] | null
-          pov_ack_at: string | null
           updated_at: string
         }
         Insert: {
@@ -951,11 +975,11 @@ export type Database = {
           controller_confirmed_at?: string | null
           created_at?: string
           discord_id?: string | null
+          discord_synced_at?: string | null
           discord_username?: string | null
           id: string
           is_free_agent?: boolean
           platform?: Database["public"]["Enums"]["platform"] | null
-          pov_ack_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -966,11 +990,11 @@ export type Database = {
           controller_confirmed_at?: string | null
           created_at?: string
           discord_id?: string | null
+          discord_synced_at?: string | null
           discord_username?: string | null
           id?: string
           is_free_agent?: boolean
           platform?: Database["public"]["Enums"]["platform"] | null
-          pov_ack_at?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1982,8 +2006,21 @@ export type Database = {
         Returns: string
       }
       can_staff_match: { Args: { p_match_id: string }; Returns: boolean }
+      can_staff_match_for: {
+        Args: { p_match_id: string; p_user_id: string }
+        Returns: boolean
+      }
       can_staff_team: { Args: { p_team_id: string }; Returns: boolean }
+      can_staff_team_for: {
+        Args: { p_team_id: string; p_user_id: string }
+        Returns: boolean
+      }
       cancel_invite: { Args: { p_invite_id: string }; Returns: undefined }
+      discord_sync_enqueue: {
+        Args: { p_action: string; p_payload?: Json }
+        Returns: undefined
+      }
+      discord_sync_secret: { Args: never; Returns: string }
       free_agent_board: {
         Args: {
           p_limit?: number
@@ -2010,6 +2047,13 @@ export type Database = {
         Args: { p_role: Database["public"]["Enums"]["staff_role"] }
         Returns: boolean
       }
+      has_role_for: {
+        Args: {
+          p_role: Database["public"]["Enums"]["staff_role"]
+          p_user_id: string
+        }
+        Returns: boolean
+      }
       invite_player: {
         Args: {
           p_role?: Database["public"]["Enums"]["member_role"]
@@ -2019,18 +2063,32 @@ export type Database = {
         Returns: string
       }
       is_admin: { Args: never; Returns: boolean }
+      is_admin_for: { Args: { p_user_id: string }; Returns: boolean }
       is_captain_in_match: {
         Args: { p_match_id: string; p_team_id: string }
         Returns: boolean
       }
       is_captain_of: { Args: { p_team_id: string }; Returns: boolean }
+      is_captain_of_for: {
+        Args: { p_team_id: string; p_user_id: string }
+        Returns: boolean
+      }
       is_caster: { Args: never; Returns: boolean }
       is_internal: { Args: never; Returns: boolean }
       is_on_team: { Args: { p_team_id: string }; Returns: boolean }
+      is_on_team_for: {
+        Args: { p_team_id: string; p_user_id: string }
+        Returns: boolean
+      }
       is_owner: { Args: never; Returns: boolean }
       is_party_to_match: { Args: { p_match_id: string }; Returns: boolean }
+      is_party_to_match_for: {
+        Args: { p_match_id: string; p_user_id: string }
+        Returns: boolean
+      }
       is_profile_complete: { Args: { p_user_id: string }; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
+      is_staff_for: { Args: { p_user_id: string }; Returns: boolean }
       leave_team: { Args: { p_team_id: string }; Returns: undefined }
       like_pattern: { Args: { p: string }; Returns: string }
       match_captain_team: { Args: { p_match_id: string }; Returns: string }
@@ -2067,6 +2125,7 @@ export type Database = {
         Args: { p_team_id: string; p_user_id: string }
         Returns: undefined
       }
+      request_my_discord_sync: { Args: never; Returns: boolean }
       respond_to_invite: {
         Args: { p_accept: boolean; p_invite_id: string }
         Returns: undefined

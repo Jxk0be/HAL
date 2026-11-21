@@ -29,19 +29,12 @@ export interface OnboardingFields {
   platform: Platform | null
   age_confirmed_at: string | null
   controller_confirmed_at: string | null
-  pov_ack_at: string | null
 }
 
 /** Mirrors public.is_profile_complete(). */
 export function isProfileComplete(p: OnboardingFields | null | undefined): boolean {
   if (!p) return false
-  return Boolean(
-    p.activision_id &&
-      p.platform &&
-      p.age_confirmed_at &&
-      p.controller_confirmed_at &&
-      (p.platform !== 'pc' || p.pov_ack_at),
-  )
+  return Boolean(p.activision_id && p.platform && p.age_confirmed_at && p.controller_confirmed_at)
 }
 
 /** Turn database errors from profile saves into messages for people. */

@@ -6,7 +6,7 @@ import { normalizeActivisionId, profileErrorMessage } from '@/lib/validation/pro
 
 type ProfileUpdate = Pick<
   Database['public']['Tables']['profiles']['Update'],
-  'activision_id' | 'platform' | 'is_free_agent' | 'age_confirmed_at' | 'controller_confirmed_at' | 'pov_ack_at'
+  'activision_id' | 'platform' | 'is_free_agent' | 'age_confirmed_at' | 'controller_confirmed_at'
 >
 
 /** Save the signed-in player's own profile. Confirmation timestamps are stamped by the server. */

@@ -23,7 +23,6 @@ const form = reactive({
   platform: '' as Platform | '',
   adult: false,
   controller: false,
-  pov: false,
   freeAgent: true,
 })
 const touched = ref(false)
@@ -33,7 +32,6 @@ function reset(p: MyProfile) {
   form.platform = p.platform ?? ''
   form.adult = Boolean(p.age_confirmed_at)
   form.controller = Boolean(p.controller_confirmed_at)
-  form.pov = Boolean(p.pov_ack_at)
   form.freeAgent = p.is_free_agent
 }
 watch(() => props.profile, reset, { immediate: true })
@@ -43,10 +41,6 @@ const errors = computed(() => ({
   platform: form.platform ? null : 'Choose your platform.',
   adult: form.adult ? null : 'You must be 18 or older to play in HAL.',
   controller: form.controller ? null : 'HAL is controller only on every platform.',
-  pov:
-    form.platform !== 'pc' || form.pov
-      ? null
-      : 'PC players must keep a POV recording of every match for 72 hours.',
 }))
 const valid = computed(() => Object.values(errors.value).every((e) => e === null))
 const show = (key: keyof typeof errors.value) => (touched.value ? (errors.value[key] ?? undefined) : undefined)
@@ -62,7 +56,6 @@ async function submit() {
     is_free_agent: props.onTeam ? p.is_free_agent : form.freeAgent,
     ...(p.age_confirmed_at ? {} : { age_confirmed_at: now }),
     ...(p.controller_confirmed_at ? {} : { controller_confirmed_at: now }),
-    ...(form.platform === 'pc' && !p.pov_ack_at ? { pov_ack_at: now } : {}),
   })
   if (ok) emit('saved')
 }
@@ -107,15 +100,6 @@ async function submit() {
         :disabled="Boolean(profile.controller_confirmed_at)"
         :description="profile.controller_confirmed_at ? 'Confirmed. HAL is controller only on every platform.' : 'HAL is controller only on every platform. PC is allowed with a controller.'"
         :error="show('controller')"
-      />
-      <UiCheckbox
-        v-if="form.platform === 'pc'"
-        v-model="form.pov"
-        label="I'll keep a POV recording of every match for 72 hours"
-        required
-        :disabled="Boolean(profile.pov_ack_at)"
-        description="Admins may also ask PC players for a live screen-share."
-        :error="show('pov')"
       />
     </fieldset>
 

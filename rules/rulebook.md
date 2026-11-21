@@ -27,9 +27,9 @@ Effective: November 20, 2026
 
 **2.3** Controller only, on every platform. PC players are allowed if they play with a controller.
 
-**2.4** PC players must keep a point-of-view (POV) recording of every match for 72 hours after it ends and hand it over if an admin asks. Admins may also ask a PC player for a live screen-share during a match.
+**2.4** Admins may ask a PC player for a live screen-share during a match.
 
-**2.5** You log in with Discord and must set up your player profile before joining or creating a team: your Activision ID, your platform, and the confirmations in 2.1, 2.3 and (for PC) 2.4.
+**2.5** You log in with Discord and must set up your player profile before joining or creating a team: your Activision ID, your platform, and the confirmations in 2.1 and 2.3.
 
 **2.6** Your Activision ID must be your real, current ID. Each Activision ID can be registered to only one HAL account.
 

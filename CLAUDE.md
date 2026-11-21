@@ -35,7 +35,7 @@ The step-by-step build plan is `hal-build-guide.html` (kept outside the repo); e
 
 ## Eligibility, rosters, subs
 - 18+ (age confirmed at signup). Controller only on every platform. PC is allowed with a controller.
-- PC players keep a POV recording for 72 hours; admins may ask for a live screen-share.
+- Admins may ask a PC player for a live screen-share. (There is no POV-recording pledge; it was removed.)
 - Login is Discord OAuth only. Players add their Activision ID to their profile.
 - One team per player per season. Roster: up to 4 starters (the captain is one of them) and 3 subs, so max 7. One captain, one optional co-captain.
 - Joining a team: everyone who signs in with Discord is automatically a free agent. A captain invites a free agent, either by searching their name on the team page or with Invite on the Free Agents page, and only while the team has an open spot. The player accepts or declines (on the site, later also in Discord). Accepting puts them on the roster immediately with no admin approval, takes them off the free agent list and cancels their other invites. Invites expire after 7 days.
@@ -117,7 +117,7 @@ The step-by-step build plan is `hal-build-guide.html` (kept outside the repo); e
 - Layout: `App.vue` renders a skip link, LiveBanner (fed in step 17), AppHeader (desktop nav, UserMenu, mobile `<dialog>` drawer), `<main id="main">`, AppFooter and UiToastHost. Pages start with `PageHeader`. Nav items are `mainNav` in `src/config/site.ts`; home copy is in `src/content/home.ts`.
 - Routing: every page is a lazy route in `src/router/index.ts`. Unbuilt pages use `PlaceholderView`, which reads `meta.title/eyebrow/description/buildStep`. `meta.requiresAuth` sends logged-out users to `/login?redirect=`; `meta.staff` is `'any' | 'admin' | 'owner'`, checked against the auth store. `/dev/ui` (the style guide) exists only in dev builds.
 - Auth: `useAuthStore` (`src/stores/auth.ts`) holds the session, `profile` (selected with `PROFILE_COLUMNS`, never `*`), staff roles, the current-season `team` (role, captain or co-captain), `isOnboarded`, `isBanned`/`bannedUntil` and `isStaff`/`isAdmin`/`isOwner`. Call `refresh()` after anything that changes them. Login is Discord OAuth with PKCE and scopes `identify email` (Supabase needs the email to create the user; it is never shown). It returns to `/auth/callback?next=…`, which sends incomplete profiles to `/onboarding?next=…`. Redirect targets always go through `safeNext()` (same-site paths only).
-- Onboarding: `ProfileForm` (used by `/onboarding` and `/profile`) needs an Activision ID (`Name#1234567`, unique ignoring case), a platform, 18+, a controller confirmation, and for PC the 72-hour POV pledge. Confirmations are set once and stamped by the server. The rules live in `src/lib/validation/profile.ts`, which mirrors `public.is_profile_complete()`; the database refuses team creation and invite acceptance until the profile is complete. Profile saves go through `useMyProfile()`.
+- Onboarding: `ProfileForm` (used by `/onboarding` and `/profile`) needs an Activision ID (`Name#1234567`, unique ignoring case), a platform, and the 18+ and controller confirmations. That's the same for every platform; there is no POV pledge. Confirmations are set once and stamped by the server. The rules live in `src/lib/validation/profile.ts`, which mirrors `public.is_profile_complete()`; the database refuses team creation and invite acceptance until the profile is complete. Profile saves go through `useMyProfile()`.
 - Route meta `player: true` (My Team, Report, Reschedules) needs a complete profile and no active ban. `AccountNotice` shows a site-wide banned or "finish your profile" bar.
 - Owner bootstrap: run `supabase/snippets/make_owner.sql` once after your first login.
 - Teams (step 6):
@@ -158,6 +158,22 @@ The step-by-step build plan is `hal-build-guide.html` (kept outside the repo); e
   - Discord REST calls go through `_shared/discord.ts`, which retries on 429. Embeds use `halEmbed()` (gold bar, HAL footer).
   - Slash commands are defined only in `_shared/commands.ts`. Register them with `pnpm commands:register`. Deno tests run with `pnpm test:functions`.
   - Deploying with the Supabase MCP: pass the entrypoint plus every `../_shared/*.ts` it imports as files.
+- Discord role sync (step 11):
+  - Postgres triggers on `teams`, `team_members`, `staff_roles` and `profiles` call `discord_sync_enqueue(action, payload)`, which fires a pg_net POST to the `discord-sync` Edge Function.
+    - Actions: `team_sync`, `team_removed`, `user_sync`.
+    - The URL and shared secret live in Vault (`discord_sync_url`, `discord_sync_secret`), created once per environment by `supabase/snippets/setup_discord_sync.sql`. Without them the triggers do nothing.
+    - The function reads the secret through the service-role-only `discord_sync_secret()`.
+  - The function recomputes the desired state each time, so every call is idempotent.
+    - `plan.ts` holds the pure rules: `desiredRoles`, `roleDiff` (only removes HAL-managed roles), and team channel names and permissions. `sync.ts` does the I/O.
+    - Fixed roles (Captain, Player, Free Agent, HAL Admin, HAL Caster) and the "Team Channels" category are created on first use (matched by name if they already exist), with their ids stored in `app_settings.discord`.
+    - Team role and channel ids are stored on `teams`. Team channels are visible only to the team role, HAL Admin and the bot.
+  - Who gets which role:
+    - Players not in the server are skipped (counted as `notInServer`). `auth.refresh()` calls `request_my_discord_sync()` (throttled to 10 minutes) so they catch up after joining.
+    - Free Agent needs a complete profile and no ban.
+  - `full_resync` is only for the owner, called with their JWT from `/admin/discord`, which also shows the latest 20 rows of `discord_sync_errors`.
+  - The function is deployed with `verify_jwt: false` and authenticates in code (secret header, or owner JWT for `full_resync`).
+  - The audit trigger ignores changes that only touch Discord ids or `discord_synced_at`.
+  - pg_net is installed in the `extensions` schema; call it as `net.http_post`.
 - Test seasons: only one active season can exist, so tests reuse it (forced to `signups` inside the rolled-back block). `supabase/tests/free_agents_test.sql` covers the board, privacy and posts.
 - Check every page at 375px (no horizontal scroll). Don't put responsive `hidden`/`sm:inline-flex` classes on a component whose root already sets `display`; wrap it in a span instead.
 

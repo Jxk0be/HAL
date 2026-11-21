@@ -33,7 +33,6 @@ describe('isProfileComplete', () => {
     platform: 'playstation' as const,
     age_confirmed_at: '2026-01-01T00:00:00Z',
     controller_confirmed_at: '2026-01-01T00:00:00Z',
-    pov_ack_at: null,
   }
 
   it('needs every console field', () => {
@@ -43,9 +42,8 @@ describe('isProfileComplete', () => {
     expect(isProfileComplete(null)).toBe(false)
   })
 
-  it('needs the POV pledge on PC only', () => {
-    expect(isProfileComplete({ ...base, platform: 'pc' })).toBe(false)
-    expect(isProfileComplete({ ...base, platform: 'pc', pov_ack_at: '2026-01-01T00:00:00Z' })).toBe(true)
+  it('treats PC the same as consoles (no extra pledge)', () => {
+    expect(isProfileComplete({ ...base, platform: 'pc' })).toBe(true)
   })
 })
 

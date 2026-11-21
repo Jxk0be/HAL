@@ -90,6 +90,14 @@ async function logout() {
         >
           Admin
         </RouterLink>
+        <RouterLink
+          v-if="auth.isOwner"
+          class="block px-4 py-2 text-sm text-gold hover:bg-surface-3"
+          to="/admin/discord"
+          @click="open = false"
+        >
+          Discord sync
+        </RouterLink>
         <button
           type="button"
           class="block w-full border-t border-line px-4 py-2 text-left text-sm text-muted hover:bg-surface-3 hover:text-text"

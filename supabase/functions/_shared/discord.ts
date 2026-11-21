@@ -150,3 +150,49 @@ export const createPrivateThread = (channelId: string, name: string, reason?: st
 
 export const addThreadMember = (threadId: string, userId: string) =>
   discordRequest('PUT', `/channels/${threadId}/thread-members/${userId}`)
+
+// ---- Reads and edits used by role sync -------------------------------------
+export interface GuildRole {
+  id: string
+  name: string
+  position: number
+}
+export interface GuildChannel {
+  id: string
+  name: string
+  type: number
+  parent_id?: string | null
+}
+export interface GuildMember {
+  user: { id: string }
+  roles: string[]
+}
+
+/** Discord error code for "Unknown Member" (user isn't in the server). */
+export const UNKNOWN_MEMBER = 10007
+export const UNKNOWN_ROLE = 10011
+export const UNKNOWN_CHANNEL = 10003
+
+export function discordErrorCode(err: unknown): number | null {
+  if (err instanceof DiscordError && err.body && typeof err.body === 'object' && 'code' in err.body) {
+    return Number((err.body as { code: unknown }).code)
+  }
+  return null
+}
+
+export const getGuildRoles = (guildId: string) => discordRequest<GuildRole[]>('GET', `/guilds/${guildId}/roles`)
+
+export const getGuildChannels = (guildId: string) =>
+  discordRequest<GuildChannel[]>('GET', `/guilds/${guildId}/channels`)
+
+export const getGuildMember = (guildId: string, userId: string) =>
+  discordRequest<GuildMember>('GET', `/guilds/${guildId}/members/${userId}`)
+
+export const editRole = (guildId: string, roleId: string, patch: { name?: string; color?: number }, reason?: string) =>
+  discordRequest('PATCH', `/guilds/${guildId}/roles/${roleId}`, { body: patch, reason })
+
+export const editChannel = (
+  channelId: string,
+  patch: { name?: string; parent_id?: string; topic?: string; permission_overwrites?: PermissionOverwrite[] },
+  reason?: string,
+) => discordRequest('PATCH', `/channels/${channelId}`, { body: patch, reason })
