@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+// The real client throws without VITE_SUPABASE_* env vars (as in CI).
+vi.mock('../supabase', () => ({ supabase: { rpc: vi.fn() } }))
+
 import { describeError } from '../errorReporter'
 
 describe('describeError', () => {
