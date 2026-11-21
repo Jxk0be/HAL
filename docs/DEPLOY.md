@@ -21,7 +21,6 @@ Nothing secret ever goes in a `VITE_` variable: those are compiled into the publ
 | `VITE_SUPABASE_URL` | `https://lluwzpwiybvgnsimpwey.supabase.co` | Public |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase → Project Settings → API Keys → publishable key | Public by design; RLS protects the data |
 | `VITE_DISCORD_INVITE_URL` | `https://discord.gg/WWavSTQXWR` | Set the invite to never expire in Discord |
-| `VITE_RULEBOOK_REPO` | `Jxk0be/HAL` | The repo must be public for the Rules page to load `rules/rulebook.md` |
 | `VITE_SITE_URL` | Your Netlify URL, e.g. `https://hal-league.netlify.app` (later your domain) | No trailing slash. Used for share previews |
 
 Node 22 and pnpm (from `package.json` `packageManager`) are picked automatically.
@@ -65,7 +64,7 @@ Channel IDs for `#lfg-free-agents`, `#results`, `#announcements`, `#disputes` an
 ## 2. First deploy, in order
 
 1. **GitHub secrets**, then **push** `main`. The `deploy` job should pass and change nothing the first time (every migration is already applied).
-2. **Netlify:** Add new site → Import from Git → pick `Jxk0be/HAL`. Netlify reads `netlify.toml` (base `/`, build `pnpm --filter web build`, publish `apps/web/dist`). Add the `VITE_` variables, then deploy. Note the site URL.
+2. **Netlify:** Add new site → Import from Git → pick the HAL repository. Netlify reads `netlify.toml` (base `/`, build `pnpm --filter web build`, publish `apps/web/dist`). Add the `VITE_` variables, then deploy. Note the site URL.
 3. **Point everything at the live URL:**
    - Netlify: set `VITE_SITE_URL` to the site URL and redeploy.
    - Supabase Edge Function secret `SITE_URL`: the same URL.

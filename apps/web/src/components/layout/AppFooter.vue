@@ -21,11 +21,6 @@ const year = new Date().getFullYear()
               Discord<span class="sr-only"> (opens in a new tab)</span>
             </a>
           </li>
-          <li>
-            <a :href="site.githubUrl" target="_blank" rel="noopener noreferrer" class="text-muted hover:text-text">
-              GitHub<span class="sr-only"> (opens in a new tab)</span>
-            </a>
-          </li>
         </ul>
       </nav>
     </div>

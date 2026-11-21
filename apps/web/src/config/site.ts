@@ -4,8 +4,6 @@ export const site = {
   shortName: 'HAL',
   tagline: 'Competitive Call of Duty for NA controller players.',
   discordInviteUrl: import.meta.env.VITE_DISCORD_INVITE_URL,
-  rulebookRepo: import.meta.env.VITE_RULEBOOK_REPO,
-  githubUrl: `https://github.com/${import.meta.env.VITE_RULEBOOK_REPO}`,
   leagueTimezone: 'America/New_York',
 } as const
 

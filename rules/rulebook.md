@@ -207,6 +207,6 @@ Effective: November 20, 2026
 
 **15.1** League staff may change these rules during the season. Changes are announced in Discord.
 
-**15.2** The full history of every change is public on GitHub, and the website shows the date of the latest change.
+**15.2** Every change is announced in Discord, and the website shows the date of the latest change.
 
 **15.3** A rule change does not apply to a match that was played before the change.

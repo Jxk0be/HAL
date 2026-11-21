@@ -5,10 +5,9 @@
  */
 import { ephemeral, type Handler } from '../_shared/interactions.ts'
 import { noticeEmbed } from '../_shared/embeds.ts'
-import { CANNOT_DM, createDmChannel, discordErrorCode, sendMessage } from '../_shared/discord.ts'
 import { adminClient } from '../_shared/supabase.ts'
 import { loadChannels } from '../_shared/match_data.ts'
-import { inviteDm, lfgModal, modalValues } from '../_shared/lfg_messages.ts'
+import { lfgModal, modalValues } from '../_shared/lfg_messages.ts'
 import { deleteLfgMessage, publishLfg } from '../_shared/lfg_sync.ts'
 
 const readable = (error: { code?: string; message: string }, fallback: string) =>
@@ -107,25 +106,15 @@ export const lfgButton: Handler = {
         const { error } = await db.rpc('invite_player_as', { p_actor: profile.id, p_team_id: teamId, p_user_id: id })
         if (error) return { embeds: [noticeEmbed(readable(error, 'Could not send the invite.'), 'error')] }
 
-        const [{ data: team }, { data: player }] = await Promise.all([
-          db.from('teams').select('name').eq('id', teamId).single(),
-          db.from('profiles').select('discord_id, discord_username, activision_id').eq('id', id).single(),
-        ])
+        // The invite queues a DM with Accept / Decline (team_invite_sent), same as invites from the site.
+        const { data: player } = await db.from('profiles').select('discord_username, activision_id').eq('id', id).single()
         const playerName = player?.discord_username ?? player?.activision_id ?? 'the player'
-        const captain = profile.discordUsername ?? profile.activisionId ?? 'A captain'
-        const manual = `${deps.siteUrl}/profile`
-        if (player?.discord_id) {
-          try {
-            const dm = await createDmChannel(player.discord_id)
-            await sendMessage(dm.id, inviteDm(captain, team?.name ?? 'A team', deps.siteUrl))
-            return { embeds: [noticeEmbed(`Invite sent to **${playerName}**. I DM’d them the link; it’s also on their HAL profile.`, 'success')] }
-          } catch (err) {
-            if (discordErrorCode(err) !== CANNOT_DM) console.error('invite DM failed', err)
-          }
-        }
         return {
           embeds: [
-            noticeEmbed(`Invite sent to **${playerName}** on the site, but I couldn’t DM them. Send them this link to accept: ${manual}`, 'success'),
+            noticeEmbed(
+              `Invite sent to **${playerName}**. They'll get a DM with Accept / Decline within a few minutes, and it's on their HAL profile (${deps.siteUrl}/profile). Your team channel hears their answer.`,
+              'success',
+            ),
           ],
         }
       },

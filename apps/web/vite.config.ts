@@ -6,15 +6,14 @@ import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 
 /** Last commit that touched the rulebook, baked in at build time (fallback for the Rules page). */
-function rulebookCommit(): { date: string; message: string } | null {
+function rulebookCommit(): { date: string } | null {
   try {
-    const out = execSync('git log -1 --format=%cI%x1f%s -- rules/rulebook.md', {
+    const out = execSync('git log -1 --format=%cI -- rules/rulebook.md', {
       cwd: fileURLToPath(new URL('../..', import.meta.url)),
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim()
-    const [date, message] = out.split('\x1f')
-    return date ? { date, message: message ?? '' } : null
+    return out ? { date: out } : null
   } catch {
     return null
   }

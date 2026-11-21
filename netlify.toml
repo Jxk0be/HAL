@@ -20,7 +20,6 @@
   [headers.values]
     # Only the hosts HAL talks to. Add a host here before using it in the app, or production blocks it.
     #  - Supabase: API, Auth, Storage (logos, signed screenshot URLs), Realtime (wss)
-    #  - GitHub: the rulebook (raw.githubusercontent.com) and its commit history (api.github.com)
     #  - Discord CDN: player avatars
     #  - Google Fonts: allowed for future use (fonts are self-hosted via Fontsource today)
     Content-Security-Policy = """
@@ -29,7 +28,7 @@
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       font-src 'self' data: https://fonts.gstatic.com;
       img-src 'self' data: blob: https://lluwzpwiybvgnsimpwey.supabase.co https://cdn.discordapp.com https://media.discordapp.net;
-      connect-src 'self' https://lluwzpwiybvgnsimpwey.supabase.co wss://lluwzpwiybvgnsimpwey.supabase.co https://raw.githubusercontent.com https://api.github.com;
+      connect-src 'self' https://lluwzpwiybvgnsimpwey.supabase.co wss://lluwzpwiybvgnsimpwey.supabase.co;
       frame-src 'none';
       frame-ancestors 'none';
       object-src 'none';

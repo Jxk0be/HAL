@@ -43,6 +43,7 @@ import { finishRescheduleRequest, postRescheduleRequest } from '../_shared/resch
 import { closeDisputeThread, ensureDisputeThread, postDisputeComment, reopenDisputeThread } from '../_shared/dispute_flow.ts'
 import { handleEsubEvent } from '../_shared/esub_flow.ts'
 import { runAutoAnnouncements } from '../_shared/announcement_flow.ts'
+import { handleInviteEvent } from '../_shared/invite_flow.ts'
 import { disputeAlert, mismatchAlert, teamPendingAlert, unreportedAlert, withAdminPing } from '../_shared/admin_alerts.ts'
 
 const HANDLED = [
@@ -66,6 +67,8 @@ const HANDLED = [
   'emergency_sub_reviewed',
   'team_pending',
   'mismatch_opened',
+  'team_invite_sent',
+  'team_invite_closed',
 ]
 const MAX_ATTEMPTS = 5
 
@@ -298,6 +301,11 @@ async function handleOutbox(ctx: Ctx, row: { id: number; type: string; payload: 
         withAdminPing(disputeAlert(m, String(p.category), ctx.siteUrl, threadId), ctx.adminRole))
       return
     }
+    case 'team_invite_sent':
+    case 'team_invite_closed':
+      await handleInviteEvent(ctx.db, row.type, String(p.invite_id), ctx.siteUrl)
+      bump(ctx, 'invite')
+      return
     case 'team_pending': {
       if (!ctx.channels.admin) return
       const { data: t } = await ctx.db

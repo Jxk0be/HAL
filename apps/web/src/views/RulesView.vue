@@ -13,7 +13,7 @@ import { allRules, ruleMatches } from '@/lib/rulebook'
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
-const { book, commit, historyUrl, loading } = useRulebook()
+const { book, commit, loading } = useRulebook()
 const { season } = useActiveSeason()
 
 // ---- Search -------------------------------------------------------------
@@ -130,14 +130,6 @@ function mobileJump(number: string) {
             <span aria-hidden="true" class="hidden h-3 w-px bg-line-strong sm:inline-block" />
             Last updated <time :datetime="commit?.date">{{ updated }}</time>
           </span>
-          <a
-            :href="historyUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-gold hover:text-gold-strong print:hidden"
-          >
-            View change history<span class="sr-only"> (opens in a new tab)</span> →
-          </a>
         </div>
         <div v-for="(p, i) in book.intro" :key="i" class="mt-5 max-w-3xl text-muted">
           <!-- eslint-disable-next-line vue/no-v-html -- sanitised inline fragment -->
@@ -244,8 +236,8 @@ function mobileJump(number: string) {
           </section>
 
           <p class="flex flex-wrap items-center gap-2 text-xs text-muted print:hidden">
-            <UiBadge variant="outline">Source</UiBadge>
-            This rulebook lives in the league's GitHub repository. Every change is public.
+            <UiBadge variant="outline">Changes</UiBadge>
+            Rule changes are announced in Discord, and the date above shows the latest one.
           </p>
         </div>
       </div>
