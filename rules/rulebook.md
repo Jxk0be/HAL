@@ -82,6 +82,7 @@ Effective: November 20, 2026
 **5.4** Standings are ranked by series wins.
 
 **5.5** Ties in the standings are broken in this order:
+
 1. Series wins
 2. Map differential (maps won minus maps lost)
 3. Head-to-head result between the tied teams
@@ -125,14 +126,53 @@ Effective: November 20, 2026
 
 **8.2** Mode order for a best-of-5: to be published by league staff.
 
-**8.3** Map pool for each mode: to be published by league staff.
+**8.3** The modes are Hardpoint, Search and Destroy and Hijack. The maps played in each mode are listed on the [Map pool](/maps) page, which league staff keep up to date. 8s use the same pool.
 
-**8.4** BIL Gentlemen's Agreements: to be published by league staff.
+**8.4** Weapons. No other weapons are allowed.
+
+- Assault rifle: HAN 86
+- Submachine gun: VEL 46
+- Pistol: any pistol except the Deagle and the Revolver, with no attachments
+
+**8.5** Required perks. Every player runs all three:
+
+- Kill Chain
+- Ninja
+- Battle Hardened
+
+**8.6** Banned attachments:
+
+- Suppressors
+- Long barrel on the VEL 46
+- Any attachment that multiplies headshot damage
+- Scopes and optics above 1x magnification
+- All Apexes
+
+**8.7** Grenades:
+
+- Hardpoint and Hijack: flash and stun only
+- Search and Destroy: flash and stun, plus 1 smoke per team
+
+**8.8** Lobby settings for every mode:
+
+- Tac Sprint: On
+- Killstreaks: Disabled
+- Killcams: On
+- Team Assignment: On
+- Friendly Fire: Punish, limit 5 kills
+
+**8.9** Search and Destroy also uses:
+
+- Equipment Delay: 5 seconds
+
+**8.10** Hardpoint and Hijack also use:
+
+- Respawn Delay: 2.5 seconds
 
 > [!NOTE]
-> League staff will publish the MW4 modes, map pool and GA list before the regular season. They are kept on the website and announced in Discord, and any change is recorded in the public audit log.
+> Any change to these settings is announced in Discord and recorded in the public audit log. Where a setting isn't listed here, the CDL default applies (8.1).
 
-**8.5** Breaking a GA results in the penalty listed for it. Where none is listed, the offending team loses the map.
+**8.11** Breaking a GA in 8.4 to 8.7 (for example a banned weapon, perk, attachment or grenade) results in the penalty listed for it. Where none is listed, the offending team loses the map.
 
 ## 9. Reporting and Stats
 

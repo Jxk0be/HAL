@@ -16,6 +16,7 @@ URL and the Supabase project. What changes: the server ID, the channel IDs and t
 ## 1. Setup, in order
 
 ### Step 1: Rename the bot (Discord Developer Portal)
+
 1. https://discord.com/developers/applications → your bot's application.
 2. **General Information:** name `Blackhat Bot`, app icon = `apps/web/src/assets/brand/emblem.png`.
    Check **Interactions Endpoint URL** still reads
@@ -26,6 +27,7 @@ URL and the Supabase project. What changes: the server ID, the channel IDs and t
 Do this before inviting the bot: its role in the server is named after it when it joins.
 
 ### Step 2: Create the server
+
 1. Discord → **+** → Create My Own → For a club or community. Name it `Blackhat Invitational League`,
    icon = `emblem.png`.
 2. Server Settings → **Enable Community** and follow the prompts. Community is needed for Onboarding,
@@ -34,11 +36,13 @@ Do this before inviting the bot: its role in the server is named after it when i
 4. Right-click the server icon → **Copy Server ID**.
 
 ### Step 3: Point the bot at the new server
+
 1. Supabase dashboard → Edge Functions → **Secrets** → edit `DISCORD_GUILD_ID` → paste the new server ID.
    If the site URL changed (Netlify rename), update `SITE_URL` here too.
 2. On your computer, set `DISCORD_GUILD_ID` to the same ID in the repo-root `.env`.
 
 ### Step 4: Invite the bot
+
 Open this link and pick the new server. It asks for exactly the permissions the bot uses:
 
 https://discord.com/oauth2/authorize?client_id=1573484470487744522&permissions=361099423248&scope=bot%20applications.commands
@@ -53,46 +57,49 @@ Move Members lets it put 8s players into their team's voice channel.)
 Or tick **Move Members** on the Blackhat Bot role (Server Settings → Roles) yourself.
 
 ### Step 5: Register the slash commands
+
 From the repo root: `pnpm commands:register`. It should list `/ping, /link, /help, /lfg, /8s, /reschedule,
 /report, /dispute`. Type `/ping` in any channel: "Blackhat bot online." means the bot is hooked up.
 
 ### Step 6: Create the categories and channels
+
 Make them as listed below (create a category, then its channels inside it). **Don't** create the
 Captain, Player, Free Agent, BIL Admin, BIL Caster or team roles, or the Team Channels category: the
 bot makes those in step 8.
 
 ✍️ = you post the text from part 2 · 🤖 = the bot posts and keeps it up to date · 🔒 = read-only for @everyone
 
-| Category | Channel | Who writes | Admin → Discord field |
-|---|---|---|---|
-| **INFO** | #start-here 🔒 | ✍️ | — |
-| | #rules 🔒 | ✍️ | — |
-| | #announcements 🔒 | staff + 🤖 season posts, "Now live" | #announcements |
-| **LEAGUE** | #team-rosters 🔒 | 🤖 one post per approved team | #team-rosters |
-| | #standings 🔒 | 🤖 one table per division | #standings |
-| | #match-schedule 🔒 | 🤖 one post per week | #match-schedule |
-| | #results 🔒 | 🤖 confirmed results | #results |
-| | #player-of-the-week 🔒 | 🤖 Mondays at noon ET | #player-of-the-week |
-| **COMMUNITY** | #general | everyone | — |
-| | #free-agents 🔒 | 🤖 free agent cards (posted with the pinned guide's **Post as free agent** button) | #free-agents |
-| | #teams-recruiting | captains | — |
-| | #sub-board 🔒 | 🤖 teams short for a match, with an **I'm available** button | #sub-board |
-| | #clips | everyone | — |
-| | #suggestions | everyone | — |
-| **SUPPORT** | #disputes 🔒 | 🤖 private threads from `/dispute` | #disputes |
-| **STAFF** (private) | #admin-only | 🤖 alerts that ping BIL Admin | #admin-only |
-| | #audit-log | staff notes (the full log is public on the site) | — |
-| **VOICE** | 🔊 Lobby | everyone | — |
-| | 🔊 Waiting Room | players waiting on staff (check-in or dispute help) | — |
-| | 🔊 Casting Stage (Stage channel) | casters speak, everyone listens | — |
-| | 🔊 Admin (private) | staff | — |
-| **8s** | #lf-8s | 🤖 queue post (Join / Leave / Leaderboard) and a post per match; players can chat | #lf-8s |
-| | 🔊 8s Waiting Room | queued players wait here so the bot can move them | — |
-| | 🔊 8s Team A | 🤖 Team A is moved here when a match starts | 🔊 8s Team A |
-| | 🔊 8s Team B | 🤖 Team B is moved here | 🔊 8s Team B |
-| **TEAM CHANNELS** | created by the bot | 🤖 a private text + voice channel per approved team | — |
+| Category            | Channel                          | Who writes                                                                         | Admin → Discord field |
+| ------------------- | -------------------------------- | ---------------------------------------------------------------------------------- | --------------------- |
+| **INFO**            | #start-here 🔒                   | ✍️                                                                                 | —                     |
+|                     | #rules 🔒                        | ✍️                                                                                 | —                     |
+|                     | #announcements 🔒                | staff + 🤖 season posts, "Now live"                                                | #announcements        |
+| **LEAGUE**          | #team-rosters 🔒                 | 🤖 one post per approved team                                                      | #team-rosters         |
+|                     | #standings 🔒                    | 🤖 one table per division                                                          | #standings            |
+|                     | #match-schedule 🔒               | 🤖 one post per week                                                               | #match-schedule       |
+|                     | #results 🔒                      | 🤖 confirmed results                                                               | #results              |
+|                     | #player-of-the-week 🔒           | 🤖 Mondays at noon ET                                                              | #player-of-the-week   |
+| **COMMUNITY**       | #general                         | everyone                                                                           | —                     |
+|                     | #free-agents 🔒                  | 🤖 free agent cards (posted with the pinned guide's **Post as free agent** button) | #free-agents          |
+|                     | #teams-recruiting                | captains                                                                           | —                     |
+|                     | #sub-board 🔒                    | 🤖 teams short for a match, with an **I'm available** button                       | #sub-board            |
+|                     | #clips                           | everyone                                                                           | —                     |
+|                     | #suggestions                     | everyone                                                                           | —                     |
+| **SUPPORT**         | #disputes 🔒                     | 🤖 private threads from `/dispute`                                                 | #disputes             |
+| **STAFF** (private) | #admin-only                      | 🤖 alerts that ping BIL Admin                                                      | #admin-only           |
+|                     | #audit-log                       | staff notes (the full log is public on the site)                                   | —                     |
+| **VOICE**           | 🔊 Lobby                         | everyone                                                                           | —                     |
+|                     | 🔊 Waiting Room                  | players waiting on staff (check-in or dispute help)                                | —                     |
+|                     | 🔊 Casting Stage (Stage channel) | casters speak, everyone listens                                                    | —                     |
+|                     | 🔊 Admin (private)               | staff                                                                              | —                     |
+| **8s**              | #lf-8s                           | 🤖 queue post (Join / Leave / Leaderboard) and a post per match; players can chat  | #lf-8s                |
+|                     | 🔊 8s Waiting Room               | queued players wait here so the bot can move them                                  | —                     |
+|                     | 🔊 8s Team A                     | 🤖 Team A is moved here when a match starts                                        | 🔊 8s Team A          |
+|                     | 🔊 8s Team B                     | 🤖 Team B is moved here                                                            | 🔊 8s Team B          |
+| **TEAM CHANNELS**   | created by the bot               | 🤖 a private text + voice channel per approved team                                | —                     |
 
 ### Step 7: Connect the channels on the website
+
 1. Log in on the site → **Admin → Discord** → **Channels** card.
 2. For each field, right-click the matching channel in Discord → **Copy Channel ID** → paste.
    Thirteen fields: #announcements, #results, #free-agents, #disputes, #admin-only, #team-rosters,
@@ -100,25 +107,28 @@ bot makes those in step 8.
    🔊 8s Team B (right-click the voice channels the same way). Press **Save channels**.
 
 ### Step 8: Let the bot build its roles
+
 On the same page press **Resync Discord**. The bot creates the roles **BIL Admin, BIL Caster,
 Captain, Player, Free Agent** and the **Team Channels** category, and gives you BIL Admin (you're the
 league owner). It's safe to run again any time something looks out of sync.
 
 ### Step 9: Order the roles
+
 Server Settings → Roles, drag them into this order (top = most powerful). The bot can only manage
 roles **below** its own, so its role must sit above everything it hands out:
 
 1. **Blackhat Bot** (the bot's own role, created when it joined)
-2. **BIL Admin**: tick *Display role members separately*
+2. **BIL Admin**: tick _Display role members separately_
 3. **BIL Caster**
-4. **Captain**: tick *Display role members separately*
-5. *team roles* (one per approved team; the bot places them here automatically)
+4. **Captain**: tick _Display role members separately_
+5. _team roles_ (one per approved team; the bot places them here automatically)
 6. **Player**
 7. **Free Agent**
 8. @everyone
 
 Role permissions (Server Settings → Roles → the role → Permissions). The bot uses roles for access
 and labels, so they need very little:
+
 - **BIL Admin:** Manage Messages, Manage Threads, Timeout Members, Kick Members, Mute Members, Move
   Members, Manage Nicknames, View Audit Log. Not Administrator: admins don't need to edit roles or
   channels, the bot does that.
@@ -127,6 +137,7 @@ and labels, so they need very little:
   Connect, Speak...). Turn **off** Mention @everyone.
 
 ### Step 10: Channel permissions
+
 Edit Category/Channel → Permissions → add the role → set the box.
 
 **Do this first: let the bot through.** A ✗ on @everyone in a channel also blocks the bot (Discord
@@ -139,6 +150,7 @@ Sync Now), so the bot's ✓ reaches it. If a channel shows "not synced", give th
 that channel too.
 
 Then the restrictions:
+
 - **🔒 read-only channels** (#start-here, #rules, #announcements, everything in LEAGUE, #sub-board,
   #disputes): @everyone → **Send Messages ✗**, **Create Public Threads ✗**. The bot still posts
   thanks to its ✓ above, and the #sub-board buttons still work. In #disputes keep **Send Messages in
@@ -157,6 +169,7 @@ Then the restrictions:
   BIL Admin and the bot can see it.
 
 ### Step 11: Post the text and the guides
+
 1. Paste the messages from part 2 into #start-here, #rules and the "pin this" channels, then pin them.
    Set the channel topics from part 3.
 2. Admin → Discord → **Post channel guides**. The bot pins a "how this channel works" message (with the
@@ -166,11 +179,13 @@ Then the restrictions:
    The 8s queue post appears in #lf-8s within 5 minutes of saving its channel ID.
 
 ### Step 12: Invite link and website
+
 1. Server name → **Invite People** → Edit invite link → Expire After **Never**, Max Uses **No limit**.
 2. Netlify → Site configuration → Environment variables → `VITE_DISCORD_INVITE_URL` = that link →
    redeploy (Deploys → Trigger deploy). Every "Join the Discord" button on the site uses it.
 
 ### Step 13: Check it works
+
 - `/ping` → "Blackhat bot online." · `/help` in a few channels → a private explanation for each.
 - `/link` → your profile link.
 - You have the **BIL Admin** role.
@@ -249,6 +264,34 @@ Every staff action is public on the audit log: https://YOUR-SITE/audit-log
 • 2 forfeits in a season = removed from the league (12.2).
 ```
 
+### #rules: message 3 (in-game rules and lobby settings)
+
+```
+# In-game rules (GAs) and lobby settings
+Full list: https://YOUR-SITE/rules (section 8) · Map pool: https://YOUR-SITE/maps
+
+**Weapons** (nothing else is allowed) (8.4)
+• AR: HAN 86 · SMG: VEL 46
+• Pistol: anything but the Deagle and Revolver, no attachments
+
+**Perks** (all three, everyone) (8.5)
+• Kill Chain · Ninja · Battle Hardened
+
+**Banned attachments** (8.6)
+• Suppressors · headshot-damage multipliers · optics above 1x · all Apexes · long barrel on the VEL 46
+
+**Grenades** (8.7)
+• Hardpoint and Hijack: flash and stun only
+• Search and Destroy: flash and stun, plus 1 smoke per team
+
+**Lobby settings** (8.8–8.10)
+• All modes: Tac Sprint On · Killstreaks Disabled · Killcams On · Team Assignment On · Friendly Fire Punish, limit 5 kills
+• Search and Destroy: Equipment Delay 5 sec
+• Hardpoint and Hijack: Respawn Delay 2.5 sec
+
+Breaking a GA costs your team the map unless the rulebook lists another penalty (8.11).
+```
+
 ### #teams-recruiting (pin this)
 
 ```
@@ -307,22 +350,22 @@ Full season stats: https://YOUR-SITE/leaderboard
 
 ## 3. Channel topics (Edit Channel → Topic)
 
-| Channel | Topic |
-|---|---|
-| #start-here | New here? Log in on the site with Discord and your roles set themselves up. |
-| #rules | Short version here, official rulebook on the site. |
-| #announcements | League news from staff and the bot. |
-| #team-rosters | Every approved team, kept up to date by the bot. |
-| #standings | Live division tables. Updated after every confirmed result. |
-| #match-schedule | This week's matches in your time zone, with results as they land. |
-| #results | Confirmed results, posted by the bot. Wrong? Captains /dispute in your team channel. |
-| #player-of-the-week | Monday noon ET: last week's top performer. |
-| #free-agents | Free agents: press Post as free agent on the pinned message (or /lfg post from any channel) · Captains: press Invite to team on a card |
-| #teams-recruiting | Captains: who you need, one post per team. |
-| #sub-board | Teams short for a match. Not on a team? Press I'm available. |
-| #clips | Your best plays. Links or uploads. |
-| #suggestions | One idea per message. 👍 / 👎 to vote. |
-| #disputes | Private dispute threads. Open one with /dispute from your team channel. |
+| Channel             | Topic                                                                                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| #start-here         | New here? Log in on the site with Discord and your roles set themselves up.                                                            |
+| #rules              | Short version here, official rulebook on the site.                                                                                     |
+| #announcements      | League news from staff and the bot.                                                                                                    |
+| #team-rosters       | Every approved team, kept up to date by the bot.                                                                                       |
+| #standings          | Live division tables. Updated after every confirmed result.                                                                            |
+| #match-schedule     | This week's matches in your time zone, with results as they land.                                                                      |
+| #results            | Confirmed results, posted by the bot. Wrong? Captains /dispute in your team channel.                                                   |
+| #player-of-the-week | Monday noon ET: last week's top performer.                                                                                             |
+| #free-agents        | Free agents: press Post as free agent on the pinned message (or /lfg post from any channel) · Captains: press Invite to team on a card |
+| #teams-recruiting   | Captains: who you need, one post per team.                                                                                             |
+| #sub-board          | Teams short for a match. Not on a team? Press I'm available.                                                                           |
+| #clips              | Your best plays. Links or uploads.                                                                                                     |
+| #suggestions        | One idea per message. 👍 / 👎 to vote.                                                                                                 |
+| #disputes           | Private dispute threads. Open one with /dispute from your team channel.                                                                |
 
 ## 4. Discord settings worth turning on
 
