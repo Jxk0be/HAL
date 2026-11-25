@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { weekLabel } from '@/lib/preseason'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import ReportMapCard from '@/components/report/ReportMapCard.vue'
@@ -133,7 +134,7 @@ function discard() {
 
     <template v-else>
       <header class="flex flex-col gap-4 border-b border-line pb-6">
-        <p class="eyebrow text-accent">Report match · Week {{ match.week }}</p>
+        <p class="eyebrow text-accent">Report match · {{ weekLabel(match.week) }}</p>
         <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
           <span class="flex items-center gap-3">
             <TeamLogo :tag="match.home.tag" :name="match.home.name" :logo-url="match.home.logoUrl" decorative />

@@ -19,7 +19,7 @@ export interface MatchCardData {
   seasonId: string
   divisionId: string | null
   week: number
-  stage: 'regular' | 'playoff'
+  stage: 'regular' | 'playoff' | 'preseason'
   playoffRound: number | null
   status: MatchStatus
   scheduledAt: string
@@ -43,7 +43,7 @@ type MatchRow = {
   season_id: string
   division_id: string | null
   week: number
-  stage: 'regular' | 'playoff'
+  stage: 'regular' | 'playoff' | 'preseason'
   playoff_round: number | null
   status: MatchStatus
   scheduled_at: string

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { weekLabel } from '@/lib/preseason'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import PageHeader from '@/components/layout/PageHeader.vue'
@@ -131,7 +132,7 @@ function shots(n: number) {
 
       <div class="flex flex-col gap-8 px-4 py-8 sm:px-6">
         <p class="text-sm text-muted">
-          {{ match.home.name }} (home) vs {{ match.away.name }} (away) · Week {{ match.week }} · <LeagueTime :iso="match.scheduledAt" /> ·
+          {{ match.home.name }} (home) vs {{ match.away.name }} (away) · {{ weekLabel(match.week) }} · <LeagueTime :iso="match.scheduledAt" /> ·
           <UiBadge :variant="match.status === 'confirmed' ? 'win' : match.status === 'disputed' ? 'loss' : 'neutral'">{{ match.status }}</UiBadge>
         </p>
 

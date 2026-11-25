@@ -5,7 +5,7 @@
  */
 import type { MessagePayload } from './discord.ts'
 import { halEmbed, HAL_LOSS } from './embeds.ts'
-import { discordTime, type MsgMatch } from './match_messages.ts'
+import { discordTime, weekLabel, type MsgMatch } from './match_messages.ts'
 
 /** Adds a BIL Admin role ping to a message (no ping when the role id isn't known yet). */
 export function withAdminPing(payload: MessagePayload, roleId: string | null): MessagePayload {
@@ -17,7 +17,7 @@ export function withAdminPing(payload: MessagePayload, roleId: string | null): M
   }
 }
 
-const matchLabel = (m: MsgMatch) => `${m.home.tag} vs ${m.away.tag} (week ${m.week}, ${discordTime(m.scheduledAt, 'f')})`
+const matchLabel = (m: MsgMatch) => `${m.home.tag} vs ${m.away.tag} (${weekLabel(m.week).toLowerCase()}, ${discordTime(m.scheduledAt, 'f')})`
 
 function alert(title: string, description: string, url: string): MessagePayload {
   return { embeds: [halEmbed({ title, description, url, color: HAL_LOSS })] }

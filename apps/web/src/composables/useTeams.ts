@@ -21,20 +21,21 @@ export interface TeamDetail extends TeamSummary {
   coCaptainId: string | null
   rosterChangesUsed: number
   reviewNote: string | null
+  description: string | null
   rules: SeasonRules
   roster: RosterPlayer[]
 }
 
 // Discord usernames are only readable when signed in, so there are two selects.
 const TEAM_DETAIL_SELECT = `
-  id, name, tag, logo_url, status, season_id, captain_id, co_captain_id, roster_changes_used, review_note,
+  id, name, tag, logo_url, description, status, season_id, captain_id, co_captain_id, roster_changes_used, review_note,
   division:divisions(name),
   season:seasons(name, status, max_roster, max_starters, max_subs, max_roster_changes, roster_lock_at),
   members:team_members(id, user_id, role, joined_at, left_at, is_emergency,
     profile:profiles(discord_username, avatar_url, activision_id, platform))
 `
 const TEAM_DETAIL_SELECT_PUBLIC = `
-  id, name, tag, logo_url, status, season_id, captain_id, co_captain_id, roster_changes_used, review_note,
+  id, name, tag, logo_url, description, status, season_id, captain_id, co_captain_id, roster_changes_used, review_note,
   division:divisions(name),
   season:seasons(name, status, max_roster, max_starters, max_subs, max_roster_changes, roster_lock_at),
   members:team_members(id, user_id, role, joined_at, left_at, is_emergency,
@@ -131,6 +132,7 @@ export function useTeam(id: MaybeRefOrGetter<string | null | undefined>) {
       coCaptainId: data.co_captain_id,
       rosterChangesUsed: data.roster_changes_used,
       reviewNote: data.review_note,
+      description: data.description,
       rules: data.season,
       roster: sortRoster(roster),
     }

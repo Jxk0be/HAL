@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { weekLabel } from '@/lib/preseason'
 import { reactive } from 'vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import PublicLogNotice from '@/components/admin/PublicLogNotice.vue'
@@ -44,7 +45,7 @@ async function review(q: RosterRequestRow, approve: boolean) {
                 <RouterLink :to="`/teams/${q.team.id}`" class="hover:text-accent">{{ q.team.name }} [{{ q.team.tag }}]</RouterLink>
                 <template v-if="q.match">
                   · for <RouterLink :to="`/matches/${q.match.id}`" class="hover:text-accent">{{ q.match.home.tag }} vs {{ q.match.away.tag }}</RouterLink>,
-                  week {{ q.match.week }}, <LeagueTime :iso="q.match.scheduledAt" />
+                  {{ weekLabel(q.match.week).toLowerCase() }}, <LeagueTime :iso="q.match.scheduledAt" />
                 </template>
               </p>
               <p class="mt-1 text-xs text-muted">Requested <LeagueTime :iso="q.createdAt" /></p>

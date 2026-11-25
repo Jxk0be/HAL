@@ -14,6 +14,7 @@ const links = computed(() =>
     { to: '/admin/rosters', label: 'Roster approvals', show: auth.isAdmin },
     { to: '/admin/content', label: 'Content', show: auth.isAdmin },
     { to: '/admin/season', label: 'Season & schedule', show: auth.isAdmin },
+    { to: '/admin/preseason', label: 'Preseason', show: auth.isAdmin },
     { to: '/admin/maps', label: 'Modes & maps', show: auth.isAdmin },
     { to: '/admin/announcements', label: 'Announcements', show: auth.isAdmin },
     { to: '/admin/health', label: 'Health', show: auth.isAdmin },

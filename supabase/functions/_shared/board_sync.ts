@@ -184,6 +184,7 @@ async function scheduleBoards(db: SupabaseClient, channelId: string, siteUrl: st
         'home:teams!matches_home_team_id_fkey(name, tag), away:teams!matches_away_team_id_fkey(name, tag)',
     )
     .in('season_id', seasons.map((s) => s.id))
+    .neq('stage', 'preseason') // preseason (week 0) has its own channels; this board is the league weeks
     .gte('scheduled_at', from)
     .lt('scheduled_at', to)
   if (error) throw error

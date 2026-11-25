@@ -16,13 +16,14 @@ const { season, matches, loading } = useSeasonSchedule()
 
 const week = ref<number | ''>('')
 const team = ref<string>(typeof route.query.team === 'string' ? route.query.team : '')
-const stage = ref<'regular' | 'playoff' | ''>('')
+const stage = ref<'regular' | 'playoff' | 'preseason' | ''>('')
 
 // Default to the current week once matches load (unless a team filter shows the whole season).
 watch(
   matches,
   (m) => {
-    if (week.value === '' && m.length && !team.value) week.value = currentWeek(m)
+    // Before the regular season only preseason matches exist: show those.
+    if (week.value === '' && m.length && !team.value) week.value = m.some((x) => x.stage === 'regular') ? currentWeek(m) : 0
   },
   { immediate: true },
 )
@@ -33,7 +34,8 @@ watch(team, (t) => {
 
 const weekOptions = computed(() => {
   const weeks = [...new Set(matches.value.filter((m) => m.stage === 'regular').map((m) => m.week))].sort((a, b) => a - b)
-  return [{ value: '' as const, label: 'All weeks' }, ...weeks.map((w) => ({ value: w, label: `Week ${w}` }))]
+  const pre = matches.value.some((m) => m.stage === 'preseason') ? [{ value: 0, label: 'Preseason' }] : []
+  return [{ value: '' as const, label: 'All weeks' }, ...pre, ...weeks.map((w) => ({ value: w, label: `Week ${w}` }))]
 })
 const teamOptions = computed(() => {
   const teams = new Map<string, string>()
@@ -47,6 +49,7 @@ const stageOptions = [
   { value: '' as const, label: 'All stages' },
   { value: 'regular' as const, label: 'Regular season' },
   { value: 'playoff' as const, label: 'Playoffs' },
+  { value: 'preseason' as const, label: 'Preseason' },
 ]
 
 const filtered = computed(() =>

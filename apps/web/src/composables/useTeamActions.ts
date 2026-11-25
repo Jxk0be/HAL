@@ -24,13 +24,19 @@ export function useTeamActions() {
     return { ok: true }
   }
 
-  async function createTeam(input: { seasonId: string; name: string; tag: string }) {
+  async function createTeam(input: { seasonId: string; name: string; tag: string; description?: string | null }) {
     const uid = auth.user?.id
     if (!uid) return { ok: false, message: 'Log in first.' } as const
     busy.value = true
     const { data, error } = await supabase
       .from('teams')
-      .insert({ season_id: input.seasonId, name: input.name.trim(), tag: input.tag.trim(), captain_id: uid })
+      .insert({
+        season_id: input.seasonId,
+        name: input.name.trim(),
+        tag: input.tag.trim(),
+        description: input.description ?? null,
+        captain_id: uid,
+      })
       .select('id')
       .single()
     busy.value = false
@@ -39,7 +45,10 @@ export function useTeamActions() {
     return { ok: true, id: data.id } as const
   }
 
-  const updateTeam = (teamId: string, patch: { name?: string; tag?: string; logo_url?: string | null }) =>
+  const updateTeam = (
+    teamId: string,
+    patch: { name?: string; tag?: string; logo_url?: string | null; description?: string | null },
+  ) =>
     run(() => supabase.from('teams').update(patch).eq('id', teamId), TAKEN)
 
   async function uploadLogo(teamId: string, file: File): Promise<Result> {

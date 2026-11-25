@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { weekLabel } from '@/lib/preseason'
 import { computed } from 'vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import LeagueTime from './LeagueTime.vue'
@@ -26,7 +27,7 @@ const label = computed(() => {
     <div class="flex items-center justify-between gap-2 text-xs text-muted">
       <span>
         <template v-if="match.stage === 'playoff'">Playoffs · </template>
-        Week {{ match.week }} · <LeagueTime :iso="match.scheduledAt" />
+        {{ weekLabel(match.week) }} · <LeagueTime :iso="match.scheduledAt" />
       </span>
       <MatchStatus :match="match" />
     </div>

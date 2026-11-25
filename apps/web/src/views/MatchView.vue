@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { weekLabel } from '@/lib/preseason'
 import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import UiBadge from '@/components/ui/UiBadge.vue'
@@ -81,7 +82,7 @@ watch(match, (m) => {
         <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
           <div class="flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
             <span>
-              <template v-if="match.stage === 'playoff'">Playoffs · </template>Week {{ match.week }} ·
+              <template v-if="match.stage === 'playoff'">Playoffs · </template>{{ weekLabel(match.week) }} ·
               <LeagueTime :iso="match.scheduledAt" />
             </span>
             <MatchStatus :match="match" />
@@ -133,7 +134,13 @@ watch(match, (m) => {
           <p v-if="dispute.resolution" class="mt-3 text-sm"><strong class="text-accent">Decision:</strong> {{ dispute.resolution }}</p>
         </UiCard>
 
-        <RescheduleCard :match="match" :captain-of="captainOf" @changed="reload()" />
+        <RescheduleCard v-if="match.stage !== 'preseason'" :match="match" :captain-of="captainOf" @changed="reload()" />
+        <UiCard v-else-if="captainOf" eyebrow="Match time" title="Preseason match">
+          <p class="text-sm text-muted">
+            To move it, propose a new time on <RouterLink to="/my-team" class="text-accent hover:text-accent-strong">My team</RouterLink> or with
+            <code>/preseason</code> in your shared preseason channel. The other captain accepts.
+          </p>
+        </UiCard>
 
         <CheckInCard :match="match" :checkins="checkins" :captain-of="captainOf" @changed="reload()" />
 

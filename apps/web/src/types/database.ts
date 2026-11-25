@@ -1843,6 +1843,246 @@ export type Database = {
           },
         ]
       }
+      preseason_interest: {
+        Row: {
+          discord_channel_id: string | null
+          discord_message_id: string | null
+          interested: boolean | null
+          invited_at: string
+          responded_at: string | null
+          responded_by: string | null
+          season_id: string
+          team_id: string
+        }
+        Insert: {
+          discord_channel_id?: string | null
+          discord_message_id?: string | null
+          interested?: boolean | null
+          invited_at?: string
+          responded_at?: string | null
+          responded_by?: string | null
+          season_id: string
+          team_id: string
+        }
+        Update: {
+          discord_channel_id?: string | null
+          discord_message_id?: string | null
+          interested?: boolean | null
+          invited_at?: string
+          responded_at?: string | null
+          responded_by?: string | null
+          season_id?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "preseason_interest_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_interest_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_interest_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_interest_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_interest_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: true
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      preseason_pairings: {
+        Row: {
+          away_team_id: string
+          created_at: string
+          discord_channel_id: string | null
+          home_team_id: string
+          id: string
+          match_id: string | null
+          season_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          away_team_id: string
+          created_at?: string
+          discord_channel_id?: string | null
+          home_team_id: string
+          id?: string
+          match_id?: string | null
+          season_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          away_team_id?: string
+          created_at?: string
+          discord_channel_id?: string | null
+          home_team_id?: string
+          id?: string
+          match_id?: string | null
+          season_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "preseason_pairings_away_team_id_fkey"
+            columns: ["away_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_pairings_home_team_id_fkey"
+            columns: ["home_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_pairings_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: true
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
+          {
+            foreignKeyName: "preseason_pairings_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: true
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_pairings_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      preseason_proposals: {
+        Row: {
+          created_at: string
+          discord_channel_id: string | null
+          discord_message_id: string | null
+          id: string
+          pairing_id: string
+          proposed_at: string
+          proposed_by: string
+          responded_at: string | null
+          responded_by: string | null
+          status: Database["public"]["Enums"]["reschedule_status"]
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          discord_channel_id?: string | null
+          discord_message_id?: string | null
+          id?: string
+          pairing_id: string
+          proposed_at: string
+          proposed_by: string
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: Database["public"]["Enums"]["reschedule_status"]
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          discord_channel_id?: string | null
+          discord_message_id?: string | null
+          id?: string
+          pairing_id?: string
+          proposed_at?: string
+          proposed_by?: string
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: Database["public"]["Enums"]["reschedule_status"]
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "preseason_proposals_pairing_id_fkey"
+            columns: ["pairing_id"]
+            isOneToOne: false
+            referencedRelation: "preseason_pairings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_proposals_proposed_by_fkey"
+            columns: ["proposed_by"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_proposals_proposed_by_fkey"
+            columns: ["proposed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_proposals_proposed_by_fkey"
+            columns: ["proposed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_proposals_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_proposals_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_proposals_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preseason_proposals_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           activision_id: string | null
@@ -1853,6 +2093,7 @@ export type Database = {
           controller_confirmed_at: string | null
           created_at: string
           discord_id: string | null
+          discord_profile_checked_at: string | null
           discord_synced_at: string | null
           discord_username: string | null
           id: string
@@ -1872,6 +2113,7 @@ export type Database = {
           controller_confirmed_at?: string | null
           created_at?: string
           discord_id?: string | null
+          discord_profile_checked_at?: string | null
           discord_synced_at?: string | null
           discord_username?: string | null
           id: string
@@ -1891,6 +2133,7 @@ export type Database = {
           controller_confirmed_at?: string | null
           created_at?: string
           discord_id?: string | null
+          discord_profile_checked_at?: string | null
           discord_synced_at?: string | null
           discord_username?: string | null
           id?: string
@@ -2347,6 +2590,8 @@ export type Database = {
           max_subs: number
           name: string
           playoff_teams: number
+          preseason_generated_at: string | null
+          preseason_invites_at: string | null
           prize_text: string | null
           regular_weeks: number
           roster_lock_at: string | null
@@ -2368,6 +2613,8 @@ export type Database = {
           max_subs?: number
           name: string
           playoff_teams?: number
+          preseason_generated_at?: string | null
+          preseason_invites_at?: string | null
           prize_text?: string | null
           regular_weeks?: number
           roster_lock_at?: string | null
@@ -2389,6 +2636,8 @@ export type Database = {
           max_subs?: number
           name?: string
           playoff_teams?: number
+          preseason_generated_at?: string | null
+          preseason_invites_at?: string | null
           prize_text?: string | null
           regular_weeks?: number
           roster_lock_at?: string | null
@@ -2809,6 +3058,7 @@ export type Database = {
           captain_id: string
           co_captain_id: string | null
           created_at: string
+          description: string | null
           discord_channel_id: string | null
           discord_role_id: string | null
           discord_voice_channel_id: string | null
@@ -2828,6 +3078,7 @@ export type Database = {
           captain_id: string
           co_captain_id?: string | null
           created_at?: string
+          description?: string | null
           discord_channel_id?: string | null
           discord_role_id?: string | null
           discord_voice_channel_id?: string | null
@@ -2847,6 +3098,7 @@ export type Database = {
           captain_id?: string
           co_captain_id?: string | null
           created_at?: string
+          description?: string | null
           discord_channel_id?: string | null
           discord_role_id?: string | null
           discord_voice_channel_id?: string | null
@@ -3610,6 +3862,51 @@ export type Database = {
           total_count: number
         }[]
       }
+      preseason_cancel_pairing: {
+        Args: { p_pairing_id: string }
+        Returns: undefined
+      }
+      preseason_cancel_proposal: {
+        Args: { p_proposal_id: string }
+        Returns: undefined
+      }
+      preseason_cancel_proposal_as: {
+        Args: { p_actor: string; p_proposal_id: string }
+        Returns: undefined
+      }
+      preseason_conflict: {
+        Args: { p_at: string; p_ignore_match?: string; p_season_id: string }
+        Returns: string
+      }
+      preseason_generate: {
+        Args: { p_replace?: boolean; p_season_id: string }
+        Returns: number
+      }
+      preseason_propose: {
+        Args: { p_at: string; p_pairing_id: string }
+        Returns: string
+      }
+      preseason_propose_as: {
+        Args: { p_actor: string; p_at: string; p_pairing_id: string }
+        Returns: string
+      }
+      preseason_respond: {
+        Args: { p_accept: boolean; p_proposal_id: string }
+        Returns: undefined
+      }
+      preseason_respond_as: {
+        Args: { p_accept: boolean; p_actor: string; p_proposal_id: string }
+        Returns: undefined
+      }
+      preseason_send_invites: { Args: { p_season_id: string }; Returns: number }
+      preseason_set_interest: {
+        Args: { p_interested: boolean; p_team_id: string }
+        Returns: undefined
+      }
+      preseason_set_interest_as: {
+        Args: { p_actor: string; p_interested: boolean; p_team_id: string }
+        Returns: undefined
+      }
       rank_block_reason: { Args: { p_user_id: string }; Returns: string }
       remove_player: {
         Args: { p_team_id: string; p_user_id: string }
@@ -3803,7 +4100,7 @@ export type Database = {
         | "declined"
         | "cancelled"
         | "expired"
-      match_stage: "regular" | "playoff"
+      match_stage: "regular" | "playoff" | "preseason"
       match_status:
         | "scheduled"
         | "checkin_open"
@@ -3991,7 +4288,7 @@ export const Constants = {
         "cancelled",
         "expired",
       ],
-      match_stage: ["regular", "playoff"],
+      match_stage: ["regular", "playoff", "preseason"],
       match_status: [
         "scheduled",
         "checkin_open",

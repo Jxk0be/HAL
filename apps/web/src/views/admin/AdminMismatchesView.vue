@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { weekLabel } from '@/lib/preseason'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import RecusedNotice from '@/components/admin/RecusedNotice.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
@@ -26,7 +27,7 @@ const { items, loading } = useMismatchQueue()
           >
             <span class="min-w-0 flex-1">
               <span class="block font-heading text-lg">{{ q.home.tag }} vs {{ q.away.tag }}</span>
-              <span class="text-xs text-muted">Week {{ q.week }} · <LeagueTime :iso="q.scheduled_at" /></span>
+              <span class="text-xs text-muted">{{ weekLabel(q.week) }} · <LeagueTime :iso="q.scheduled_at" /></span>
             </span>
             <UiBadge v-if="q.map_fields" variant="loss">{{ q.map_fields }} map {{ q.map_fields === 1 ? 'field' : 'fields' }}</UiBadge>
             <UiBadge v-if="q.player_fields" variant="accent">{{ q.player_fields }} player {{ q.player_fields === 1 ? 'stat' : 'stats' }}</UiBadge>

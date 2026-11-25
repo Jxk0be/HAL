@@ -24,6 +24,9 @@ export function discordTime(iso: string, style: 'F' | 'f' | 'R' | 't' = 'F'): st
   return `<t:${Math.floor(new Date(iso).getTime() / 1000)}:${style}>`
 }
 
+/** "Week 3", or "Preseason" for preseason matches (week 0). */
+export const weekLabel = (week: number) => (week === 0 ? 'Preseason' : `Week ${week}`)
+
 const matchUrl = (siteUrl: string, id: string) => `${siteUrl}/matches/${id}`
 const opponentOf = (m: MsgMatch, teamId: string) => (m.home.id === teamId ? m.away : m.home)
 
@@ -39,7 +42,7 @@ export function reminderMessage(m: MsgMatch, teamId: string, hoursBefore: 24 | 1
         title: hoursBefore === 24 ? `Match tomorrow vs ${opp.name}` : `Match in 1 hour vs ${opp.name}`,
         url: matchUrl(siteUrl, m.id),
         description: [
-          `**Week ${m.week}** · ${discordTime(m.scheduledAt)} (${discordTime(m.scheduledAt, 'R')})`,
+          `**${weekLabel(m.week)}** · ${discordTime(m.scheduledAt)} (${discordTime(m.scheduledAt, 'R')})`,
           `Opponent: **${opp.name}** [${opp.tag}]`,
           '',
           'Check-in opens 15 minutes before. Your captain or co-captain checks in 4 players here or on the site.',
@@ -151,7 +154,7 @@ export function resultMessage(
       allowed_mentions: NO_PINGS,
       embeds: [
         halEmbed({
-          title: `${m.home.tag} vs ${m.away.tag} · Week ${m.week}`,
+          title: `${m.home.tag} vs ${m.away.tag} · ${weekLabel(m.week)}`,
           url: matchUrl(siteUrl, m.id),
           description: `**${winner?.name ?? '?'}** wins by forfeit (${loser.name} forfeited).\n[Match page](${matchUrl(siteUrl, m.id)})`,
         }),
@@ -172,7 +175,7 @@ export function resultMessage(
     allowed_mentions: NO_PINGS,
     embeds: [
       halEmbed({
-        title: `${m.home.tag} vs ${m.away.tag} · Week ${m.week}`,
+        title: `${m.home.tag} vs ${m.away.tag} · ${weekLabel(m.week)}`,
         url: matchUrl(siteUrl, m.id),
         description: `${side(m.home, m.homeSeries)} – ${side(m.away, m.awaySeries)}\n[Match page](${matchUrl(siteUrl, m.id)})`,
         fields: fields.slice(0, 25),
@@ -204,7 +207,7 @@ export function liveMessage(m: MsgMatch, url: string, caster: string, siteUrl: s
       halEmbed({
         title: `Now live: ${m.home.name} vs ${m.away.name}`,
         url,
-        description: `Week ${m.week}, cast by **${caster}**.\n[Watch the stream](${url}) · [Match page](${matchUrl(siteUrl, m.id)})`,
+        description: `${weekLabel(m.week)}, cast by **${caster}**.\n[Watch the stream](${url}) · [Match page](${matchUrl(siteUrl, m.id)})`,
       }),
     ],
   }
@@ -274,7 +277,7 @@ export function rescheduleRequestMessage(
         title: `Reschedule request: ${m.home.tag} vs ${m.away.tag}`,
         url: matchUrl(siteUrl, m.id),
         description: [
-          `**${asker.name}** wants to move the week ${m.week} match to **${discordTime(r.proposedAt)}** (${discordTime(r.proposedAt, 'R')}).`,
+          `**${asker.name}** wants to move the ${weekLabel(m.week).toLowerCase()} match to **${discordTime(r.proposedAt)}** (${discordTime(r.proposedAt, 'R')}).`,
           `Currently: ${discordTime(m.scheduledAt)}.`,
           isOpponent
             ? 'Captain or co-captain: accept or decline below (or on the site).'

@@ -26,6 +26,17 @@ export interface SeasonRules {
   status: Database['public']['Enums']['season_status']
 }
 
+/** Matches the teams_description_length check in the database. */
+export const TEAM_DESCRIPTION_MAX = 500
+
+/** What the team identity form emits (create and edit). */
+export interface TeamIdentity {
+  name: string
+  tag: string
+  description: string | null
+  logo: File | null
+}
+
 /** Team tag shown in brackets: 2–4 letters or digits. */
 export const TAG_PATTERN = /^[A-Za-z0-9]{2,4}$/
 

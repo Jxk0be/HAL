@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { weekLabel } from '@/lib/preseason'
 import { computed, ref } from 'vue'
 import MatchEditModal from '@/components/admin/MatchEditModal.vue'
 import PublicLogNotice from '@/components/admin/PublicLogNotice.vue'
@@ -113,7 +114,7 @@ async function cancel(m: AdminMatch) {
       <li v-for="m in filtered" :key="m.id" class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 text-sm" :class="isRecused(m.homeTeamId, m.awayTeamId) ? 'opacity-70' : ''">
         <span class="min-w-48 flex-1">
           <RouterLink :to="`/matches/${m.id}`" class="font-medium hover:text-accent">{{ team(m.homeTeamId).tag }} vs {{ team(m.awayTeamId).tag }}</RouterLink>
-          <span class="block text-xs text-muted">Week {{ m.week }}<template v-if="m.stage === 'playoff'"> · playoffs</template> · <LeagueTime :iso="m.scheduledAt" /></span>
+          <span class="block text-xs text-muted">{{ weekLabel(m.week) }}<template v-if="m.stage === 'playoff'"> · playoffs</template> · <LeagueTime :iso="m.scheduledAt" /></span>
         </span>
         <UiBadge :variant="m.status === 'confirmed' ? 'win' : ['disputed', 'forfeit', 'cancelled'].includes(m.status) ? 'loss' : 'neutral'">{{ m.status.replace('_', ' ') }}</UiBadge>
         <RecusedNotice v-if="isRecused(m.homeTeamId, m.awayTeamId)" />

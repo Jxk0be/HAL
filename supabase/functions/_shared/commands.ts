@@ -1,4 +1,4 @@
-import { RESCHEDULE_TIMES } from './time.ts'
+import { PRESEASON_TIMES, RESCHEDULE_TIMES } from './time.ts'
 
 /**
  * Slash command definitions: the single source for scripts/register-commands.ts and the router.
@@ -51,6 +51,17 @@ export const COMMANDS: CommandDefinition[] = [
       { type: 3, name: 'match', description: 'One of your upcoming matches', required: true, autocomplete: true },
       { type: 3, name: 'day', description: 'Day in that league week (pick the match first)', required: true, autocomplete: true },
       { type: 3, name: 'time', description: 'Start time (Eastern)', required: true, choices: RESCHEDULE_TIMES },
+    ],
+  },
+  {
+    name: 'preseason',
+    description: 'Propose a time for a preseason match (captains); the other captain accepts',
+    type: 1,
+    dm_permission: false,
+    options: [
+      { type: 3, name: 'match', description: 'Your preseason match', required: true, autocomplete: true },
+      { type: 3, name: 'day', description: 'Day (Eastern)', required: true, autocomplete: true },
+      { type: 3, name: 'time', description: 'Start time (Eastern)', required: true, choices: PRESEASON_TIMES },
     ],
   },
   {

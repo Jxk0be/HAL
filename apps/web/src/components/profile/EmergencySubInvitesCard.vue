@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { weekLabel } from '@/lib/preseason'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiCard from '@/components/ui/UiCard.vue'
@@ -27,7 +28,7 @@ async function answer(id: string, tag: string, accept: boolean) {
           </p>
           <p class="text-xs text-muted">
             <RouterLink :to="`/matches/${r.match.id}`" class="hover:text-accent">{{ r.match.home }} vs {{ r.match.away }}</RouterLink>,
-            week {{ r.match.week }}, <LeagueTime :iso="r.match.scheduledAt" />
+            {{ weekLabel(r.match.week).toLowerCase() }}, <LeagueTime :iso="r.match.scheduledAt" />
           </p>
           <p v-if="r.note" class="mt-1 text-sm">"{{ r.note }}"</p>
         </div>

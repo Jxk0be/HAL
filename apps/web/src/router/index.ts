@@ -137,6 +137,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'disputes', name: 'admin-disputes', component: () => import('@/views/admin/AdminDisputesView.vue'), meta: { title: 'Disputes', staff: 'admin' } },
       { path: 'rosters', name: 'admin-rosters', component: () => import('@/views/admin/AdminRostersView.vue'), meta: { title: 'Roster Approvals', staff: 'admin' } },
       { path: 'season', name: 'admin-season', component: () => import('@/views/admin/AdminSeasonView.vue'), meta: { title: 'Season & Schedule', staff: 'admin' } },
+      { path: 'preseason', name: 'admin-preseason', component: () => import('@/views/admin/AdminPreseasonView.vue'), meta: { title: 'Preseason', staff: 'admin' } },
       { path: 'maps', name: 'admin-maps', component: () => import('@/views/admin/AdminMapsView.vue'), meta: { title: 'Modes & maps', staff: 'admin' } },
       { path: 'content', name: 'admin-content', component: () => import('@/views/admin/AdminContentView.vue'), meta: { title: 'Content', staff: 'admin' } },
       { path: 'roles', name: 'admin-roles', component: () => import('@/views/admin/AdminRolesView.vue'), meta: { title: 'User Roles', staff: 'owner' } },

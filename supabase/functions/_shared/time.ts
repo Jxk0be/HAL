@@ -79,3 +79,21 @@ export const RESCHEDULE_TIMES: { name: string; value: string }[] = Array.from({ 
   const m = minutes % 60
   return { name: `${h - 12}:${String(m).padStart(2, '0')} PM ET`, value: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}` }
 })
+
+/** Preseason start times: 12:00 PM to 11:30 PM in 30-minute steps (24 choices; Discord allows 25). */
+export const PRESEASON_TIMES: { name: string; value: string }[] = Array.from({ length: 24 }, (_, i) => {
+  const minutes = 12 * 60 + i * 30
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  const h12 = h === 12 ? 12 : h - 12
+  return { name: `${h12}:${String(m).padStart(2, '0')} PM ET`, value: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}` }
+})
+
+/** The next `n` days from today in `tz` (for /preseason's day picker). */
+export function upcomingDays(now: Date, n: number, tz: string = LEAGUE_TZ): { date: string; label: string }[] {
+  const today = zonedDate(now, tz)
+  return Array.from({ length: n }, (_, i) => {
+    const date = addDays(today, i)
+    return { date, label: dayLabel(date) }
+  })
+}

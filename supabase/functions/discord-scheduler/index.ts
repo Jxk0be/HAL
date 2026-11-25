@@ -6,7 +6,8 @@
  *    warning (plus #admin-only) if a team hasn't checked in at the start time.
  * 2. Drains notifications_outbox for the types it handles: results to #results, "Now live" to
  *    #announcements, reschedule notices to both team channels, check-in confirmations, and new
- *    disputes to #admin-only. Other types stay queued for later features.
+ *    disputes to #admin-only, and preseason invites, shared channels and proposals
+ *    (preseason_flow.ts). Other types stay queued for later features.
  *
  * 3. Live boards (board_sync.ts): #team-rosters, #standings, #match-schedule, #sub-board and the
  *    weekly #player-of-the-week post, edited only when their content changes.
@@ -49,6 +50,7 @@ import { handleEsubEvent } from '../_shared/esub_flow.ts'
 import { runAutoAnnouncements } from '../_shared/announcement_flow.ts'
 import { handleInviteEvent } from '../_shared/invite_flow.ts'
 import { syncBoards } from '../_shared/board_sync.ts'
+import { announceCancelledPairing, finishProposal, postProposal, removeChannel, setupPairing, syncInvite } from '../_shared/preseason_flow.ts'
 import { disputeAlert, mismatchAlert, rankExceptionAlert, teamPendingAlert, unreportedAlert, withAdminPing } from '../_shared/admin_alerts.ts'
 
 const HANDLED = [
@@ -75,6 +77,11 @@ const HANDLED = [
   'mismatch_opened',
   'team_invite_sent',
   'team_invite_closed',
+  'preseason_invite',
+  'preseason_pairing',
+  'preseason_proposal',
+  'preseason_pairing_cancelled',
+  'preseason_channel_removed',
 ]
 const MAX_ATTEMPTS = 5
 
@@ -347,6 +354,25 @@ async function handleOutbox(ctx: Ctx, row: { id: number; type: string; payload: 
       bump(ctx, 'admin_alert')
       return
     }
+    case 'preseason_invite':
+      await syncInvite(ctx.db, String(p.team_id), ctx.siteUrl)
+      bump(ctx, 'preseason')
+      return
+    case 'preseason_pairing':
+      await setupPairing(ctx.db, String(p.pairing_id), ctx.siteUrl)
+      bump(ctx, 'preseason')
+      return
+    case 'preseason_proposal':
+      if (p.event === 'answered') await finishProposal(ctx.db, String(p.proposal_id), ctx.siteUrl)
+      else await postProposal(ctx.db, String(p.proposal_id), ctx.siteUrl)
+      bump(ctx, 'preseason')
+      return
+    case 'preseason_pairing_cancelled':
+      await announceCancelledPairing(ctx.db, String(p.pairing_id))
+      return
+    case 'preseason_channel_removed':
+      await removeChannel(String(p.channel_id))
+      return
     case 'mismatch_opened': {
       if (!ctx.channels.admin) return
       const m = await loadMatch(ctx.db, matchId)

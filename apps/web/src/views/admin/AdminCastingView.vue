@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { weekLabel } from '@/lib/preseason'
 import { computed, ref } from 'vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import RecusedNotice from '@/components/admin/RecusedNotice.vue'
@@ -81,7 +82,7 @@ async function goLive() {
           <li v-for="m in g.items" :key="m.id" class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 text-sm" :class="isRecused(m.home.id, m.away.id) ? 'opacity-70' : ''">
             <span class="min-w-48 flex-1">
               <RouterLink :to="`/matches/${m.id}`" class="font-heading text-lg hover:text-accent">{{ m.home.tag }} vs {{ m.away.tag }}</RouterLink>
-              <span class="block text-xs text-muted">Week {{ m.week }} · <LeagueTime :iso="m.scheduledAt" /></span>
+              <span class="block text-xs text-muted">{{ weekLabel(m.week) }} · <LeagueTime :iso="m.scheduledAt" /></span>
             </span>
             <UiBadge v-if="m.live" variant="live">Live</UiBadge>
             <span v-if="m.caster" class="text-xs text-muted">{{ mine(m) ? 'You' : m.caster }}{{ m.live ? ' casting' : ' claimed it' }}</span>

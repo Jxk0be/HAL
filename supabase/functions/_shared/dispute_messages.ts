@@ -1,6 +1,7 @@
 /** Dispute thread messages. Pure builders, tested in dispute_messages_test.ts. */
 import type { MessagePayload } from './discord.ts'
 import { halEmbed, HAL_LOSS, HAL_WIN } from './embeds.ts'
+import { weekLabel } from './match_messages.ts'
 
 export const CATEGORY_LABEL: Record<string, string> = {
   score: 'Score',
@@ -52,7 +53,7 @@ export function disputeOpeningMessage(d: OpeningInput, siteUrl: string): Message
         title: `${CATEGORY_LABEL[d.category] ?? d.category} dispute: ${d.homeName} vs ${d.awayName}`,
         url: `${siteUrl}/matches/${d.matchId}`,
         color: HAL_LOSS,
-        description: `Opened by **${d.openedByTeam}** · week ${d.week}\n\n${d.reason.slice(0, 3500)}`,
+        description: `Opened by **${d.openedByTeam}** · ${weekLabel(d.week).toLowerCase()}\n\n${d.reason.slice(0, 3500)}`,
         fields: [
           { name: 'Evidence', value: evidence.slice(0, 1024), inline: false },
           { name: 'Links', value: `[Match page](${siteUrl}/matches/${d.matchId}) · [Admin disputes](${siteUrl}/admin/disputes)`, inline: false },

@@ -97,6 +97,8 @@ Effective: November 20, 2026
 
 **5.6** To play in the playoffs, a player must have played in at least 2 regular-season matches for their team.
 
+**5.7** Preseason matches are optional. Teams that sign up are paired for 1 or 2 matches, and the two captains agree on each time. They are played and reported like league matches (Sections 7 to 10), but they don't count toward standings, stats, leaderboards or the forfeit limit in 12.2. Each preseason match must be at least 2 hours apart from any other match, so league casters can cover it.
+
 ## 6. Scheduling and Reschedules
 
 **6.1** Default match nights are Tuesday and Thursday at 9:00 PM Eastern (8:00 PM Central). Staff may set different match nights or times for a season, and the website shows the schedule.

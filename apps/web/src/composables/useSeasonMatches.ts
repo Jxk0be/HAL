@@ -21,7 +21,7 @@ export interface AdminMatch {
 export interface NewMatch {
   division_id: string | null
   week: number
-  stage?: 'regular' | 'playoff'
+  stage?: 'regular' | 'playoff' | 'preseason'
   playoff_round?: number | null
   home_team_id: string
   away_team_id: string

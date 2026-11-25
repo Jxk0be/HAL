@@ -13,12 +13,13 @@ import ManagePlayerModal from '@/components/team/ManagePlayerModal.vue'
 import InvitePanel from '@/components/team/InvitePanel.vue'
 import TeamRequestsPanel from '@/components/team/TeamRequestsPanel.vue'
 import TeamIdentityForm from '@/components/team/TeamIdentityForm.vue'
+import PreseasonCard from '@/components/team/PreseasonCard.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useActiveSeason } from '@/composables/useActiveSeason'
 import { useTeam } from '@/composables/useTeams'
 import { useTeamActions } from '@/composables/useTeamActions'
 import { useToast } from '@/composables/useToast'
-import { rosterCounts, type RosterPlayer } from '@/lib/teams'
+import { rosterCounts, type RosterPlayer, type TeamIdentity } from '@/lib/teams'
 import { site } from '@/config/site'
 
 const auth = useAuthStore()
@@ -42,10 +43,10 @@ const changesCount = computed(() => rules.value?.status === 'regular' || rules.v
 
 // Create team
 const createError = ref<string | null>(null)
-async function create(v: { name: string; tag: string; logo: File | null }) {
+async function create(v: TeamIdentity) {
   if (!season.value) return
   createError.value = null
-  const result = await actions.createTeam({ seasonId: season.value.id, name: v.name, tag: v.tag })
+  const result = await actions.createTeam({ seasonId: season.value.id, name: v.name, tag: v.tag, description: v.description })
   if (!result.ok) {
     createError.value = result.message
     return
@@ -60,12 +61,12 @@ async function create(v: { name: string; tag: string; logo: File | null }) {
 
 // Edit identity
 const settingsError = ref<string | null>(null)
-async function saveIdentity(v: { name: string; tag: string; logo: File | null }) {
+async function saveIdentity(v: TeamIdentity) {
   const t = team.value
   if (!t) return
   settingsError.value = null
-  if (v.name !== t.name || v.tag !== t.tag) {
-    const r = await actions.updateTeam(t.id, { name: v.name, tag: v.tag })
+  if (v.name !== t.name || v.tag !== t.tag || v.description !== t.description) {
+    const r = await actions.updateTeam(t.id, { name: v.name, tag: v.tag, description: v.description })
     if (!r.ok) {
       settingsError.value = r.message
       return
@@ -253,6 +254,7 @@ const lockDate = computed(() =>
           </UiCard>
 
           <div class="flex flex-col gap-6">
+            <PreseasonCard v-if="canManage && team.status === 'approved'" :team-id="team.id" :season-id="team.seasonId" />
             <UiCard v-if="canManage" eyebrow="Matches" title="Requests">
               <TeamRequestsPanel :team-id="team.id" />
             </UiCard>
@@ -261,7 +263,7 @@ const lockDate = computed(() =>
             </UiCard>
             <UiCard v-if="canManage" eyebrow="Settings" title="Team identity">
               <TeamIdentityForm
-                :initial="{ name: team.name, tag: team.tag, logoUrl: team.logoUrl }"
+                :initial="{ name: team.name, tag: team.tag, logoUrl: team.logoUrl, description: team.description }"
                 submit-label="Save changes"
                 :busy="actions.busy.value"
                 :server-error="settingsError"

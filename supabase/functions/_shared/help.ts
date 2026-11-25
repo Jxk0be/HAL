@@ -32,7 +32,8 @@ const ANYWHERE: Field = {
 const CAPTAIN_COMMANDS =
   '`/report` after the match: pick it, attach up to 5 scoreboard screenshots, then enter the map scores. Player stats go on the site (9.1).\n' +
   '`/reschedule` move a match: at least 24h before the default time, to a time in the same week. The other captain accepts or declines with the buttons (6.2–6.3).\n' +
-  '`/dispute` within 24 hours of the match, with evidence. Opens a private thread with both captains and the admins (10.2–10.3).'
+  '`/dispute` within 24 hours of the match, with evidence. Opens a private thread with both captains and the admins (10.2–10.3).\n' +
+  '`/preseason` propose a time for a preseason match (in your shared PRESEASON channel); the other captain accepts.'
 
 function rulesLine(siteUrl: string) {
   return `[Full rulebook](${siteUrl}/rules) · [Schedule](${siteUrl}/matches) · [Standings](${siteUrl}/standings)`

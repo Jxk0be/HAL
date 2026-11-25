@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { weekLabel } from '@/lib/preseason'
 import { computed, reactive, ref } from 'vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import PublicLogNotice from '@/components/admin/PublicLogNotice.vue'
@@ -116,7 +117,7 @@ async function issuePenalty() {
               <div>
                 <RouterLink :to="`/matches/${r.matchId}`" class="font-heading text-xl hover:text-accent">{{ r.match.home.tag }} vs {{ r.match.away.tag }}</RouterLink>
                 <p class="text-xs text-muted">
-                  Week {{ r.match.week }} · <LeagueTime :iso="r.match.scheduledAt" /> · opened by {{ r.openedBy }} ({{ teamOf(r, r.teamId).tag }}) <LeagueTime :iso="r.createdAt" />
+                  {{ weekLabel(r.match.week) }} · <LeagueTime :iso="r.match.scheduledAt" /> · opened by {{ r.openedBy }} ({{ teamOf(r, r.teamId).tag }}) <LeagueTime :iso="r.createdAt" />
                 </p>
               </div>
               <span class="flex flex-wrap gap-2">

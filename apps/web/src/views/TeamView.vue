@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { weekLabel } from '@/lib/preseason'
 import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import UiBadge from '@/components/ui/UiBadge.vue'
@@ -67,6 +68,7 @@ watch(team, (t) => {
               <UiBadge v-if="team.status === 'pending'" variant="accent">Awaiting approval</UiBadge>
               <UiBadge v-if="team.status === 'removed'" variant="loss">Removed</UiBadge>
             </p>
+            <p v-if="team.description" class="mt-4 max-w-2xl whitespace-pre-line break-words text-muted">{{ team.description }}</p>
           </div>
           <dl class="flex gap-6">
             <div>
@@ -111,7 +113,7 @@ watch(team, (t) => {
                 <TeamLogo :tag="opp(m).tag" :name="opp(m).name" :logo-url="opp(m).logoUrl" size="sm" decorative />
                 <span class="min-w-0 flex-1">
                   <RouterLink :to="`/matches/${m.id}`" class="block truncate hover:text-accent">{{ side(m) === 'home' ? 'vs' : '@' }} {{ opp(m).name }}</RouterLink>
-                  <span class="text-xs text-muted">Week {{ m.week }} · <LeagueTime :iso="m.scheduledAt" /></span>
+                  <span class="text-xs text-muted">{{ weekLabel(m.week) }} · <LeagueTime :iso="m.scheduledAt" /></span>
                 </span>
               </li>
             </ul>
@@ -122,7 +124,7 @@ watch(team, (t) => {
               <li v-for="m in results" :key="m.id" class="flex items-center gap-3">
                 <ScoreChip :score="ours(m)" :opponent="theirs(m)" :result="m.status === 'forfeit' && m.forfeitTeamId === id ? 'FF' : undefined" />
                 <RouterLink :to="`/matches/${m.id}`" class="min-w-0 flex-1 truncate hover:text-accent">{{ side(m) === 'home' ? 'vs' : '@' }} {{ opp(m).name }}</RouterLink>
-                <span class="text-xs text-muted">Wk {{ m.week }}</span>
+                <span class="text-xs text-muted">{{ weekLabel(m.week, true) }}</span>
               </li>
             </ul>
           </UiCard>

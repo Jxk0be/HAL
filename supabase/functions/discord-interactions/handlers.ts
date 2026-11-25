@@ -10,6 +10,7 @@ import { esubButton } from './esub.ts'
 import { inviteButton } from './invite.ts'
 import { subsButton } from './subs.ts'
 import { eightsButton, eightsCommand } from './eights.ts'
+import { preseasonAutocomplete, preseasonButton, preseasonCommand } from './preseason.ts'
 
 /**
  * Command, component, modal and autocomplete handlers. Later steps register more here:
@@ -51,6 +52,7 @@ export const registry: Registry = {
     report: reportCommand,
     dispute: disputeCommand,
     '8s': eightsCommand,
+    preseason: preseasonCommand,
   },
   components: {
     checkin: checkinHandler,
@@ -60,6 +62,7 @@ export const registry: Registry = {
     invite: inviteButton,
     subs: subsButton,
     eights: eightsButton,
+    preseason: preseasonButton,
   },
   modals: {
     lfg: lfgModalHandler,
@@ -70,5 +73,6 @@ export const registry: Registry = {
     reschedule: rescheduleAutocomplete,
     report: reportAutocomplete,
     dispute: disputeAutocomplete,
+    preseason: preseasonAutocomplete,
   },
 }

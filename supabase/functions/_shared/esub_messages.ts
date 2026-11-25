@@ -6,7 +6,7 @@
  */
 import type { MessagePayload } from './discord.ts'
 import { halEmbed, HAL_LOSS, HAL_WIN } from './embeds.ts'
-import { discordTime, type MsgMatch, type MsgTeam } from './match_messages.ts'
+import { discordTime, weekLabel, type MsgMatch, type MsgTeam } from './match_messages.ts'
 
 const NO_PINGS = { parse: [] as ('roles' | 'users' | 'everyone')[] }
 
@@ -22,7 +22,7 @@ export interface EsubRequest {
   out?: { name: string; reason: string | null }[]
 }
 
-const matchLine = (m: MsgMatch) => `${m.home.tag} vs ${m.away.tag} (week ${m.week}), ${discordTime(m.scheduledAt)}`
+const matchLine = (m: MsgMatch) => `${m.home.tag} vs ${m.away.tag} (${weekLabel(m.week).toLowerCase()}), ${discordTime(m.scheduledAt)}`
 
 export const esubButtons = (requestId: string, siteUrl: string, disabled = false) => ({
   type: 1,

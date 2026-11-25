@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import { computed, reactive, ref, useTemplateRef, watch } from 'vue'
+import { computed, reactive, ref, useId, useTemplateRef, watch } from 'vue'
 import UiInput from '@/components/ui/UiInput.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
-import { validateLogo, validateTag, validateTeamName } from '@/lib/teams'
+import { TEAM_DESCRIPTION_MAX, validateLogo, validateTag, validateTeamName, type TeamIdentity } from '@/lib/teams'
 
-/** Name, tag and logo. Used to create a team and to edit it. Emits the values; the parent saves. */
+/** Name, tag, logo and description. Used to create a team and to edit it. Emits the values; the parent saves. */
 const props = defineProps<{
-  initial?: { name: string; tag: string; logoUrl: string | null }
+  initial?: { name: string; tag: string; logoUrl: string | null; description: string | null }
   submitLabel: string
   busy?: boolean
   serverError?: string | null
 }>()
-const emit = defineEmits<{ submit: [value: { name: string; tag: string; logo: File | null }] }>()
+const emit = defineEmits<{ submit: [value: TeamIdentity] }>()
 
-const form = reactive({ name: '', tag: '' })
+const form = reactive({ name: '', tag: '', description: '' })
+const descriptionId = useId()
 const logo = ref<File | null>(null)
 const preview = ref<string | null>(null)
 const logoError = ref<string | null>(null)
@@ -26,6 +27,7 @@ watch(
   (v) => {
     form.name = v?.name ?? ''
     form.tag = v?.tag ?? ''
+    form.description = v?.description ?? ''
     preview.value = v?.logoUrl ?? null
     logo.value = null
   },
@@ -46,7 +48,12 @@ function onFile(e: Event) {
 function submit() {
   touched.value = true
   if (errors.value.name || errors.value.tag || logoError.value) return
-  emit('submit', { name: form.name.trim(), tag: form.tag.trim(), logo: logo.value })
+  emit('submit', {
+    name: form.name.trim(),
+    tag: form.tag.trim(),
+    description: form.description.trim() || null,
+    logo: logo.value,
+  })
 }
 </script>
 
@@ -88,6 +95,23 @@ function submit() {
           {{ logoError ?? 'Optional. Square PNG, JPG or WebP, up to 1 MB.' }}
         </p>
       </div>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label :for="descriptionId" class="eyebrow text-muted">About the team</label>
+      <textarea
+        :id="descriptionId"
+        v-model="form.description"
+        rows="4"
+        :maxlength="TEAM_DESCRIPTION_MAX"
+        :aria-describedby="`${descriptionId}-hint`"
+        placeholder="Who you are, your playstyle, what you're looking for in players…"
+        class="w-full rounded-md border border-line-strong bg-surface-2 px-3 py-2 text-sm text-text placeholder:text-faint focus:border-accent-dim focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-0"
+      />
+      <p :id="`${descriptionId}-hint`" class="flex justify-between gap-3 text-xs text-muted">
+        <span>Optional. Shown on your public team page.</span>
+        <span class="tnum">{{ form.description.length }}/{{ TEAM_DESCRIPTION_MAX }}</span>
+      </p>
     </div>
 
     <p v-if="serverError" role="alert" class="rounded-md border border-loss/40 bg-loss-soft px-4 py-3 text-sm text-loss">
