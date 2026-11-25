@@ -15,7 +15,7 @@
  */
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
 import { adminClient } from '../_shared/supabase.ts'
-import { editMessage, sendMessage, type MessagePayload } from '../_shared/discord.ts'
+import { describeDiscordError, editMessage, sendMessage, type MessagePayload } from '../_shared/discord.ts'
 import {
   claimEvent,
   findEvent,
@@ -105,7 +105,7 @@ async function postOnce(ctx: Ctx, matchId: string, teamId: string | null, kind: 
 }
 
 async function logError(ctx: Ctx, action: string, payload: unknown, err: unknown) {
-  const message = err instanceof Error ? `${err.message}${'body' in err ? ` ${JSON.stringify((err as { body: unknown }).body)}` : ''}` : String(err)
+  const message = describeDiscordError(err)
   console.error(action, message)
   bump(ctx, 'errors')
   await ctx.db.from('discord_sync_errors').insert({ action: `scheduler:${action}`, payload, error: message.slice(0, 2000) })

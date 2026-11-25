@@ -1,9 +1,10 @@
 /**
- * /lfg post | remove, the post modal ("lfg:post") and the "Invite to team" button
- * ("lfg:invite:<userId>"). The database functions (lfg_upsert_as, lfg_remove_as,
+ * /lfg post | remove, the post modal ("lfg:post"), the pinned guide's "Post as free agent" /
+ * "Remove my post" buttons ("lfg:post", "lfg:remove") and the "Invite to team" button
+ * ("lfg:invite:<userId>"). #free-agents is read-only, so the guide buttons are how most people post. The database functions (lfg_upsert_as, lfg_remove_as,
  * invite_player_as) apply the same rules as the site.
  */
-import { ephemeral, type Handler } from '../_shared/interactions.ts'
+import { ephemeral, type Handler, type Reply } from '../_shared/interactions.ts'
 import { noticeEmbed } from '../_shared/embeds.ts'
 import { adminClient } from '../_shared/supabase.ts'
 import { loadChannels } from '../_shared/match_data.ts'
@@ -14,43 +15,50 @@ const readable = (error: { code?: string; message: string }, fallback: string) =
   error.code === 'P0001' || error.code === '42501' || error.code === 'P0002' ? error.message : fallback
 
 export const lfgCommand: Handler = {
-  async run({ interaction, profile, deps }) {
+  run({ interaction, profile, deps }) {
     if (!profile) return ephemeral('Link your account on the site first.', 'error')
-    const db = adminClient()
     const sub = interaction.data?.options?.[0]?.name
-
-    if (sub === 'remove') {
-      return {
-        kind: 'deferred',
-        ephemeral: true,
-        async work() {
-          const { data, error } = await db.rpc('lfg_remove_as', { p_user_id: profile.id })
-          if (error) return { embeds: [noticeEmbed(readable(error, 'Could not remove your post.'), 'error')] }
-          const r = data as { removed: boolean; channel_id?: string; message_id?: string }
-          if (!r.removed) return { embeds: [noticeEmbed('You don’t have an active free agent post.')] }
-          await deleteLfgMessage(r.channel_id, r.message_id).catch((err) => console.error('delete lfg message failed', err))
-          return { embeds: [noticeEmbed('Your free agent post is down, here and on the site.', 'success')] }
-        },
-      }
-    }
-
-    // post: check the basics before showing the form, then prefill it from the current post.
-    const [{ data: complete }, { data: onTeam }, { data: current }] = await Promise.all([
-      db.rpc('is_profile_complete', { p_user_id: profile.id }),
-      db.from('team_members').select('id').eq('user_id', profile.id).is('left_at', null).eq('is_emergency', false).limit(1),
-      db.from('free_agent_posts').select('preferred_role, availability, note').eq('user_id', profile.id).eq('active', true).maybeSingle(),
-    ])
-    if (complete !== true) {
-      return ephemeral(`Finish your profile first (Activision ID, platform and age): [set it up on the site](${deps.siteUrl}/onboarding).`, 'error')
-    }
-    if (onTeam?.length) {
-      return ephemeral(`You’re on a team, so you can’t post as a free agent. [My team](${deps.siteUrl}/my-team)`, 'error')
-    }
-    return {
-      kind: 'modal',
-      data: lfgModal(current ? { role: current.preferred_role, availability: current.availability, note: current.note } : null),
-    }
+    return sub === 'remove' ? removePost(profile.id, false) : openPostForm(profile.id, deps.siteUrl)
   },
+}
+
+/** Takes the caller's post down here and on the site. */
+function removePost(userId: string, newMessage: boolean): Reply {
+  return {
+    kind: 'deferred',
+    ephemeral: true,
+    // From a button, answer in a new private message instead of editing the pinned guide.
+    newMessage,
+    async work() {
+      const db = adminClient()
+      const { data, error } = await db.rpc('lfg_remove_as', { p_user_id: userId })
+      if (error) return { embeds: [noticeEmbed(readable(error, 'Could not remove your post.'), 'error')] }
+      const r = data as { removed: boolean; channel_id?: string; message_id?: string }
+      if (!r.removed) return { embeds: [noticeEmbed('You don’t have an active free agent post.')] }
+      await deleteLfgMessage(r.channel_id, r.message_id).catch((err) => console.error('delete lfg message failed', err))
+      return { embeds: [noticeEmbed('Your free agent post is down, here and on the site.', 'success')] }
+    },
+  }
+}
+
+/** Checks the basics, then shows the post form prefilled from the current post. */
+async function openPostForm(userId: string, siteUrl: string): Promise<Reply> {
+  const db = adminClient()
+  const [{ data: complete }, { data: onTeam }, { data: current }] = await Promise.all([
+    db.rpc('is_profile_complete', { p_user_id: userId }),
+    db.from('team_members').select('id').eq('user_id', userId).is('left_at', null).eq('is_emergency', false).limit(1),
+    db.from('free_agent_posts').select('preferred_role, availability, note').eq('user_id', userId).eq('active', true).maybeSingle(),
+  ])
+  if (complete !== true) {
+    return ephemeral(`Finish your profile first (Activision ID, platform and age): [set it up on the site](${siteUrl}/onboarding).`, 'error')
+  }
+  if (onTeam?.length) {
+    return ephemeral(`You’re on a team, so you can’t post as a free agent. [My team](${siteUrl}/my-team)`, 'error')
+  }
+  return {
+    kind: 'modal',
+    data: lfgModal(current ? { role: current.preferred_role, availability: current.availability, note: current.note } : null),
+  }
 }
 
 export const lfgModalHandler: Handler = {
@@ -84,7 +92,7 @@ export const lfgModalHandler: Handler = {
           }
         } catch (err) {
           console.error('publish lfg failed', err)
-          return { embeds: [noticeEmbed(`Saved on the site ([Free Agents](${deps.siteUrl}/free-agents)), but I couldn’t post it in Discord. An admin needs to set the #lfg-free-agents channel.`, 'error')] }
+          return { embeds: [noticeEmbed(`Saved on the site ([Free Agents](${deps.siteUrl}/free-agents)), but I couldn’t post it in Discord. An admin needs to check the #free-agents channel in Admin → Discord.`, 'error')] }
         }
       },
     }
@@ -93,6 +101,10 @@ export const lfgModalHandler: Handler = {
 
 export const lfgButton: Handler = {
   run({ profile, deps, action, id }) {
+    if (action === 'post' || action === 'remove') {
+      if (!profile) return ephemeral(`Link your account first: [log in with Discord](${deps.siteUrl}/login).`, 'error')
+      return action === 'post' ? openPostForm(profile.id, deps.siteUrl) : removePost(profile.id, true)
+    }
     if (action !== 'invite' || !id) return ephemeral('Unknown action.', 'error')
     return {
       kind: 'deferred',

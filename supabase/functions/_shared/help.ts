@@ -69,8 +69,8 @@ function guideParts(kind: ChannelKind, siteUrl: string): { title: string; descri
           {
             name: 'Free agents',
             value:
-              '`/lfg post` post or edit your free agent post (role, availability, a short note).\n' +
-              '`/lfg remove` take it down when you join a team or stop looking.\n' +
+              'Press **Post as free agent** below to post or edit yours (role, availability, a short note), ' +
+              'and **Remove my post** when you join a team or stop looking. `/lfg post` and `/lfg remove` do the same from any channel.\n' +
               'You need a finished Blackhat profile first: `/link`.',
           },
           {
@@ -136,7 +136,7 @@ function guideParts(kind: ChannelKind, siteUrl: string): { title: string; descri
         description: 'Commands by channel:',
         fields: [
           { name: 'Your team channel (captains)', value: '`/report` · `/reschedule` · `/dispute` · **Check in** button' },
-          { name: '#free-agents', value: '`/lfg post` · `/lfg remove` · **Invite to team** button (captains)' },
+          { name: '#free-agents', value: '**Post as free agent** button or `/lfg post` · `/lfg remove` · **Invite to team** button (captains)' },
           ANYWHERE,
         ],
       }
@@ -151,6 +151,23 @@ export function guideEmbed(kind: ChannelKind, siteUrl: string): Embed {
     description: `${g.description}\n\n${rulesLine(siteUrl)}`,
     fields: g.fields,
   })
+}
+
+/**
+ * Buttons under a pinned guide. #free-agents is read-only (nobody can type there, so nobody can
+ * run a slash command there), so its guide carries the buttons that open the post form.
+ */
+export function guideComponents(kind: ChannelKind): Record<string, unknown>[] {
+  if (kind !== 'lfg') return []
+  return [
+    {
+      type: 1,
+      components: [
+        { type: 2, style: 1, label: 'Post as free agent', custom_id: 'lfg:post' },
+        { type: 2, style: 2, label: 'Remove my post', custom_id: 'lfg:remove' },
+      ],
+    },
+  ]
 }
 
 /** /help: the channel's guide plus a line about the viewer (linked? captain here?). */

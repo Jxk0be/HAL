@@ -21,6 +21,7 @@ import {
   UNKNOWN_MEMBER,
   UNKNOWN_ROLE,
   type GuildRole,
+  describeDiscordError,
 } from '../_shared/discord.ts'
 import {
   desiredRoles,
@@ -76,7 +77,7 @@ async function ignoreMissing(p: Promise<unknown>) {
 }
 
 export async function logError(db: SupabaseClient, action: string, payload: unknown, err: unknown) {
-  const message = err instanceof Error ? `${err.message}${'body' in err ? ` ${JSON.stringify((err as { body: unknown }).body)}` : ''}` : String(err)
+  const message = describeDiscordError(err)
   console.error(action, message)
   await db.from('discord_sync_errors').insert({ action, payload, error: message.slice(0, 2000) })
 }

@@ -207,6 +207,30 @@ export function discordErrorCode(err: unknown): number | null {
   return null
 }
 
+export const MISSING_ACCESS = 50001
+export const MISSING_PERMISSIONS = 50013
+
+/**
+ * The text logged to discord_sync_errors (shown on Admin → Discord): the status, Discord's own
+ * message, and for the two permission errors a plain fix.
+ */
+export function describeDiscordError(err: unknown): string {
+  if (!(err instanceof Error)) return String(err)
+  if (!(err instanceof DiscordError)) return err.message
+  const code = discordErrorCode(err)
+  const body = err.body && typeof err.body === 'object' ? (err.body as { message?: unknown }) : null
+  let text = err.message
+  if (body?.message) text += `: ${String(body.message)}${code ? ` (${code})` : ''}`
+  if (code === MISSING_ACCESS) {
+    text +=
+      ". The bot can't see this channel. In its permissions, add the Blackhat Bot role with View Channel and Send Messages allowed."
+  } else if (code === MISSING_PERMISSIONS) {
+    text +=
+      '. The bot is missing a permission here. Add the Blackhat Bot role to this channel (or its category) with View Channel, Send Messages, Embed Links, Read Message History and Manage Messages allowed, and keep its role above the roles it hands out.'
+  }
+  return text
+}
+
 export const getGuildRoles = (guildId: string) => discordRequest<GuildRole[]>('GET', `/guilds/${guildId}/roles`)
 
 export const getGuildChannels = (guildId: string) =>

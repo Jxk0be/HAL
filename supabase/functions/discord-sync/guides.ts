@@ -5,9 +5,9 @@
  * { channelId: messageId }.
  */
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
-import { discordErrorCode, editMessage, pinMessage, sendMessage, UNKNOWN_CHANNEL, UNKNOWN_MESSAGE } from '../_shared/discord.ts'
+import { describeDiscordError, discordErrorCode, editMessage, pinMessage, sendMessage, UNKNOWN_CHANNEL, UNKNOWN_MESSAGE } from '../_shared/discord.ts'
 import { loadChannels } from '../_shared/match_data.ts'
-import { guideEmbed, type ChannelKind } from '../_shared/help.ts'
+import { guideComponents, guideEmbed, type ChannelKind } from '../_shared/help.ts'
 
 const KEY = 'discord_guides'
 
@@ -37,7 +37,8 @@ async function upsertGuide(
   channelId: string,
   kind: ChannelKind,
 ): Promise<'posted' | 'updated' | 'posted_unpinned'> {
-  const payload = { embeds: [guideEmbed(kind, siteUrl())], allowed_mentions: { parse: [] } }
+  // Components are always sent, so a refresh also adds (or clears) the buttons on an existing guide.
+  const payload = { embeds: [guideEmbed(kind, siteUrl())], components: guideComponents(kind), allowed_mentions: { parse: [] } }
   const existing = ids[channelId]
   if (existing) {
     try {
@@ -102,7 +103,7 @@ export async function postAllGuides(db: SupabaseClient): Promise<GuideStats> {
       await db.from('discord_sync_errors').insert({
         action: 'post_guides',
         payload: { channel_id: channelId, kind },
-        error: (err instanceof Error ? err.message : String(err)).slice(0, 2000),
+        error: describeDiscordError(err).slice(0, 2000),
       })
     }
   }

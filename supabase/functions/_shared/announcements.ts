@@ -119,7 +119,7 @@ export function buildAnnouncement(key: AnnouncementKey, s: AnnouncementSeason, n
         `Signups ${at.getTime() <= now.getTime() ? 'are open' : `open ${ts(at)} (${ts(at, 'R')})`}. Free entry, NA only, controller only, 18+.`,
         `**Join:** log in on the site with Discord and finish your profile: ${siteUrl}/login`,
         `**Build a team:** create one on the site and invite players. Rosters are up to ${s.maxStarters} starters and ${s.maxSubs} subs (3.2). A team needs **4 players** before admins can approve it (3.5).`,
-        `**Need a team?** Post in the free agents channel with \`/lfg post\`.`,
+        `**Need a team?** Press **Post as free agent** in the free agents channel.`,
         s.startsOn ? `The regular season starts ${ts(eventTime('season_countdown', s)!)}. Matches are ${nights(s)}.` : '',
         s.prize ? `**Prize:** ${s.prize}` : '',
       ]

@@ -70,7 +70,7 @@ bot makes those in step 8.
 | | #results 🔒 | 🤖 confirmed results | #results |
 | | #player-of-the-week 🔒 | 🤖 Mondays at noon ET | #player-of-the-week |
 | **COMMUNITY** | #general | everyone | — |
-| | #free-agents | 🤖 `/lfg post` cards | #free-agents |
+| | #free-agents 🔒 | 🤖 free agent cards (posted with the pinned guide's **Post as free agent** button) | #free-agents |
 | | #teams-recruiting | captains | — |
 | | #sub-board 🔒 | 🤖 teams short for a match, with an **I'm available** button | #sub-board |
 | | #clips | everyone | — |
@@ -118,12 +118,26 @@ and labels, so they need very little:
   Connect, Speak...). Turn **off** Mention @everyone.
 
 ### Step 10: Channel permissions
-Edit Channel → Permissions → add the role → set the box:
+Edit Category/Channel → Permissions → add the role → set the box.
+
+**Do this first: let the bot through.** A ✗ on @everyone in a channel also blocks the bot (Discord
+applies channel denies over the permissions a role has server-wide). So before denying anything,
+on each of the **INFO, LEAGUE, COMMUNITY, SUPPORT and STAFF** categories add the **Blackhat Bot**
+role and tick ✓: View Channel, Send Messages, Send Messages in Threads, Create Private Threads,
+Manage Threads, Embed Links, Attach Files, Read Message History, Manage Messages (to pin), Mention
+@everyone. Then make every channel inside **sync to its category** (Edit Channel → Permissions →
+Sync Now), so the bot's ✓ reaches it. If a channel shows "not synced", give the bot the same ✓ on
+that channel too.
+
+Then the restrictions:
 - **🔒 read-only channels** (#start-here, #rules, #announcements, everything in LEAGUE, #sub-board,
-  #disputes): @everyone → **Send Messages ✗**, **Create Public Threads ✗**. The bot still posts (its
-  own role allows it) and the #sub-board buttons still work. In #disputes keep **Send Messages in
+  #disputes): @everyone → **Send Messages ✗**, **Create Public Threads ✗**. The bot still posts
+  thanks to its ✓ above, and the #sub-board buttons still work. In #disputes keep **Send Messages in
   Threads ✓** so captains can talk in their private dispute threads.
-- **#free-agents:** @everyone → **Send Messages ✗**, **Use Application Commands ✓**. Only `/lfg` cards appear.
+- **#free-agents:** @everyone → **Send Messages ✗**, **Add Reactions ✗**. Nobody can type here, and that
+  includes slash commands (Discord hides the message box). Players post with the **Post as free agent** /
+  **Remove my post** buttons on the bot's pinned guide (step 11), or `/lfg post` from any other channel;
+  the card always lands here.
 - **#teams-recruiting:** optional slow mode of 6 hours, so each captain's post stays visible.
 - **STAFF category and 🔊 Admin:** @everyone → **View Channel ✗**; BIL Admin → **View Channel ✓**.
   Sync the channels inside to the category.
@@ -148,8 +162,12 @@ Edit Channel → Permissions → add the role → set the box:
 - `/ping` → "Blackhat bot online." · `/help` in a few channels → a private explanation for each.
 - `/link` → your profile link.
 - You have the **BIL Admin** role.
-- Admin → Discord → **Bot and sync errors** is empty. If not, the error names the problem (most often
-  a wrong channel ID, or the bot's role sitting too low in step 9).
+- Admin → Discord → **Bot and sync errors** is empty. If not, the error names the problem. The
+  usual ones:
+  - `403 ... Missing Permissions` / `Missing Access`: that channel (or its category) has no Blackhat
+    Bot ✓ (step 10). Fix it, then press **Post channel guides** again.
+  - `404 ... Unknown Channel`: a wrong channel ID in step 7.
+  - Role errors: the bot's role sits too low (step 9).
 
 ## 2. Channel text
 
@@ -165,7 +183,7 @@ A free-entry, NA-only Call of Duty: MW4 league on the CDL ruleset. Controller on
 **3.** Done. Your roles here update by themselves: **Free Agent** until you join a team, then your team's role and private text + voice channels.
 
 ## Find a team
-• Free agents: `/lfg post` in #free-agents. It also shows on https://YOUR-SITE/free-agents
+• Free agents: press **Post as free agent** on the pinned message in #free-agents. It also shows on https://YOUR-SITE/free-agents
 • Captains: post what you need in #teams-recruiting, invite from the site, or press **Invite to team** on a #free-agents card.
 • Starting a team? Create it on the site while signups are open. It's approved once you have 4 players.
 
@@ -231,7 +249,7 @@ Platform / region: PS5 · East
 Times: Tue & Thu 9 PM ET + scrims Sun
 DM the captain or reply here.
 
-Players: you can also `/lfg post` in #free-agents so captains find you, and invites come to your DMs with Accept / Decline.
+Players: you can also press **Post as free agent** in #free-agents so captains find you, and invites come to your DMs with Accept / Decline.
 ```
 
 ### #sub-board (pin this)
@@ -286,7 +304,7 @@ Full season stats: https://YOUR-SITE/leaderboard
 | #match-schedule | This week's matches in your time zone, with results as they land. |
 | #results | Confirmed results, posted by the bot. Wrong? Captains /dispute in your team channel. |
 | #player-of-the-week | Monday noon ET: last week's top performer. |
-| #free-agents | Free agents: /lfg post · Captains: press Invite to team on a card · /help |
+| #free-agents | Free agents: press Post as free agent on the pinned message · Captains: press Invite to team on a card |
 | #teams-recruiting | Captains: who you need, one post per team. |
 | #sub-board | Teams short for a match. Not on a team? Press I'm available. |
 | #clips | Your best plays. Links or uploads. |

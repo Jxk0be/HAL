@@ -1,5 +1,5 @@
 import { assertEquals } from 'jsr:@std/assert@1'
-import { GUIDE_KINDS, guideEmbed, helpEmbeds, type ChannelKind } from './help.ts'
+import { GUIDE_KINDS, guideComponents, guideEmbed, helpEmbeds, type ChannelKind } from './help.ts'
 import { COMMANDS } from './commands.ts'
 
 const SITE = 'https://hal.example'
@@ -57,4 +57,11 @@ Deno.test('help tells unlinked users to log in and players who can use captain c
   // Outside a team channel a linked user just gets the guide.
   const [plain] = helpEmbeds('results', { linked: true, captain: false }, SITE)
   assertEquals(plain!.description, guideEmbed('results', SITE).description)
+})
+
+Deno.test('only the #free-agents guide has buttons, and they open the post form or remove the post', () => {
+  for (const kind of ALL) {
+    const ids = guideComponents(kind).flatMap((row) => (row.components as { custom_id: string }[]).map((b) => b.custom_id))
+    assertEquals(ids, kind === 'lfg' ? ['lfg:post', 'lfg:remove'] : [])
+  }
 })
