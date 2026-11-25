@@ -60,6 +60,17 @@ export function useAnnouncements() {
     return { ok: true }
   }
 
+  /** Posts pasted text to #announcements as an announcement embed. */
+  async function postCustom(text: string, everyone: boolean): Promise<Result> {
+    busyKey.value = 'custom'
+    const { data, error: err } = await supabase.functions.invoke<{ ok: boolean; error?: string }>('discord-sync', {
+      body: { action: 'announcement_custom', text, everyone },
+    })
+    busyKey.value = null
+    if (err || !data?.ok) return { ok: false, message: data?.error ?? "Couldn't post. Check Admin → Health." }
+    return { ok: true }
+  }
+
   async function setAuto(key: string, auto: boolean): Promise<Result> {
     busyKey.value = key
     const { error: err } = await supabase.from('announcement_settings').update({ auto }).eq('key', key)
@@ -71,5 +82,5 @@ export function useAnnouncements() {
   }
 
   void load()
-  return { rows, season, channelSet, loading, error, busyKey, post, setAuto, reload: load }
+  return { rows, season, channelSet, loading, error, busyKey, post, postCustom, setAuto, reload: load }
 }

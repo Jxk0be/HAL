@@ -7,14 +7,15 @@
  *    member_left/staff_role_changed/free_agent_changed are accepted as aliases).
  *  - The owner's buttons on Admin → Discord (Supabase user JWT; owner only): full_resync, and
  *    post_guides (posts or refreshes the pinned channel guides).
- *  - Any admin from Admin → Announcements: announcements_preview, announcement_post.
+ *  - Any admin from Admin → Announcements: announcements_preview, announcement_post, and
+ *    announcement_custom (pasted text posted as an announcement embed).
  *
  * Deployed with verify_jwt off because pg_net can't send a JWT; both paths authenticate here.
  * Secrets: DISCORD_BOT_TOKEN, DISCORD_APP_ID (= the bot's user id), DISCORD_GUILD_ID.
  */
 import { adminClient } from '../_shared/supabase.ts'
 import { postAllGuides, siteUrl } from './guides.ts'
-import { postAnnouncementNow, previewAnnouncements } from '../_shared/announcement_flow.ts'
+import { postAnnouncementNow, postCustomAnnouncement, previewAnnouncements } from '../_shared/announcement_flow.ts'
 import type { AnnouncementKey } from '../_shared/announcements.ts'
 import { emptyStats, ensureSettings, fullResync, logError, removeTeamDiscord, syncTeam, syncUser, type SyncEnv } from './sync.ts'
 import { refreshMatchPost } from '../_shared/eights_flow.ts'
@@ -41,7 +42,7 @@ const ALIASES: Record<string, string> = {
 /** Actions the owner can run from the site (everything else is trigger-only). */
 const OWNER_ACTIONS = ['full_resync', 'post_guides']
 /** Actions any admin (or the owner) can run from Admin → Announcements. */
-const ADMIN_ACTIONS = ['announcements_preview', 'announcement_post']
+const ADMIN_ACTIONS = ['announcements_preview', 'announcement_post', 'announcement_custom']
 
 let cachedSecret: { value: string | null; at: number } | null = null
 async function syncSecret(): Promise<string | null> {
@@ -108,6 +109,19 @@ Deno.serve(async (req) => {
       return json(error ? { ok: false, error } : { ok: true }, error ? 400 : 200)
     } catch (err) {
       await logError(adminClient(), action, body, err)
+      return json({ ok: false, error: err instanceof Error ? err.message : String(err) }, 500)
+    }
+  }
+
+  if (action === 'announcement_custom') {
+    try {
+      const error = await postCustomAnnouncement(adminClient(), String(body.text ?? ''), {
+        by: caller ?? '',
+        everyone: body.everyone === true,
+      })
+      return json(error ? { ok: false, error } : { ok: true }, error ? 400 : 200)
+    } catch (err) {
+      await logError(adminClient(), action, { everyone: body.everyone === true }, err)
       return json({ ok: false, error: err instanceof Error ? err.message : String(err) }, 500)
     }
   }

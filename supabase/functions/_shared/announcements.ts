@@ -186,3 +186,38 @@ export function dueOffsets(key: AnnouncementKey, at: Date, now: Date): number[] 
     return now.getTime() >= moment && now.getTime() < end
   })
 }
+
+// ---- Custom announcements (pasted on Admin → Announcements) -------------------------------------
+
+export const CUSTOM_TITLE_MAX = 256
+export const CUSTOM_BODY_MAX = 4000
+
+/**
+ * Splits pasted text into an embed title and body. A first line that is all bold (**Title**) or a
+ * heading (# Title) becomes the title; otherwise there is no title. Mirrored in
+ * apps/web/src/lib/announcements.ts for the preview.
+ */
+export function parseCustomAnnouncement(text: string): { title: string | null; body: string } {
+  const lines = text.replace(/\r\n/g, '\n').trim().split('\n')
+  const first = (lines[0] ?? '').trim()
+  const m = first.match(/^\*\*(.+)\*\*$/) ?? first.match(/^#{1,3}\s+(.+)$/)
+  if (m && m[1] && !m[1].includes('**')) {
+    return { title: m[1].trim(), body: lines.slice(1).join('\n').trim() }
+  }
+  return { title: null, body: lines.join('\n').trim() }
+}
+
+/** The announcement embed, or an error message for text that doesn't fit. */
+export function customAnnouncement(text: string): { payload: MessagePayload | null; error: string | null } {
+  const { title, body } = parseCustomAnnouncement(text)
+  if (!title && !body) return { payload: null, error: 'Write the announcement first.' }
+  if (title && title.length > CUSTOM_TITLE_MAX) return { payload: null, error: `The title is too long (max ${CUSTOM_TITLE_MAX} characters).` }
+  if (body.length > CUSTOM_BODY_MAX) return { payload: null, error: `The text is too long (max ${CUSTOM_BODY_MAX} characters).` }
+  return {
+    payload: {
+      embeds: [halEmbed({ ...(title ? { title } : {}), ...(body ? { description: body } : {}) })],
+      allowed_mentions: { parse: [] },
+    },
+    error: null,
+  }
+}

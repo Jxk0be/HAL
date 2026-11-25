@@ -1,5 +1,15 @@
 import { assertEquals } from 'jsr:@std/assert@1'
-import { ANNOUNCEMENTS, buildAnnouncement, daysUntil, dueOffsets, eventTime, withEveryone, type AnnouncementSeason } from './announcements.ts'
+import {
+  ANNOUNCEMENTS,
+  buildAnnouncement,
+  customAnnouncement,
+  daysUntil,
+  dueOffsets,
+  eventTime,
+  parseCustomAnnouncement,
+  withEveryone,
+  type AnnouncementSeason,
+} from './announcements.ts'
 
 const SITE = 'https://hal.example'
 const season: AnnouncementSeason = {
@@ -61,4 +71,25 @@ Deno.test('automatic posts fire once in their window, never stale', () => {
 
 Deno.test('@everyone is opt-in', () => {
   assertEquals(withEveryone({ embeds: [] }).allowed_mentions, { parse: ['everyone'] })
+})
+
+Deno.test('custom announcement: a bold or heading first line becomes the title', () => {
+  assertEquals(parseCustomAnnouncement('**Preseason matches are coming**\n\nBody here\n- point'), {
+    title: 'Preseason matches are coming',
+    body: 'Body here\n- point',
+  })
+  assertEquals(parseCustomAnnouncement('# Big news\nText').title, 'Big news')
+  assertEquals(parseCustomAnnouncement('Just text, **some bold**\nmore'), { title: null, body: 'Just text, **some bold**\nmore' })
+  assertEquals(parseCustomAnnouncement('**a** and **b**').title, null)
+})
+
+Deno.test('custom announcement: branded embed, no pings unless @everyone is added, limits checked', () => {
+  const ok = customAnnouncement('**Title**\nBody')
+  assertEquals(ok.error, null)
+  assertEquals(ok.payload?.embeds?.[0]?.title, 'Title')
+  assertEquals(ok.payload?.embeds?.[0]?.description, 'Body')
+  assertEquals(ok.payload?.allowed_mentions, { parse: [] })
+  assertEquals(withEveryone(ok.payload!).allowed_mentions, { parse: ['everyone'] })
+  assertEquals(customAnnouncement('   ').error, 'Write the announcement first.')
+  assertEquals(customAnnouncement('x'.repeat(4001)).payload, null)
 })

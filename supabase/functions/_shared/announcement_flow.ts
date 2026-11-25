@@ -9,6 +9,7 @@ import { loadChannels } from './match_data.ts'
 import {
   ANNOUNCEMENTS,
   buildAnnouncement,
+  customAnnouncement,
   dueOffsets,
   eventTime,
   withEveryone,
@@ -109,6 +110,32 @@ export async function postAnnouncementNow(
     discord_channel_id: channel,
     discord_message_id: msg.id,
   })
+  return null
+}
+
+/** Posts a pasted announcement now (admin page). Returns an error message or null. */
+export async function postCustomAnnouncement(
+  db: SupabaseClient,
+  text: string,
+  opts: { by: string; everyone: boolean },
+): Promise<string | null> {
+  const { payload, error } = customAnnouncement(text)
+  if (!payload) return error ?? 'Nothing to post.'
+  const channel = (await loadChannels(db)).announcements
+  if (!channel) return 'Set the #announcements channel ID on Admin → Discord first.'
+  const msg = await sendMessage(channel, opts.everyone ? withEveryone(payload) : payload)
+  // Kept with the season's other announcements when a season is running.
+  const season = await loadAnnouncementSeason(db)
+  if (season) {
+    await db.from('announcement_posts').insert({
+      season_id: season.id,
+      key: 'custom',
+      occurrence: `manual:${crypto.randomUUID()}`,
+      posted_by: opts.by,
+      discord_channel_id: channel,
+      discord_message_id: msg.id,
+    })
+  }
   return null
 }
 
