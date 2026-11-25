@@ -42,6 +42,7 @@ import {
 } from '../_shared/match_messages.ts'
 import { dueKinds, scanWindow, type Kind } from './plan.ts'
 import { deleteLfgMessage, publishLfg } from '../_shared/lfg_sync.ts'
+import { refreshDiscordProfiles } from '../_shared/discord_profile.ts'
 import { finishRescheduleRequest, postRescheduleRequest } from '../_shared/reschedule_flow.ts'
 import { closeDisputeThread, ensureDisputeThread, postDisputeComment, reopenDisputeThread } from '../_shared/dispute_flow.ts'
 import { handleEsubEvent } from '../_shared/esub_flow.ts'
@@ -436,5 +437,12 @@ Deno.serve(async (req) => {
   }
   // Boards last, so they already reflect results and changes handled above.
   Object.assign(ctx.stats, await syncBoards(ctx.db, ctx.channels, ctx.siteUrl, new Date(), (family, err) => logError(ctx, family, {}, err)))
+  // Profile pictures and names: a small batch per run, oldest first (logins alone left them stale).
+  try {
+    const n = await refreshDiscordProfiles(ctx.db, 20)
+    if (n) ctx.stats.profiles_checked = n
+  } catch (err) {
+    await logError(ctx, 'discord_profiles', {}, err)
+  }
   return json({ ok: true, stats: ctx.stats })
 })

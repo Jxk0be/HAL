@@ -16,7 +16,8 @@ const post = {
 Deno.test('lfg post shows the player, never pings, and has the invite button', () => {
   const msg = lfgPostMessage(post, 'https://hal.example')
   assertEquals(msg.allowed_mentions, { parse: [] })
-  assertEquals(msg.content, '<@42> is looking for a team')
+  // The plain name comes first: a non-pinging mention can show as @unknown-user.
+  assertEquals(msg.content, '**kairo** (<@42>) is looking for a team')
   assertEquals(msg.embeds![0]!.title, 'Kairo#1234567')
   assertEquals(msg.embeds![0]!.fields![0], { name: 'Platform', value: 'PlayStation', inline: true })
   // deno-lint-ignore no-explicit-any

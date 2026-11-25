@@ -70,7 +70,7 @@ const roleLabel = computed(() => {
             </div>
           </dl>
           <p class="mt-4 text-xs text-muted">
-            Your Discord name and avatar update automatically each time you log in.
+            Your name and picture come from Discord and stay in sync automatically. Change them in Discord and the site catches up within a few minutes.
           </p>
         </UiCard>
 

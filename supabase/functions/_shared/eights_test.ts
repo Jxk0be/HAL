@@ -78,7 +78,7 @@ Deno.test('dispute alert shows who said what and has settle buttons; resolved al
     ],
   })
   const a = disputeAlert(m)
-  assert(a.embeds![0]!.description!.includes('<@1001> (Team A) says **Team A won**'))
+  assert(a.embeds![0]!.description!.includes('**Player1** <@1001> (Team A) says **Team A won**'))
   assertEquals(buttons(a), ['eights:fix:m1:a', 'eights:fix:m1:b', 'eights:fix:m1:cancel'])
   const r = resolvedAlert({ ...m, status: 'cancelled' }, 'jake')
   assertEquals(buttons(r), [])

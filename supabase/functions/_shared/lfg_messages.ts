@@ -22,8 +22,10 @@ export function lfgPostMessage(p: LfgPost, siteUrl: string): MessagePayload {
   ]
   if (p.availability) fields.push({ name: 'Availability', value: p.availability, inline: false })
   return {
-    // Mention without pinging, so captains can click through to the player.
-    content: `<@${p.discordId}> is looking for a team`,
+    // Mention without pinging, so captains can click through to the player. A mention that doesn't
+    // ping arrives without the user's name, so Discord shows "@unknown-user" to anyone whose app
+    // hasn't loaded that member yet: the plain name in front keeps it readable for everyone.
+    content: `**${p.discordUsername ?? p.activisionId ?? 'A player'}** (<@${p.discordId}>) is looking for a team`,
     allowed_mentions: { parse: [] },
     embeds: [
       halEmbed({

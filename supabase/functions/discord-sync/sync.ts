@@ -22,7 +22,9 @@ import {
   UNKNOWN_ROLE,
   type GuildRole,
   describeDiscordError,
+  getUser,
 } from '../_shared/discord.ts'
+import { saveDiscordProfile } from '../_shared/discord_profile.ts'
 import {
   desiredRoles,
   FIXED_ROLE_SPECS,
@@ -164,10 +166,17 @@ export async function syncUser(
 
   let current: string[]
   try {
-    current = (await getGuildMember(guildId, profile.discord_id)).roles
+    const member = await getGuildMember(guildId, profile.discord_id)
+    current = member.roles
+    // The member record carries their current Discord picture and name: keep the site in step.
+    await saveDiscordProfile(db, userId, member.user).catch((err) => console.error('profile refresh failed', err))
   } catch (err) {
     if (discordErrorCode(err) === UNKNOWN_MEMBER) {
       stats.notInServer++
+      // Not in the server: still refresh their picture and name from their Discord account.
+      await getUser(profile.discord_id)
+        .then((u) => saveDiscordProfile(db, userId, u))
+        .catch((e) => console.error('profile refresh failed', e))
       return
     }
     throw err

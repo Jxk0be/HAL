@@ -188,9 +188,26 @@ export interface GuildChannel {
   type: number
   parent_id?: string | null
 }
+/** The parts of a Discord user the site shows (avatar is a hash; null = default avatar). */
+export interface DiscordUserProfile {
+  id: string
+  username: string
+  global_name?: string | null
+  avatar?: string | null
+}
+
 export interface GuildMember {
-  user: { id: string }
+  user: DiscordUserProfile
   roles: string[]
+}
+
+export const getUser = (userId: string) => discordRequest<DiscordUserProfile>('GET', `/users/${userId}`)
+
+/** CDN URL for a user's avatar, matching what Discord login stores (animated hashes start with a_). */
+export function avatarUrlFor(u: DiscordUserProfile): string {
+  if (u.avatar) return `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.${u.avatar.startsWith('a_') ? 'gif' : 'png'}`
+  // Default avatar for accounts on the new username system: (id >> 22) % 6.
+  return `https://cdn.discordapp.com/embed/avatars/${Number((BigInt(u.id) >> 22n) % 6n)}.png`
 }
 
 /** Discord error code for "Unknown Member" (user isn't in the server). */

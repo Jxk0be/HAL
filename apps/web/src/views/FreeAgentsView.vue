@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import UiInput from '@/components/ui/UiInput.vue'
 import UiSelect from '@/components/ui/UiSelect.vue'
@@ -30,6 +30,12 @@ const board = useFreeAgentBoard()
 const { search, platform, role, page, pages, rows, total, loading, error } = board
 const { season } = useActiveSeason()
 const rankNote = computed(() => (auth.rankStatus in RANK_STATUS_TEXT ? RANK_STATUS_TEXT[auth.rankStatus as keyof typeof RANK_STATUS_TEXT] : null))
+
+// Long notes are clamped to 4 lines on the card; "Show more" opens one card's note in full.
+const expanded = reactive(new Set<string>())
+const toggleNote = (id: string) => (expanded.has(id) ? expanded.delete(id) : expanded.add(id))
+/** Roughly more than 4 lines on a card: long text, or several line breaks. */
+const isLongNote = (note: string) => note.length > 180 || note.split('\n').length > 4
 
 // Your post
 const myPost = useMyFreeAgentPost()
@@ -166,7 +172,17 @@ const posted = (iso: string | null) =>
             </div>
             <div v-if="p.note">
               <dt class="sr-only">About</dt>
-              <dd class="line-clamp-4 whitespace-pre-line text-muted">{{ p.note }}</dd>
+              <dd :id="`fa-note-${p.id}`" class="whitespace-pre-line text-muted" :class="expanded.has(p.id) ? '' : 'line-clamp-4'">{{ p.note }}</dd>
+              <button
+                v-if="isLongNote(p.note)"
+                type="button"
+                class="mt-1 text-sm text-accent hover:text-accent-strong focus-visible:outline-2 focus-visible:outline-accent"
+                :aria-expanded="expanded.has(p.id)"
+                :aria-controls="`fa-note-${p.id}`"
+                @click="toggleNote(p.id)"
+              >
+                {{ expanded.has(p.id) ? 'Show less' : 'Show more' }}<span class="sr-only"> of {{ p.name }}'s post</span>
+              </button>
             </div>
           </dl>
           <p v-else class="mt-4 text-sm text-faint">No post yet.</p>

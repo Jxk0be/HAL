@@ -60,7 +60,8 @@ export interface LeaderboardRow {
 }
 
 export const teamLabel = (t: Team) => (t === 'a' ? 'Team A' : 'Team B')
-const who = (p: EightsPlayer) => (p.discordId ? `<@${p.discordId}>` : p.name)
+// Name first: these mentions don't ping, so Discord may show "@unknown-user" for the mention alone.
+const who = (p: EightsPlayer) => (p.discordId ? `**${p.name}** <@${p.discordId}>` : `**${p.name}**`)
 const button = (style: 1 | 2 | 3 | 4, label: string, custom_id: string) => ({ type: 2, style, label, custom_id })
 const row = (...components: unknown[]) => ({ type: 1, components })
 
