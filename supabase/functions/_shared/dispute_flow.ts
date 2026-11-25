@@ -15,7 +15,7 @@ import {
   recusedNote,
 } from './dispute_messages.ts'
 
-const REASON = 'HAL dispute'
+const REASON = 'BIL dispute'
 
 interface DisputeRow {
   id: string

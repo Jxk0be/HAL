@@ -39,16 +39,16 @@ const anyTies = computed(() => rows.value.some((r) => r.needs_admin_decision))
           <template v-else>
             <StandingsTable :rows="rows" :cutoff="Math.min(playoffTeams, rows.length)" :caption="`${season.name} standings`" />
             <p class="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs text-muted">
-              <span><span class="mr-1 inline-block h-0.5 w-6 bg-gold-dim align-middle" aria-hidden="true" />Playoff line: top {{ playoffTeams }}</span>
-              <span v-if="anyTies"><span class="text-gold">*</span> Still tied after every tiebreak; league staff decide the order.</span>
+              <span><span class="mr-1 inline-block h-0.5 w-6 bg-accent-dim align-middle" aria-hidden="true" />Playoff line: top {{ playoffTeams }}</span>
+              <span v-if="anyTies"><span class="text-accent">*</span> Still tied after every tiebreak; league staff decide the order.</span>
             </p>
           </template>
         </UiTabs>
 
         <section aria-labelledby="leaders-title">
-          <h2 id="leaders-title" class="eyebrow mb-1 text-gold">Leaderboards</h2>
+          <h2 id="leaders-title" class="eyebrow mb-1 text-accent">Leaderboards</h2>
           <p class="mb-4 text-xs text-muted">
-            Top 10 for each stat. <RouterLink to="/leaderboard" class="text-gold hover:text-gold-strong">Full leaderboard →</RouterLink>
+            Top 10 for each stat. <RouterLink to="/leaderboard" class="text-accent hover:text-accent-strong">Full leaderboard →</RouterLink>
           </p>
           <div class="grid gap-4 md:grid-cols-3">
             <StatLeaderboard title="K/D" :rows="boards.kd" :value="(r) => (r.kd ?? 0).toFixed(2)" />

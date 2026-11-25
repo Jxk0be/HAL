@@ -25,7 +25,7 @@ defineProps<{
         <UiAvatar :src="p.avatarUrl" :name="p.name" size="md" decorative />
         <div class="min-w-0 flex-1">
           <p class="flex items-center gap-2 truncate font-medium">
-            <RouterLink v-if="linkPlayers" :to="`/players/${p.userId}`" class="truncate hover:text-gold">{{ p.name }}</RouterLink>
+            <RouterLink v-if="linkPlayers" :to="`/players/${p.userId}`" class="truncate hover:text-accent">{{ p.name }}</RouterLink>
             <span v-else class="truncate">{{ p.name }}</span>
           </p>
           <p class="mt-0.5 flex items-center gap-2 text-xs text-muted">
@@ -33,8 +33,8 @@ defineProps<{
             <span class="truncate">{{ p.activisionId ?? 'No Activision ID' }}</span>
           </p>
           <p class="mt-2 flex flex-wrap gap-1">
-            <UiBadge v-if="p.isCaptain" variant="gold">Captain</UiBadge>
-            <UiBadge v-else-if="p.isCoCaptain" variant="gold">Co-captain</UiBadge>
+            <UiBadge v-if="p.isCaptain" variant="accent">Captain</UiBadge>
+            <UiBadge v-else-if="p.isCoCaptain" variant="accent">Co-captain</UiBadge>
             <UiBadge :variant="p.role === 'starter' ? 'outline' : 'neutral'">{{ p.role === 'starter' ? 'Starter' : 'Sub' }}</UiBadge>
           </p>
         </div>
@@ -60,10 +60,10 @@ defineProps<{
             <td class="px-4 py-3">
               <span class="flex items-center gap-3">
                 <UiAvatar :src="p.avatarUrl" :name="p.name" size="sm" decorative />
-                <RouterLink v-if="linkPlayers" :to="`/players/${p.userId}`" class="font-medium hover:text-gold">{{ p.name }}</RouterLink>
+                <RouterLink v-if="linkPlayers" :to="`/players/${p.userId}`" class="font-medium hover:text-accent">{{ p.name }}</RouterLink>
                 <span v-else class="font-medium">{{ p.name }}</span>
-                <UiBadge v-if="p.isCaptain" variant="gold">Captain</UiBadge>
-                <UiBadge v-else-if="p.isCoCaptain" variant="gold">Co-captain</UiBadge>
+                <UiBadge v-if="p.isCaptain" variant="accent">Captain</UiBadge>
+                <UiBadge v-else-if="p.isCoCaptain" variant="accent">Co-captain</UiBadge>
               </span>
             </td>
             <td class="px-4 py-3 text-muted">{{ p.activisionId ?? '—' }}</td>

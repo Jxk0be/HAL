@@ -428,7 +428,7 @@ enabled = true
 # and column/key alignment. Set to "null" to emit raw, unformatted SQL.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
 
-# HAL Edge Functions. All three authenticate themselves, so the gateway JWT check is off:
+# BIL Edge Functions. All three authenticate themselves, so the gateway JWT check is off:
 # discord-interactions verifies Discord's Ed25519 signature; discord-sync and discord-scheduler
 # check the x-hal-sync-secret header (pg_net can't send a JWT; the owner's resync is checked in code).
 [functions.discord-interactions]

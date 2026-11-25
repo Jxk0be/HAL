@@ -4,7 +4,7 @@ import { useToast } from '@/composables/useToast'
 const { toasts, dismiss } = useToast()
 
 const accents = {
-  info: 'border-l-gold',
+  info: 'border-l-accent',
   success: 'border-l-win',
   error: 'border-l-loss',
 }

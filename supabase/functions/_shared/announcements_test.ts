@@ -17,7 +17,7 @@ const season: AnnouncementSeason = {
   maxRosterChanges: 3,
   maxStarters: 4,
   maxSubs: 3,
-  prize: '$200 to the champions',
+  prize: '$400 to the champions',
 }
 
 Deno.test('dates come from the season settings', () => {

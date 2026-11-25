@@ -112,7 +112,7 @@ export const lfgButton: Handler = {
         return {
           embeds: [
             noticeEmbed(
-              `Invite sent to **${playerName}**. They'll get a DM with Accept / Decline within a few minutes, and it's on their HAL profile (${deps.siteUrl}/profile). Your team channel hears their answer.`,
+              `Invite sent to **${playerName}**. They'll get a DM with Accept / Decline within a few minutes, and it's on their Blackhat profile (${deps.siteUrl}/profile). Your team channel hears their answer.`,
               'success',
             ),
           ],

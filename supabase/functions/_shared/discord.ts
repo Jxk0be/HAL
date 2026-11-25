@@ -66,7 +66,7 @@ export async function discordRequest<T = unknown>(
   }
 }
 
-// ---- Types (the subset HAL uses) ------------------------------------------
+// ---- Types (the subset BIL uses) ------------------------------------------
 export interface Embed {
   title?: string
   description?: string
@@ -98,6 +98,10 @@ export const PERMISSIONS = {
   READ_MESSAGE_HISTORY: 1n << 16n,
   ATTACH_FILES: 1n << 15n,
   EMBED_LINKS: 1n << 14n,
+  STREAM: 1n << 9n,
+  CONNECT: 1n << 20n,
+  SPEAK: 1n << 21n,
+  USE_VAD: 1n << 25n,
 } as const
 export const perms = (...bits: bigint[]) => bits.reduce((a, b) => a | b, 0n).toString()
 
@@ -147,7 +151,7 @@ export const createChannel = (
   guildId: string,
   channel: {
     name: string
-    type?: number // 0 = text
+    type?: number // 0 = text, 2 = voice, 4 = category
     parent_id?: string
     topic?: string
     permission_overwrites?: PermissionOverwrite[]

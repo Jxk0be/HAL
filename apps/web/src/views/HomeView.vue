@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import HalWordmark from '@/components/brand/HalWordmark.vue'
+import BrandLogo from '@/components/brand/BrandLogo.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiCountdown from '@/components/ui/UiCountdown.vue'
@@ -62,13 +62,13 @@ const leaders = computed(() =>
     <!-- Hero -->
     <section class="relative overflow-hidden border-b border-line" aria-labelledby="home-title">
       <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-        <!-- Soft halo glow behind the logo -->
-        <div class="absolute top-1/2 right-[8%] hidden size-[520px] -translate-y-1/2 rounded-full bg-gold/10 blur-3xl lg:block" />
+        <!-- Soft red glow behind the emblem -->
+        <div class="absolute top-1/2 right-[8%] hidden size-[520px] -translate-y-1/2 rounded-full bg-accent/10 blur-3xl lg:block" />
       </div>
       <div class="relative mx-auto grid max-w-7xl gap-12 px-4 pt-16 pb-20 sm:px-6 sm:pt-24 lg:grid-cols-[1.2fr_1fr] lg:items-center">
         <div>
-          <div class="mb-8 flex justify-center lg:hidden"><HalWordmark :size="150" decorative /></div>
-          <UiBadge variant="gold">
+          <div class="mb-8 flex justify-center lg:hidden"><BrandLogo :size="200" variant="full" decorative /></div>
+          <UiBadge variant="accent">
             <template v-if="season && inSeason && week">{{ season.name }} · Week {{ week }}</template>
             <template v-else-if="season">{{ season.name }} · {{ season.status === 'signups' ? 'Signups open' : season.status }}</template>
             <template v-else>{{ c.status }}</template>
@@ -81,7 +81,7 @@ const leaders = computed(() =>
             <UiButton :to="inSeason ? '/matches' : '/rules'" variant="secondary" size="lg">{{ inSeason ? 'See the schedule' : 'Read the rules' }}</UiButton>
           </div>
         </div>
-        <div class="relative hidden justify-center lg:flex"><HalWordmark :size="330" decorative /></div>
+        <div class="relative hidden justify-center lg:flex"><BrandLogo :size="400" variant="full" decorative /></div>
       </div>
     </section>
 
@@ -93,9 +93,9 @@ const leaders = computed(() =>
           Live now
         </h2>
         <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <li v-for="b in live" :key="b.matchId" class="flex items-center gap-3 rounded-lg border border-gold-dim bg-surface p-4">
+          <li v-for="b in live" :key="b.matchId" class="flex items-center gap-3 rounded-lg border border-accent-dim bg-surface p-4">
             <span class="min-w-0 flex-1">
-              <RouterLink :to="`/matches/${b.matchId}`" class="block truncate font-heading text-lg hover:text-gold">{{ b.homeTag }} vs {{ b.awayTag }}</RouterLink>
+              <RouterLink :to="`/matches/${b.matchId}`" class="block truncate font-heading text-lg hover:text-accent">{{ b.homeTag }} vs {{ b.awayTag }}</RouterLink>
               <span class="block truncate text-xs text-muted">Cast by {{ b.caster }} on {{ streamPlatform(b.url) }}</span>
             </span>
             <UiButton :href="b.url" size="sm">Watch<span class="sr-only"> {{ b.homeName }} vs {{ b.awayName }}</span></UiButton>
@@ -109,7 +109,7 @@ const leaders = computed(() =>
         <template v-else-if="nextNight">
           <div class="mb-4 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p class="eyebrow text-gold">{{ nextNight.isTonight ? "Tonight's matches" : 'Next match night' }}</p>
+              <p class="eyebrow text-accent">{{ nextNight.isTonight ? "Tonight's matches" : 'Next match night' }}</p>
               <h2 id="next-title" class="mt-1 font-heading text-3xl">{{ formatLeagueTime(nextNight.startsAt, season?.timezone) }}</h2>
             </div>
             <UiCountdown :to="nextNight.startsAt" ended-label="Matches are on" />
@@ -125,7 +125,7 @@ const leaders = computed(() =>
         <section v-if="latest.length" aria-labelledby="results-title">
           <div class="mb-4 flex items-end justify-between">
             <h2 id="results-title" class="font-heading text-2xl">Latest results</h2>
-            <RouterLink to="/matches" class="text-sm text-gold hover:text-gold-strong">All matches →</RouterLink>
+            <RouterLink to="/matches" class="text-sm text-accent hover:text-accent-strong">All matches →</RouterLink>
           </div>
           <ul class="grid gap-4 sm:grid-cols-2">
             <li v-for="m in latest" :key="m.id"><MatchCard :match="m" compact /></li>
@@ -137,7 +137,7 @@ const leaders = computed(() =>
           <section v-if="standings.length" aria-labelledby="top-title">
             <div class="mb-4 flex items-end justify-between">
               <h2 id="top-title" class="font-heading text-2xl">Top of the table</h2>
-              <RouterLink to="/standings" class="text-sm text-gold hover:text-gold-strong">Standings →</RouterLink>
+              <RouterLink to="/standings" class="text-sm text-accent hover:text-accent-strong">Standings →</RouterLink>
             </div>
             <StandingsTable :rows="standings.slice(0, 3)" :cutoff="0" caption="Top 3 teams" compact />
           </section>
@@ -146,9 +146,9 @@ const leaders = computed(() =>
             <dl class="grid grid-cols-3 gap-px overflow-hidden rounded-lg border border-line bg-line">
               <div v-for="l in leaders" :key="l.label" class="bg-surface p-4">
                 <dt class="eyebrow text-muted">{{ l.label }}</dt>
-                <dd class="tnum mt-1 font-heading text-2xl text-gold">{{ l.value }}</dd>
+                <dd class="tnum mt-1 font-heading text-2xl text-accent">{{ l.value }}</dd>
                 <dd class="mt-1 truncate text-xs">
-                  <RouterLink :to="`/players/${l.row?.user_id}`" class="hover:text-gold">{{ l.row?.activision_id }}</RouterLink>
+                  <RouterLink :to="`/players/${l.row?.user_id}`" class="hover:text-accent">{{ l.row?.activision_id }}</RouterLink>
                 </dd>
               </div>
             </dl>
@@ -158,11 +158,11 @@ const leaders = computed(() =>
 
       <!-- League pillars (before the season has results) -->
       <section v-if="!latest.length" aria-labelledby="pillars-title">
-        <p class="eyebrow text-gold">The league</p>
+        <p class="eyebrow text-accent">The league</p>
         <h2 id="pillars-title" class="mt-2 font-heading text-3xl sm:text-4xl">Built like a pro circuit</h2>
         <div class="mt-8 grid gap-px overflow-hidden rounded-lg border border-line bg-line md:grid-cols-3">
           <article v-for="(p, i) in c.pillars" :key="p.title" class="bg-surface p-6 sm:p-8">
-            <p class="tnum font-heading text-sm text-gold" aria-hidden="true">0{{ i + 1 }}</p>
+            <p class="tnum font-heading text-sm text-accent" aria-hidden="true">0{{ i + 1 }}</p>
             <h3 class="mt-3 font-heading text-xl">{{ p.title }}</h3>
             <p class="mt-2 text-sm leading-relaxed text-muted">{{ p.body }}</p>
           </article>

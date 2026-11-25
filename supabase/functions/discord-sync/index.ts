@@ -148,7 +148,12 @@ Deno.serve(async (req) => {
           break
         }
         case 'team_removed':
-          await removeTeamDiscord(env, (body.role_id as string) ?? null, (body.channel_id as string) ?? null)
+          await removeTeamDiscord(
+            env,
+            (body.role_id as string) ?? null,
+            (body.channel_id as string) ?? null,
+            (body.voice_channel_id as string) ?? null,
+          )
           break
         case 'user_sync': {
           const settings = await ensureSettings(env)

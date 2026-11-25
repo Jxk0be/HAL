@@ -1,10 +1,10 @@
 {
-  "name": "Heaven's Arena League",
-  "short_name": "HAL",
+  "name": "Blackhat Invitational League",
+  "short_name": "Blackhat",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0b0b0d",
-  "theme_color": "#0b0b0d",
+  "background_color": "#0a0a0b",
+  "theme_color": "#0a0a0b",
   "icons": [
     {
       "src": "/icon-192.png",

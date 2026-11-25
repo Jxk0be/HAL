@@ -53,7 +53,7 @@ function submit() {
         rows="4"
         maxlength="1000"
         placeholder="Experience, past teams, what you're looking for…"
-        class="w-full rounded-md border border-line-strong bg-surface-2 px-3 py-2 text-sm text-text placeholder:text-faint focus:border-gold-dim focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-0"
+        class="w-full rounded-md border border-line-strong bg-surface-2 px-3 py-2 text-sm text-text placeholder:text-faint focus:border-accent-dim focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-0"
       />
       <p class="tnum text-right text-xs text-muted">{{ form.note.length }}/1000</p>
     </div>

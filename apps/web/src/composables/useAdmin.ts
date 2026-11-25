@@ -401,6 +401,8 @@ export interface UserWithRoles {
   discordUsername: string | null
   activisionId: string | null
   avatarUrl: string | null
+  /** False for staff-only accounts. */
+  isPlayer: boolean
   roles: StaffRole[]
 }
 
@@ -410,7 +412,10 @@ export function useStaffRoles() {
   const loading = ref(true)
   const busy = ref(false)
 
-  async function withRoles(profiles: { id: string; discord_username: string | null; activision_id: string | null; avatar_url: string | null }[]) {
+  type RoleProfile = { id: string; discord_username: string | null; activision_id: string | null; avatar_url: string | null; is_player: boolean }
+  const COLS = 'id, discord_username, activision_id, avatar_url, is_player'
+
+  async function withRoles(profiles: RoleProfile[]) {
     const ids = profiles.map((p) => p.id)
     const { data: roles } = ids.length ? await supabase.from('staff_roles').select('user_id, role').in('user_id', ids) : { data: [] }
     return profiles.map((p) => ({
@@ -419,6 +424,7 @@ export function useStaffRoles() {
       discordUsername: p.discord_username,
       activisionId: p.activision_id,
       avatarUrl: p.avatar_url,
+      isPlayer: p.is_player,
       roles: (roles ?? []).filter((r) => r.user_id === p.id).map((r) => r.role),
     }))
   }
@@ -427,7 +433,7 @@ export function useStaffRoles() {
     const { data: roles } = await supabase.from('staff_roles').select('user_id')
     const ids = [...new Set((roles ?? []).map((r) => r.user_id))]
     const { data: profs } = ids.length
-      ? await supabase.from('profiles').select('id, discord_username, activision_id, avatar_url').in('id', ids)
+      ? await supabase.from('profiles').select(COLS).in('id', ids)
       : { data: [] }
     staff.value = (await withRoles(profs ?? [])).sort((a, b) => a.name.localeCompare(b.name))
     loading.value = false
@@ -441,7 +447,7 @@ export function useStaffRoles() {
     }
     const { data } = await supabase
       .from('profiles')
-      .select('id, discord_username, activision_id, avatar_url')
+      .select(COLS)
       .or(`discord_username.ilike.%${term}%,activision_id.ilike.%${term}%`)
       .limit(10)
     results.value = await withRoles(data ?? [])
@@ -455,14 +461,29 @@ export function useStaffRoles() {
     busy.value = false
     if (error) return { ok: false, message: dbErrorMessage(error, undefined, 'They already have that role.') }
     await loadStaff()
+    await refreshResults()
+    return { ok: true, value: undefined }
+  }
+
+  async function refreshResults() {
     results.value = await withRoles(
-      results.value.map((r) => ({ id: r.id, discord_username: r.discordUsername, activision_id: r.activisionId, avatar_url: r.avatarUrl })),
+      results.value.map((r) => ({ id: r.id, discord_username: r.discordUsername, activision_id: r.activisionId, avatar_url: r.avatarUrl, is_player: r.isPlayer })),
     )
+  }
+
+  /** Owner only: staff-only accounts don't play (off every player list, can't be on a team). */
+  async function setPlaying(userId: string, isPlayer: boolean): Promise<Result> {
+    busy.value = true
+    const { error } = await supabase.from('profiles').update({ is_player: isPlayer }).eq('id', userId)
+    busy.value = false
+    if (error) return { ok: false, message: dbErrorMessage(error) }
+    await loadStaff()
+    await refreshResults()
     return { ok: true, value: undefined }
   }
 
   void loadStaff()
-  return { staff, results, loading, busy, search, setRole }
+  return { staff, results, loading, busy, search, setRole, setPlaying }
 }
 
 // ---- Content: teams, free agent posts, players --------------------------------------

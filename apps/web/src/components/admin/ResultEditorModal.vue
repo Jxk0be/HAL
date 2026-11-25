@@ -61,28 +61,28 @@ async function save() {
         Player stats on maps that stay are kept.
       </p>
       <div v-for="(r, i) in rows" :key="i" class="grid grid-cols-2 gap-2 rounded-md border border-line p-3 sm:grid-cols-[auto_1fr_1fr_5rem_5rem]">
-        <span class="col-span-2 self-center font-heading text-sm text-gold sm:col-span-1">Map {{ i + 1 }}</span>
+        <span class="col-span-2 self-center font-heading text-sm text-accent sm:col-span-1">Map {{ i + 1 }}</span>
         <label class="flex flex-col gap-1 text-xs">
           <span class="text-muted">Mode</span>
-          <select v-model="r.mode_id" class="h-9 rounded-md border border-line-strong bg-surface-2 px-2 text-sm focus-visible:outline-2 focus-visible:outline-gold">
+          <select v-model="r.mode_id" class="h-9 rounded-md border border-line-strong bg-surface-2 px-2 text-sm focus-visible:outline-2 focus-visible:outline-accent">
             <option value="">Mode…</option>
             <option v-for="m in game.modes.value" :key="m.id" :value="m.id">{{ m.name }}</option>
           </select>
         </label>
         <label class="flex flex-col gap-1 text-xs">
           <span class="text-muted">Map</span>
-          <select v-model="r.map_id" class="h-9 rounded-md border border-line-strong bg-surface-2 px-2 text-sm focus-visible:outline-2 focus-visible:outline-gold">
+          <select v-model="r.map_id" class="h-9 rounded-md border border-line-strong bg-surface-2 px-2 text-sm focus-visible:outline-2 focus-visible:outline-accent">
             <option value="">Map…</option>
             <option v-for="m in mapsFor(r.mode_id)" :key="m.id" :value="m.id">{{ m.name }}</option>
           </select>
         </label>
         <label class="flex flex-col gap-1 text-xs">
           <span class="text-muted">{{ match.home.tag }}</span>
-          <input :value="r.home_score ?? ''" inputmode="numeric" class="tnum h-9 rounded-md border border-line-strong bg-surface-2 px-2 text-sm focus-visible:outline-2 focus-visible:outline-gold" @input="setScore(i, 'home_score', ($event.target as HTMLInputElement).value)" />
+          <input :value="r.home_score ?? ''" inputmode="numeric" class="tnum h-9 rounded-md border border-line-strong bg-surface-2 px-2 text-sm focus-visible:outline-2 focus-visible:outline-accent" @input="setScore(i, 'home_score', ($event.target as HTMLInputElement).value)" />
         </label>
         <label class="flex flex-col gap-1 text-xs">
           <span class="text-muted">{{ match.away.tag }}</span>
-          <input :value="r.away_score ?? ''" inputmode="numeric" class="tnum h-9 rounded-md border border-line-strong bg-surface-2 px-2 text-sm focus-visible:outline-2 focus-visible:outline-gold" @input="setScore(i, 'away_score', ($event.target as HTMLInputElement).value)" />
+          <input :value="r.away_score ?? ''" inputmode="numeric" class="tnum h-9 rounded-md border border-line-strong bg-surface-2 px-2 text-sm focus-visible:outline-2 focus-visible:outline-accent" @input="setScore(i, 'away_score', ($event.target as HTMLInputElement).value)" />
         </label>
       </div>
       <div class="flex flex-wrap items-center gap-2">

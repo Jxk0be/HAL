@@ -114,7 +114,7 @@ async function issuePenalty() {
           <li v-for="r in shown" :key="r.id" class="rounded-lg border border-line bg-surface p-4 sm:p-5" :class="recused(r) ? 'opacity-70' : ''">
             <div class="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <RouterLink :to="`/matches/${r.matchId}`" class="font-heading text-xl hover:text-gold">{{ r.match.home.tag }} vs {{ r.match.away.tag }}</RouterLink>
+                <RouterLink :to="`/matches/${r.matchId}`" class="font-heading text-xl hover:text-accent">{{ r.match.home.tag }} vs {{ r.match.away.tag }}</RouterLink>
                 <p class="text-xs text-muted">
                   Week {{ r.match.week }} · <LeagueTime :iso="r.match.scheduledAt" /> · opened by {{ r.openedBy }} ({{ teamOf(r, r.teamId).tag }}) <LeagueTime :iso="r.createdAt" />
                 </p>
@@ -127,7 +127,7 @@ async function issuePenalty() {
             </div>
 
             <p class="mt-3 text-sm whitespace-pre-line">{{ r.reason }}</p>
-            <p class="mt-1 text-xs text-muted">Discuss it with both captains on the <RouterLink :to="`/matches/${r.matchId}`" class="text-gold hover:text-gold-strong">match page</RouterLink>.</p>
+            <p class="mt-1 text-xs text-muted">Discuss it with both captains on the <RouterLink :to="`/matches/${r.matchId}`" class="text-accent hover:text-accent-strong">match page</RouterLink>.</p>
 
             <div v-if="r.evidence.length" class="mt-3 flex flex-col gap-2">
               <p class="eyebrow text-muted">Evidence</p>
@@ -137,19 +137,19 @@ async function issuePenalty() {
               />
               <ul class="flex flex-col gap-1 text-sm">
                 <li v-for="e in r.evidence.filter((x) => x.url)" :key="e.id">
-                  <a :href="e.url!" target="_blank" rel="noopener noreferrer" class="text-gold hover:text-gold-strong">{{ e.note || e.url }}</a>
+                  <a :href="e.url!" target="_blank" rel="noopener noreferrer" class="text-accent hover:text-accent-strong">{{ e.note || e.url }}</a>
                 </li>
               </ul>
             </div>
 
-            <p v-if="r.resolution" class="mt-3 rounded-md border border-line bg-surface-2 px-3 py-2 text-sm"><strong class="text-gold">Decision:</strong> {{ r.resolution }}</p>
+            <p v-if="r.resolution" class="mt-3 rounded-md border border-line bg-surface-2 px-3 py-2 text-sm"><strong class="text-accent">Decision:</strong> {{ r.resolution }}</p>
 
             <div class="mt-4 border-t border-line pt-4">
               <RecusedNotice v-if="recused(r)" />
               <template v-else-if="r.status === 'open'">
                 <label class="flex flex-col gap-1.5 text-sm">
                   <span class="font-medium">Decision (shown publicly)</span>
-                  <textarea v-model="resolution[r.id]" rows="3" class="rounded-md border border-line-strong bg-surface-2 px-3 py-2 text-sm focus-visible:border-gold focus-visible:outline-2 focus-visible:outline-gold" />
+                  <textarea v-model="resolution[r.id]" rows="3" class="rounded-md border border-line-strong bg-surface-2 px-3 py-2 text-sm focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent" />
                 </label>
                 <div class="mt-3 flex flex-wrap gap-2">
                   <UiButton :disabled="busy" @click="resolve(r)">Resolve</UiButton>

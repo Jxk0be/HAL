@@ -10,7 +10,7 @@ defineProps<{
     class="flex flex-col items-center rounded-lg border border-dashed border-line-strong px-6 py-12 text-center"
   >
     <div
-      class="mb-4 grid size-12 place-items-center rounded-md border border-gold-dim text-gold"
+      class="mb-4 grid size-12 place-items-center rounded-md border border-accent-dim text-accent"
       aria-hidden="true"
     >
       <slot name="icon">

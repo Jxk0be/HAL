@@ -31,7 +31,7 @@ async function run(r: TeamRequest, p: Promise<{ ok: boolean; message?: string }>
     <ul v-else class="flex flex-col gap-3">
       <li v-for="r in requests" :key="r.id" class="rounded-md border border-line bg-surface-2 p-3">
         <p>
-          <RouterLink :to="`/matches/${r.match.id}`" class="font-medium hover:text-gold">Week {{ r.match.week }} vs {{ opponent(r).tag }}</RouterLink>
+          <RouterLink :to="`/matches/${r.match.id}`" class="font-medium hover:text-accent">Week {{ r.match.week }} vs {{ opponent(r).tag }}</RouterLink>
         </p>
         <p class="mt-1 text-xs text-muted">
           {{ r.teamId === teamId ? 'You asked' : `${opponent(r).tag} asked` }} to move it from

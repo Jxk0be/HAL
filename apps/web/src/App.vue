@@ -13,7 +13,7 @@ void useAuthStore().init()
 <template>
   <a
     href="#main"
-    class="sr-only z-50 rounded-md bg-gold px-4 py-2 font-heading text-on-gold focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+    class="sr-only z-50 rounded-md bg-brand px-4 py-2 font-heading text-on-brand focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
   >
     Skip to content
   </a>

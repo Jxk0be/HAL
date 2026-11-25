@@ -17,7 +17,7 @@ const { search, page, pages, players, total, loading, error } = usePlayerDirecto
 
 <template>
   <div>
-    <PageHeader eyebrow="League" title="Players" description="Everyone registered for HAL this season." />
+    <PageHeader eyebrow="League" title="Players" description="Everyone registered for Blackhat this season." />
     <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 sm:px-6">
       <div class="max-w-md" role="search">
         <UiInput
@@ -46,7 +46,7 @@ const { search, page, pages, players, total, loading, error } = usePlayerDirecto
         <!-- Cards (mobile) -->
         <ul class="flex flex-col gap-2 sm:hidden" aria-label="Players">
           <li v-for="p in players" :key="p.id">
-            <RouterLink :to="`/players/${p.id}`" class="flex items-center gap-3 rounded-lg border border-line bg-surface px-3 py-3 hover:border-gold-dim">
+            <RouterLink :to="`/players/${p.id}`" class="flex items-center gap-3 rounded-lg border border-line bg-surface px-3 py-3 hover:border-accent-dim">
               <UiAvatar :src="p.avatarUrl" :name="p.name" size="md" decorative />
               <div class="min-w-0 flex-1">
                 <p class="truncate font-medium">{{ p.name }}</p>
@@ -73,7 +73,7 @@ const { search, page, pages, players, total, loading, error } = usePlayerDirecto
             <tbody>
               <tr v-for="p in players" :key="p.id" class="border-b border-line last:border-b-0 hover:bg-surface-2">
                 <td class="px-4 py-3">
-                  <RouterLink :to="`/players/${p.id}`" class="flex items-center gap-3 font-medium hover:text-gold">
+                  <RouterLink :to="`/players/${p.id}`" class="flex items-center gap-3 font-medium hover:text-accent">
                     <UiAvatar :src="p.avatarUrl" :name="p.name" size="sm" decorative />
                     {{ p.name }}
                   </RouterLink>
@@ -81,7 +81,7 @@ const { search, page, pages, players, total, loading, error } = usePlayerDirecto
                 <td class="px-4 py-3 text-muted">{{ p.activisionId }}</td>
                 <td class="px-4 py-3"><PlatformBadge :platform="p.platform" /></td>
                 <td class="px-4 py-3">
-                  <RouterLink v-if="p.team" :to="`/teams/${p.team.id}`" class="flex items-center gap-2 hover:text-gold">
+                  <RouterLink v-if="p.team" :to="`/teams/${p.team.id}`" class="flex items-center gap-2 hover:text-accent">
                     <TeamLogo :tag="p.team.tag" :name="p.team.name" :logo-url="p.team.logoUrl" size="sm" decorative />
                     {{ p.team.name }}
                   </RouterLink>

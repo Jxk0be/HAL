@@ -46,7 +46,7 @@ Deno.test('channel-specific commands show up where they belong', () => {
 
 Deno.test('help tells unlinked users to log in and players who can use captain commands', () => {
   const [unlinked] = helpEmbeds('lfg', { linked: false, captain: false }, SITE)
-  assertEquals(unlinked!.description!.startsWith("You're not on HAL yet"), true)
+  assertEquals(unlinked!.description!.startsWith("You're not on Blackhat yet"), true)
 
   const [captain] = helpEmbeds('team', { linked: true, captain: true, teamName: 'Team Vectorize' }, SITE)
   assertEquals(captain!.description!.startsWith("You're a captain of Team Vectorize"), true)

@@ -1,5 +1,5 @@
 /**
- * Registers HAL's slash commands in the HAL Discord server (guild commands update instantly).
+ * Registers BIL's slash commands in the BIL Discord server (guild commands update instantly).
  * Run from the repo root after filling in .env:
  *   pnpm commands:register
  * Command definitions live in supabase/functions/_shared/commands.ts (shared with the bot).

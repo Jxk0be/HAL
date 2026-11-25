@@ -1,5 +1,5 @@
 /**
- * #admin-only alerts for anything waiting on an admin. Every alert pings the HAL Admin role
+ * #admin-only alerts for anything waiting on an admin. Every alert pings the BIL Admin role
  * (all admins: recusal is enforced when they act on the site, not on who gets told).
  * Pure builders, tested in admin_alerts_test.ts.
  */
@@ -7,7 +7,7 @@ import type { MessagePayload } from './discord.ts'
 import { halEmbed, HAL_LOSS } from './embeds.ts'
 import { discordTime, type MsgMatch } from './match_messages.ts'
 
-/** Adds a HAL Admin role ping to a message (no ping when the role id isn't known yet). */
+/** Adds a BIL Admin role ping to a message (no ping when the role id isn't known yet). */
 export function withAdminPing(payload: MessagePayload, roleId: string | null): MessagePayload {
   if (!roleId) return { ...payload, allowed_mentions: { parse: [] } }
   return {

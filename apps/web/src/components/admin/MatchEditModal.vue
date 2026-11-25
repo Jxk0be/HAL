@@ -58,7 +58,7 @@ function save() {
       <UiInput v-model="form.time" type="time" label="Time (ET)" />
       <UiInput v-model="form.week" type="number" label="Week" />
       <label class="flex items-center gap-2 self-end pb-2 text-sm">
-        <input v-model="form.moveDefault" type="checkbox" class="size-4 accent-[var(--color-gold)]" />
+        <input v-model="form.moveDefault" type="checkbox" class="size-4 accent-[var(--color-accent)]" />
         Also move the default time
       </label>
     </div>

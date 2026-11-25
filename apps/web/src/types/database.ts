@@ -384,6 +384,33 @@ export type Database = {
           },
         ]
       }
+      discord_boards: {
+        Row: {
+          channel_id: string
+          content_hash: string
+          keep: boolean
+          key: string
+          message_id: string
+          updated_at: string
+        }
+        Insert: {
+          channel_id: string
+          content_hash: string
+          keep?: boolean
+          key: string
+          message_id: string
+          updated_at?: string
+        }
+        Update: {
+          channel_id?: string
+          content_hash?: string
+          keep?: boolean
+          key?: string
+          message_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       discord_sync_errors: {
         Row: {
           action: string
@@ -1564,6 +1591,7 @@ export type Database = {
           discord_username: string | null
           id: string
           is_free_agent: boolean
+          is_player: boolean
           platform: Database["public"]["Enums"]["platform"] | null
           updated_at: string
         }
@@ -1579,6 +1607,7 @@ export type Database = {
           discord_username?: string | null
           id: string
           is_free_agent?: boolean
+          is_player?: boolean
           platform?: Database["public"]["Enums"]["platform"] | null
           updated_at?: string
         }
@@ -1594,6 +1623,7 @@ export type Database = {
           discord_username?: string | null
           id?: string
           is_free_agent?: boolean
+          is_player?: boolean
           platform?: Database["public"]["Enums"]["platform"] | null
           updated_at?: string
         }
@@ -2233,6 +2263,70 @@ export type Database = {
           },
         ]
       }
+      sub_volunteers: {
+        Row: {
+          created_at: string
+          match_id: string
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          match_id: string
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          match_id?: string
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sub_volunteers_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "match_results_v"
+            referencedColumns: ["match_id"]
+          },
+          {
+            foreignKeyName: "sub_volunteers_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sub_volunteers_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sub_volunteers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sub_volunteers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sub_volunteers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_invites: {
         Row: {
           created_at: string
@@ -2421,6 +2515,7 @@ export type Database = {
           created_at: string
           discord_channel_id: string | null
           discord_role_id: string | null
+          discord_voice_channel_id: string | null
           division_id: string | null
           forfeit_count: number
           id: string
@@ -2439,6 +2534,7 @@ export type Database = {
           created_at?: string
           discord_channel_id?: string | null
           discord_role_id?: string | null
+          discord_voice_channel_id?: string | null
           division_id?: string | null
           forfeit_count?: number
           id?: string
@@ -2457,6 +2553,7 @@ export type Database = {
           created_at?: string
           discord_channel_id?: string | null
           discord_role_id?: string | null
+          discord_voice_channel_id?: string | null
           division_id?: string | null
           forfeit_count?: number
           id?: string
@@ -2903,6 +3000,7 @@ export type Database = {
           match_id: string
         }[]
       }
+      can_emergency_sub: { Args: { p_user_id: string }; Returns: boolean }
       can_flag_player_stats: {
         Args: { p_season_id: string; p_user_id: string }
         Returns: boolean
@@ -3253,6 +3351,10 @@ export type Database = {
         Args: { p_accept: boolean; p_invite_id: string }
         Returns: undefined
       }
+      respond_to_invite_as: {
+        Args: { p_accept: boolean; p_actor: string; p_invite_id: string }
+        Returns: string
+      }
       season_leaderboard: {
         Args: { p_season_id: string }
         Returns: {
@@ -3277,6 +3379,21 @@ export type Database = {
         Args: { p_live: boolean; p_match_id: string; p_url?: string }
         Returns: undefined
       }
+      sub_board: {
+        Args: never
+        Returns: {
+          match_id: string
+          needed: number
+          opponent_name: string
+          opponent_tag: string
+          scheduled_at: string
+          team_channel_id: string
+          team_id: string
+          team_name: string
+          team_tag: string
+          volunteers: Json
+        }[]
+      }
       submit_report: {
         Args: {
           p_match_id: string
@@ -3298,6 +3415,29 @@ export type Database = {
         Returns: undefined
       }
       try_uuid: { Args: { p: string }; Returns: string }
+      volunteer_for_sub_as: {
+        Args: {
+          p_actor: string
+          p_available: boolean
+          p_match_id: string
+          p_team_id: string
+        }
+        Returns: string
+      }
+      week_top_players: {
+        Args: { p_from: string; p_limit?: number; p_to: string }
+        Returns: {
+          avg_score: number
+          deaths: number
+          discord_id: string
+          kd: number
+          kills: number
+          maps: number
+          name: string
+          team_tag: string
+          user_id: string
+        }[]
+      }
     }
     Enums: {
       dispute_category:

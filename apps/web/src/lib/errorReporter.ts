@@ -10,7 +10,7 @@ import { supabase } from './supabase'
 const MAX_PER_PAGE = 5
 const seen = new Set<string>()
 
-/** Noise that isn't a HAL bug. */
+/** Noise that isn't a site bug. */
 const IGNORED = [/ResizeObserver loop/i, /^Script error\.?$/i, /Non-Error promise rejection captured/i]
 
 function sessionId(): string {

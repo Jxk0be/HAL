@@ -94,7 +94,7 @@ function submit() {
         <UiInput v-model="form.matchTime" type="time" label="Match time (ET)" :hint="`Time zone: ${season.timezone}`" />
         <UiInput v-model="form.rosterLock" type="date" label="Roster lock" hint="Rosters lock at 11:59 PM ET on this date." />
         <UiSelect v-model="form.playoffTeams" label="Playoff teams" :options="playoffOptions" />
-        <UiInput v-model="form.prize" label="Prize" placeholder="$200 to the champion" />
+        <UiInput v-model="form.prize" label="Prize" placeholder="$400 to the champion" />
       </div>
       <div>
         <p class="eyebrow mb-2 text-muted">Match nights</p>

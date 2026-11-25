@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import HalWordmark from '@/components/brand/HalWordmark.vue'
+import BrandLogo from '@/components/brand/BrandLogo.vue'
 import { site } from '@/config/site'
 
 const year = new Date().getFullYear()
@@ -9,7 +9,7 @@ const year = new Date().getFullYear()
   <footer class="mt-24 border-t border-line print:hidden">
     <div class="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1fr_auto]">
       <div>
-        <HalWordmark :size="64" />
+        <BrandLogo :size="96" variant="full" />
         <p class="mt-4 max-w-sm text-sm text-muted">{{ site.tagline }}</p>
       </div>
       <nav aria-label="Footer">

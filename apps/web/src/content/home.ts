@@ -3,11 +3,11 @@ export const homeContent = {
   eyebrow: 'Call of Duty · NA · Controller only',
   headline: 'Compete for the crown.',
   intro:
-    "Heaven's Arena League is a free-entry competitive Call of Duty league on the CDL ruleset. Best-of-5 series, twice a week, with a $200 prize for the champions.",
+    'Blackhat Invitational League is a free-entry competitive Call of Duty league on the CDL ruleset. Best-of-5 series, twice a week, with a $400 prize for the champions.',
   status: 'Season 1 · Signups open soon',
   facts: [
     { label: 'Entry', value: 'Free' },
-    { label: 'Prize pool', value: '$200' },
+    { label: 'Prize pool', value: '$400' },
     { label: 'Format', value: 'Best of 5' },
     { label: 'Match nights', value: 'Tue & Thu · 9 PM ET' },
   ],

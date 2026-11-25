@@ -40,9 +40,9 @@ async function review(q: RosterRequestRow, approve: boolean) {
             <div>
               <p class="font-heading text-lg">{{ TYPE[q.type] }}: {{ q.player }}</p>
               <p class="text-sm text-muted">
-                <RouterLink :to="`/teams/${q.team.id}`" class="hover:text-gold">{{ q.team.name }} [{{ q.team.tag }}]</RouterLink>
+                <RouterLink :to="`/teams/${q.team.id}`" class="hover:text-accent">{{ q.team.name }} [{{ q.team.tag }}]</RouterLink>
                 <template v-if="q.match">
-                  · for <RouterLink :to="`/matches/${q.match.id}`" class="hover:text-gold">{{ q.match.home.tag }} vs {{ q.match.away.tag }}</RouterLink>,
+                  · for <RouterLink :to="`/matches/${q.match.id}`" class="hover:text-accent">{{ q.match.home.tag }} vs {{ q.match.away.tag }}</RouterLink>,
                   week {{ q.match.week }}, <LeagueTime :iso="q.match.scheduledAt" />
                 </template>
               </p>
@@ -68,7 +68,7 @@ async function review(q: RosterRequestRow, approve: boolean) {
             <div v-else class="flex flex-wrap items-end gap-2">
               <label class="flex min-w-56 flex-1 flex-col gap-1 text-xs">
                 <span class="text-muted">Note for the captain (optional)</span>
-                <input v-model="notes[q.id]" class="h-9 rounded-md border border-line-strong bg-surface-2 px-2 text-sm focus-visible:outline-2 focus-visible:outline-gold" />
+                <input v-model="notes[q.id]" class="h-9 rounded-md border border-line-strong bg-surface-2 px-2 text-sm focus-visible:outline-2 focus-visible:outline-accent" />
               </label>
               <UiButton size="sm" :disabled="busy || !q.playerAccepted" :title="q.playerAccepted ? undefined : 'The player has to accept first'" @click="review(q, true)">Approve</UiButton>
               <UiButton size="sm" variant="danger" :disabled="busy" @click="review(q, false)">Deny</UiButton>

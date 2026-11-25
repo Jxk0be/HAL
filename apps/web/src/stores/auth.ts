@@ -10,7 +10,7 @@ type ProfileRow = Database['public']['Tables']['profiles']['Row']
 
 /** Every profile column except discord_id (hidden from the API by column privileges). */
 export const PROFILE_COLUMNS =
-  'id, discord_username, avatar_url, activision_id, platform, age_confirmed_at, controller_confirmed_at, is_free_agent, banned_until, created_at, updated_at'
+  'id, discord_username, avatar_url, activision_id, platform, age_confirmed_at, controller_confirmed_at, is_free_agent, is_player, banned_until, created_at, updated_at'
 export type MyProfile = Omit<ProfileRow, 'discord_id' | 'discord_synced_at'>
 
 export interface MyTeam {
@@ -36,6 +36,8 @@ export const useAuthStore = defineStore('auth', () => {
   const roles = ref<StaffRole[]>([])
   const profile = ref<MyProfile | null>(null)
   const team = ref<MyTeam | null>(null)
+  /** True when the profile request itself failed (not "no profile yet"), so pages can show an error instead of loading forever. */
+  const profileError = ref(false)
   const ready = ref(false)
   let initPromise: Promise<void> | null = null
 
@@ -60,7 +62,10 @@ export const useAuthStore = defineStore('auth', () => {
   const isCaster = computed(() => roles.value.includes('caster'))
   const isStaff = computed(() => roles.value.length > 0)
 
-  const isOnboarded = computed(() => isProfileComplete(profile.value))
+  /** False for staff-only accounts (league staff who don't play; only the owner can switch it). */
+  const isPlayer = computed(() => profile.value?.is_player !== false)
+  // Staff-only accounts skip the player setup (Activision ID, 18+ and controller confirmations).
+  const isOnboarded = computed(() => !isPlayer.value || isProfileComplete(profile.value))
   const bannedUntil = computed(() => {
     const until = profile.value?.banned_until
     return until && new Date(until).getTime() > Date.now() ? new Date(until) : null
@@ -73,7 +78,9 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function loadProfile(uid: string) {
-    const { data } = await supabase.from('profiles').select(PROFILE_COLUMNS).eq('id', uid).maybeSingle()
+    const { data, error } = await supabase.from('profiles').select(PROFILE_COLUMNS).eq('id', uid).maybeSingle()
+    profileError.value = Boolean(error)
+    if (error) console.error('profile load failed', error)
     profile.value = data
   }
 
@@ -168,6 +175,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     roles,
     profile,
+    profileError,
     team,
     ready,
     isSignedIn,
@@ -177,6 +185,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAdmin,
     isCaster,
     isStaff,
+    isPlayer,
     isOnboarded,
     isBanned,
     bannedUntil,

@@ -48,7 +48,7 @@ const review = (teamId: string, approve: boolean, note: string | null) =>
   <div>
     <PageHeader eyebrow="Admin" title="Season & schedule">
       <template v-if="season" #actions>
-        <UiBadge variant="gold">{{ season.name }} · {{ season.status }}</UiBadge>
+        <UiBadge variant="accent">{{ season.name }} · {{ season.status }}</UiBadge>
       </template>
     </PageHeader>
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import HalWordmark from '@/components/brand/HalWordmark.vue'
+import BrandLogo from '@/components/brand/BrandLogo.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UserMenu from './UserMenu.vue'
 import { mainNav, site } from '@/config/site'
@@ -29,8 +29,8 @@ function isActive(to: string) {
 <template>
   <header class="sticky top-0 z-30 border-b border-line bg-bg/90 backdrop-blur-md print:hidden">
     <div class="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
-      <RouterLink to="/" class="shrink-0 rounded-sm" aria-label="Heaven's Arena League home">
-        <HalWordmark :size="46" decorative />
+      <RouterLink to="/" class="shrink-0 rounded-sm" :aria-label="`${site.name} home`">
+        <BrandLogo :size="42" decorative />
       </RouterLink>
 
       <nav aria-label="Main" class="ml-4 hidden flex-1 lg:block">
@@ -45,7 +45,7 @@ function isActive(to: string) {
               {{ item.label }}
               <span
                 v-if="isActive(item.to)"
-                class="absolute inset-x-3 -bottom-[13px] h-px bg-gold"
+                class="absolute inset-x-3 -bottom-[13px] h-px bg-accent"
                 aria-hidden="true"
               />
             </RouterLink>
@@ -83,7 +83,7 @@ function isActive(to: string) {
     >
       <div class="flex h-full flex-col">
         <div class="flex h-16 items-center justify-between border-b border-line px-4">
-          <HalWordmark :size="40" decorative />
+          <BrandLogo :size="38" decorative />
           <button
             type="button"
             class="grid size-10 place-items-center rounded-md hover:bg-surface-2"
@@ -101,11 +101,11 @@ function isActive(to: string) {
               <RouterLink
                 :to="item.to"
                 class="flex items-center justify-between rounded-md px-3 py-3 font-heading text-lg tracking-wider"
-                :class="isActive(item.to) ? 'bg-gold-soft text-text' : 'text-muted hover:bg-surface-2 hover:text-text'"
+                :class="isActive(item.to) ? 'bg-accent-soft text-text' : 'text-muted hover:bg-surface-2 hover:text-text'"
                 :aria-current="isActive(item.to) ? 'page' : undefined"
               >
                 {{ item.label }}
-                <span v-if="isActive(item.to)" class="h-4 w-px bg-gold" aria-hidden="true" />
+                <span v-if="isActive(item.to)" class="h-4 w-px bg-accent" aria-hidden="true" />
               </RouterLink>
             </li>
           </ul>

@@ -39,8 +39,8 @@ watch(() => props.profile, reset, { immediate: true })
 const errors = computed(() => ({
   activisionId: validateActivisionId(form.activisionId),
   platform: form.platform ? null : 'Choose your platform.',
-  adult: form.adult ? null : 'You must be 18 or older to play in HAL.',
-  controller: form.controller ? null : 'HAL is controller only on every platform.',
+  adult: form.adult ? null : 'You must be 18 or older to play in Blackhat.',
+  controller: form.controller ? null : 'Blackhat is controller only on every platform.',
 }))
 const valid = computed(() => Object.values(errors.value).every((e) => e === null))
 const show = (key: keyof typeof errors.value) => (touched.value ? (errors.value[key] ?? undefined) : undefined)
@@ -84,7 +84,7 @@ async function submit() {
     </div>
 
     <fieldset class="flex flex-col gap-4 rounded-lg border border-line bg-surface-2/50 p-4 sm:p-5">
-      <legend class="eyebrow px-1 text-gold">Eligibility</legend>
+      <legend class="eyebrow px-1 text-accent">Eligibility</legend>
       <UiCheckbox
         v-model="form.adult"
         label="I am 18 or older"
@@ -98,12 +98,17 @@ async function submit() {
         label="I play with a controller"
         required
         :disabled="Boolean(profile.controller_confirmed_at)"
-        :description="profile.controller_confirmed_at ? 'Confirmed. HAL is controller only on every platform.' : 'HAL is controller only on every platform. PC is allowed with a controller.'"
+        :description="profile.controller_confirmed_at ? 'Confirmed. Blackhat is controller only on every platform.' : 'Blackhat is controller only on every platform. PC is allowed with a controller.'"
         :error="show('controller')"
       />
     </fieldset>
 
+    <p v-if="profile.is_player === false" class="rounded-md border border-line bg-surface-2/50 px-4 py-3 text-sm text-muted">
+      This is a <strong class="text-text">staff-only account</strong>: you run the league but don't play, so you're not on the
+      free agent list and can't join a team. Only the owner can change this.
+    </p>
     <UiCheckbox
+      v-else
       v-model="form.freeAgent"
       label="List me as a free agent"
       :disabled="onTeam"

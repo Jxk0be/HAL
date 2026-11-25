@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import bundled from '../../../../../rules/rulebook.md?raw'
 import { allRules, highlightParts, parseRulebook, ruleMatches } from '../rulebook'
 
-const sample = `# HAL Rulebook
+const sample = `# BIL Rulebook
 
 Intro paragraph with **bold**.
 
@@ -31,7 +31,7 @@ describe('parseRulebook', () => {
   const book = parseRulebook(sample)
 
   it('reads the title, intro and effective date', () => {
-    expect(book.title).toBe('HAL Rulebook')
+    expect(book.title).toBe('BIL Rulebook')
     expect(book.intro).toHaveLength(1)
     expect(book.intro[0]!.html).toContain('<strong>bold</strong>')
     expect(book.effective).toBe('November 20, 2026')

@@ -1,6 +1,6 @@
-# Heaven's Arena League (HAL)
+# Blackhat Invitational League (BIL)
 
-Website and Discord bot for Heaven's Arena League, a competitive Call of Duty league.
+Website and Discord bot for Blackhat Invitational League, a competitive Call of Duty league.
 Join the Discord: https://discord.gg/WWavSTQXWR
 
 ## Run locally
@@ -19,15 +19,13 @@ The bot is serverless: Discord sends every slash command, button and modal to th
 There is no bot process to keep running.
 
 ### 1. Discord setup (once)
-1. In the [Discord Developer Portal](https://discord.com/developers/applications), open the HAL
+1. In the [Discord Developer Portal](https://discord.com/developers/applications), open the BIL
    application. Copy the **Application ID** and **Public Key** (General Information) and the
    **bot token** (Bot → Reset Token).
-2. In Discord, turn on Developer Mode (User Settings → Advanced), right-click the HAL server and
+2. In Discord, turn on Developer Mode (User Settings → Advanced), right-click the BIL server and
    **Copy Server ID**.
-3. Invite the bot: OAuth2 → URL Generator, scopes `bot` and `applications.commands`, permissions
-   Manage Roles, Manage Channels, Send Messages, Create Private Threads, Manage Threads, Embed
-   Links, Attach Files, Read Message History. Open the generated URL and add it to the HAL server.
-4. Server Settings → Roles: drag the bot's role **above** every role it will assign.
+3. Invite the bot and set up the server: follow `docs/discord-server-text.md` (step-by-step, with a
+   ready-made invite link carrying exactly the permissions the bot needs).
 
 ### 2. Function secrets
 In the Supabase dashboard (Edge Functions → Secrets), or with the CLI:
@@ -55,7 +53,7 @@ Fill in `DISCORD_APP_ID`, `DISCORD_GUILD_ID` and `DISCORD_BOT_TOKEN` in the root
 pnpm commands:register
 ```
 Run it again whenever `supabase/functions/_shared/commands.ts` changes. `/ping` should answer
-"HAL bot online."
+"Blackhat bot online."
 
 ### Tests
 ```

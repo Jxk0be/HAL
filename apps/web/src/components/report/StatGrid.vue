@@ -135,7 +135,7 @@ function onPaste(e: ClipboardEvent, row: number, fieldIndex: number) {
       </thead>
       <tbody v-for="s in sections" :key="s.team.id">
         <tr>
-          <th colspan="5" scope="colgroup" class="border-b border-line bg-surface px-3 pt-3 pb-1 text-left font-heading text-xs tracking-wider text-gold">
+          <th colspan="5" scope="colgroup" class="border-b border-line bg-surface px-3 pt-3 pb-1 text-left font-heading text-xs tracking-wider text-accent">
             {{ s.team.tag }} <span class="text-muted">{{ s.team.name }}</span>
           </th>
         </tr>
@@ -145,7 +145,7 @@ function onPaste(e: ClipboardEvent, row: number, fieldIndex: number) {
               :value="rows[s.start + offset - 1]?.userId ?? ''"
               :data-cell="`${s.start + offset - 1}:0`"
               :aria-label="`Map ${mapNumber}, ${s.team.tag} player ${offset}`"
-              class="h-9 w-full min-w-40 rounded-sm border border-line-strong bg-surface-2 px-2 text-sm focus-visible:border-gold focus-visible:outline-2 focus-visible:outline-gold"
+              class="h-9 w-full min-w-40 rounded-sm border border-line-strong bg-surface-2 px-2 text-sm focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent"
               @change="update(s.start + offset - 1, { userId: ($event.target as HTMLSelectElement).value })"
               @keydown="onKeydown($event, s.start + offset - 1, 0)"
             >
@@ -163,7 +163,7 @@ function onPaste(e: ClipboardEvent, row: number, fieldIndex: number) {
               :aria-invalid="invalid.has(`${s.start + offset - 1}:${f}`) || undefined"
               inputmode="numeric"
               autocomplete="off"
-              class="tnum h-9 w-full rounded-sm border bg-surface-2 px-2 text-right focus-visible:border-gold focus-visible:outline-2 focus-visible:outline-gold"
+              class="tnum h-9 w-full rounded-sm border bg-surface-2 px-2 text-right focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent"
               :class="invalid.has(`${s.start + offset - 1}:${f}`) ? 'border-loss' : 'border-line-strong'"
               @input="onInput(s.start + offset - 1, f, ($event.target as HTMLInputElement).value)"
               @keydown="onKeydown($event, s.start + offset - 1, fi + 1)"

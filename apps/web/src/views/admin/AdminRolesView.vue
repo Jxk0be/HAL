@@ -29,6 +29,14 @@ async function toggle(u: UserWithRoles, role: StaffRole) {
   if (r.ok) toast.success(on ? `${u.name} is now ${role === 'admin' ? 'an admin' : 'a caster'}. Their Discord role updates shortly.` : `${role} removed from ${u.name}.`)
   else toast.error(r.message)
 }
+
+async function togglePlaying(u: UserWithRoles) {
+  const next = !u.isPlayer
+  if (!next && !window.confirm(`Make ${u.name} staff-only? They come off every player list and can't be on a team.`)) return
+  const r = await s.setPlaying(u.id, next)
+  if (r.ok) toast.success(next ? `${u.name} can play again.` : `${u.name} is now staff-only.`)
+  else toast.error(r.message)
+}
 </script>
 
 <template>
@@ -37,13 +45,13 @@ async function toggle(u: UserWithRoles, role: StaffRole) {
     <div class="flex flex-col gap-8 px-4 py-8 sm:px-6">
       <ul class="grid gap-3 text-sm sm:grid-cols-2">
         <li v-for="g in GRANTABLE" :key="g.role" class="rounded-lg border border-line bg-surface p-4">
-          <span class="font-heading text-lg text-gold">{{ g.label }}</span>
+          <span class="font-heading text-lg text-accent">{{ g.label }}</span>
           <p class="mt-1 text-muted">{{ g.help }}</p>
         </li>
       </ul>
 
       <section aria-labelledby="find-title" class="flex flex-col gap-3">
-        <h2 id="find-title" class="eyebrow text-gold">Find someone</h2>
+        <h2 id="find-title" class="eyebrow text-accent">Find someone</h2>
         <div class="max-w-sm"><UiInput v-model="query" label="Search by Discord name" placeholder="At least 2 characters" autocomplete="off" /></div>
         <ul v-if="results.length" class="flex flex-col divide-y divide-line rounded-lg border border-line bg-surface">
           <li v-for="u in results" :key="u.id" class="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
@@ -52,7 +60,7 @@ async function toggle(u: UserWithRoles, role: StaffRole) {
               <span class="block font-medium">{{ u.name }}</span>
               <span class="text-xs text-muted">{{ u.activisionId ?? 'No Activision ID' }}</span>
             </span>
-            <UiBadge v-if="u.roles.includes('owner')" variant="gold">Owner</UiBadge>
+            <UiBadge v-if="u.roles.includes('owner')" variant="accent">Owner</UiBadge>
             <UiButton
               v-for="g in GRANTABLE"
               :key="g.role"
@@ -69,19 +77,26 @@ async function toggle(u: UserWithRoles, role: StaffRole) {
       </section>
 
       <section aria-labelledby="staff-title" class="flex flex-col gap-3">
-        <h2 id="staff-title" class="eyebrow text-gold">Current staff</h2>
+        <h2 id="staff-title" class="eyebrow text-accent">Current staff</h2>
         <UiSkeleton v-if="loading" :lines="3" />
         <ul v-else class="flex flex-col divide-y divide-line rounded-lg border border-line bg-surface">
           <li v-for="u in staff" :key="u.id" class="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
             <UiAvatar :src="u.avatarUrl" :name="u.name" size="sm" decorative />
             <span class="min-w-40 flex-1 font-medium">{{ u.name }}</span>
-            <UiBadge v-for="r in u.roles" :key="r" :variant="r === 'owner' ? 'gold' : 'neutral'">{{ r }}</UiBadge>
+            <UiBadge v-for="r in u.roles" :key="r" :variant="r === 'owner' ? 'accent' : 'neutral'">{{ r }}</UiBadge>
+            <UiBadge v-if="!u.isPlayer" variant="outline">Staff only</UiBadge>
+            <UiButton size="sm" variant="ghost" :disabled="busy" @click="togglePlaying(u)">
+              {{ u.isPlayer ? 'Make staff-only' : 'Let them play' }}<span class="sr-only">: {{ u.name }}</span>
+            </UiButton>
             <UiButton v-for="g in GRANTABLE.filter((x) => u.roles.includes(x.role))" :key="g.role" size="sm" variant="ghost" :disabled="busy" @click="toggle(u, g.role)">
               Remove {{ g.label }}<span class="sr-only"> from {{ u.name }}</span>
             </UiButton>
           </li>
         </ul>
-        <p class="text-xs text-muted">The owner role can’t be removed from the last owner.</p>
+        <p class="text-xs text-muted">
+          The owner role can’t be removed from the last owner. Staff-only accounts run the league but don’t play: they’re off the player,
+          free agent and invite lists and can’t be on a team.
+        </p>
         <PublicLogNotice />
       </section>
     </div>

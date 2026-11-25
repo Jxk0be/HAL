@@ -15,7 +15,7 @@ export type ChannelKind = 'team' | 'lfg' | 'results' | 'disputes' | 'announcemen
 export const GUIDE_KINDS = ['team', 'lfg', 'results', 'disputes', 'admin'] as const satisfies readonly ChannelKind[]
 
 export interface Viewer {
-  /** Has a HAL account linked to this Discord user. */
+  /** Has a BIL account linked to this Discord user. */
   linked: boolean
   /** Captain or co-captain of the team whose channel this is. */
   captain: boolean
@@ -26,7 +26,7 @@ type Field = NonNullable<Embed['fields']>[number]
 
 const ANYWHERE: Field = {
   name: 'Anywhere',
-  value: '`/help` what works here · `/link` your HAL profile · `/ping` is the bot up?',
+  value: '`/help` what works here · `/link` your Blackhat profile · `/ping` is the bot up?',
 }
 
 const CAPTAIN_COMMANDS =
@@ -44,7 +44,7 @@ function guideParts(kind: ChannelKind, siteUrl: string): { title: string; descri
       return {
         title: 'Your team channel',
         description:
-          'Private to your roster, HAL admins and the bot. Match reminders, check-in and reschedule requests land here.',
+          'Private to your roster, league admins and the bot. Match reminders, check-in and reschedule requests land here.',
         fields: [
           {
             name: 'Match day',
@@ -71,7 +71,7 @@ function guideParts(kind: ChannelKind, siteUrl: string): { title: string; descri
             value:
               '`/lfg post` post or edit your free agent post (role, availability, a short note).\n' +
               '`/lfg remove` take it down when you join a team or stop looking.\n' +
-              'You need a finished HAL profile first: `/link`.',
+              'You need a finished Blackhat profile first: `/link`.',
           },
           {
             name: 'Captains',
@@ -116,7 +116,7 @@ function guideParts(kind: ChannelKind, siteUrl: string): { title: string; descri
     case 'admin':
       return {
         title: 'Staff channel',
-        description: 'Bot alerts for HAL staff.',
+        description: 'Bot alerts for league staff.',
         fields: [
           {
             name: 'Where to act',
@@ -132,11 +132,11 @@ function guideParts(kind: ChannelKind, siteUrl: string): { title: string; descri
     case 'announcements':
     case 'other':
       return {
-        title: "Heaven's Arena League bot",
+        title: 'Blackhat Invitational League bot',
         description: 'Commands by channel:',
         fields: [
           { name: 'Your team channel (captains)', value: '`/report` · `/reschedule` · `/dispute` · **Check in** button' },
-          { name: '#lfg', value: '`/lfg post` · `/lfg remove` · **Invite to team** button (captains)' },
+          { name: '#free-agents', value: '`/lfg post` · `/lfg remove` · **Invite to team** button (captains)' },
           ANYWHERE,
         ],
       }
@@ -157,7 +157,7 @@ export function guideEmbed(kind: ChannelKind, siteUrl: string): Embed {
 export function helpEmbeds(kind: ChannelKind, viewer: Viewer, siteUrl: string): Embed[] {
   const notes: string[] = []
   if (!viewer.linked) {
-    notes.push(`You're not on HAL yet. [Log in with Discord](${siteUrl}/login) to create your player profile; your roles update automatically.`)
+    notes.push(`You're not on Blackhat yet. [Log in with Discord](${siteUrl}/login) to create your player profile; your roles update automatically.`)
   } else if (kind === 'team') {
     notes.push(
       viewer.captain

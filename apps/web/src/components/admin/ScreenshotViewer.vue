@@ -46,7 +46,7 @@ function onKeydown(e: KeyboardEvent) {
       <li v-for="(img, i) in images" :key="img.url">
         <button
           type="button"
-          class="block overflow-hidden rounded-sm border border-line hover:border-gold-dim focus-visible:outline-2 focus-visible:outline-gold"
+          class="block overflow-hidden rounded-sm border border-line hover:border-accent-dim focus-visible:outline-2 focus-visible:outline-accent"
           :aria-label="`Open ${img.label}`"
           @click="show(i)"
         >
@@ -61,7 +61,7 @@ function onKeydown(e: KeyboardEvent) {
         <div class="max-h-[70vh] overflow-auto rounded-md border border-line bg-bg">
           <button
             type="button"
-            class="block w-full focus-visible:outline-2 focus-visible:outline-gold"
+            class="block w-full focus-visible:outline-2 focus-visible:outline-accent"
             :class="zoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'"
             :aria-label="zoomed ? 'Zoom out' : 'Zoom in'"
             @click="zoomed = !zoomed"
@@ -70,11 +70,11 @@ function onKeydown(e: KeyboardEvent) {
           </button>
         </div>
         <div class="flex items-center justify-between gap-2 text-sm">
-          <button type="button" class="rounded-md border border-line-strong px-3 py-1.5 hover:border-gold-dim focus-visible:outline-2 focus-visible:outline-gold" @click="step(-1)">
+          <button type="button" class="rounded-md border border-line-strong px-3 py-1.5 hover:border-accent-dim focus-visible:outline-2 focus-visible:outline-accent" @click="step(-1)">
             <span aria-hidden="true">←</span> Previous
           </button>
           <span class="tnum text-muted">{{ index + 1 }} / {{ images.length }} · Z to zoom</span>
-          <button type="button" class="rounded-md border border-line-strong px-3 py-1.5 hover:border-gold-dim focus-visible:outline-2 focus-visible:outline-gold" @click="step(1)">
+          <button type="button" class="rounded-md border border-line-strong px-3 py-1.5 hover:border-accent-dim focus-visible:outline-2 focus-visible:outline-accent" @click="step(1)">
             Next <span aria-hidden="true">→</span>
           </button>
         </div>

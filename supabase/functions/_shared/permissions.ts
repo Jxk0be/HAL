@@ -1,7 +1,7 @@
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
 
 /**
- * Permission checks for the bot, acting as a specific HAL user. They call the same rules as RLS
+ * Permission checks for the bot, acting as a specific BIL user. They call the same rules as RLS
  * (the *_for SQL helpers, service-role only), so the bot can never do more than the site allows.
  */
 export function permissionsFor(db: SupabaseClient, userId: string) {

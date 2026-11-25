@@ -50,7 +50,7 @@ export default defineConfig({
     __RULEBOOK_COMMIT__: JSON.stringify(rulebookCommit()),
     __APP_RELEASE__: JSON.stringify(release()),
   },
-  // 5174 so HAL can run alongside other local Vite apps on the default 5173.
+  // 5174 so BIL can run alongside other local Vite apps on the default 5173.
   server: { port: 5174, strictPort: true },
   test: { environment: 'jsdom' },
 })

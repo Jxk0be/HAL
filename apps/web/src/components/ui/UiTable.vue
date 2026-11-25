@@ -72,7 +72,7 @@ function ariaSort(col: TableColumn) {
               v-if="col.sortable"
               type="button"
               class="inline-flex items-center gap-1 tracking-[inherit] uppercase hover:text-text"
-              :class="sort?.key === col.key ? 'text-gold' : ''"
+              :class="sort?.key === col.key ? 'text-accent' : ''"
               @click="toggle(col)"
             >
               {{ col.label }}

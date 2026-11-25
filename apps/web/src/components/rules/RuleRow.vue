@@ -17,11 +17,11 @@ const parts = (text: string) => highlightParts(text, props.term ?? '')
   <div
     :id="rule.number"
     class="group relative grid scroll-mt-24 grid-cols-[3.25rem_1fr] gap-x-3 rounded-md px-2 py-3 transition-colors duration-700 sm:grid-cols-[4rem_1fr] print:break-inside-avoid"
-    :class="highlighted ? 'bg-gold-soft' : ''"
+    :class="highlighted ? 'bg-accent-soft' : ''"
   >
     <a
       :href="`#${rule.number}`"
-      class="tnum pt-px font-mono text-sm font-semibold text-gold hover:text-gold-strong print:text-black"
+      class="tnum pt-px font-mono text-sm font-semibold text-accent hover:text-accent-strong print:text-black"
       :aria-label="`Rule ${rule.number}`"
       @click.prevent="emit('copy', rule.number)"
     >
@@ -31,7 +31,7 @@ const parts = (text: string) => highlightParts(text, props.term ?? '')
       <template v-if="term">
         <p>
           <template v-for="(p, i) in parts(rule.text)" :key="i">
-            <mark v-if="p.match" class="rounded-sm bg-gold/30 px-0.5 text-text">{{ p.text }}</mark>
+            <mark v-if="p.match" class="rounded-sm bg-accent/30 px-0.5 text-text">{{ p.text }}</mark>
             <template v-else>{{ p.text }}</template>
           </template>
         </p>
@@ -43,12 +43,12 @@ const parts = (text: string) => highlightParts(text, props.term ?? '')
         :is="rule.list.ordered ? 'ol' : 'ul'"
         v-if="rule.list"
         class="mt-2 flex flex-col gap-1 pl-5 text-muted print:text-black"
-        :class="rule.list.ordered ? 'list-decimal marker:text-gold' : 'list-disc marker:text-gold'"
+        :class="rule.list.ordered ? 'list-decimal marker:text-accent' : 'list-disc marker:text-accent'"
       >
         <li v-for="(item, i) in rule.list.items" :key="i">
           <template v-if="term">
             <template v-for="(p, j) in parts(item.text)" :key="j">
-              <mark v-if="p.match" class="rounded-sm bg-gold/30 px-0.5 text-text">{{ p.text }}</mark>
+              <mark v-if="p.match" class="rounded-sm bg-accent/30 px-0.5 text-text">{{ p.text }}</mark>
               <template v-else>{{ p.text }}</template>
             </template>
           </template>
@@ -59,7 +59,7 @@ const parts = (text: string) => highlightParts(text, props.term ?? '')
     </div>
     <button
       type="button"
-      class="absolute top-2.5 right-1 rounded-sm p-1 text-muted opacity-0 transition-opacity group-hover:opacity-100 hover:text-gold focus-visible:opacity-100 print:hidden"
+      class="absolute top-2.5 right-1 rounded-sm p-1 text-muted opacity-0 transition-opacity group-hover:opacity-100 hover:text-accent focus-visible:opacity-100 print:hidden"
       :aria-label="`Copy link to rule ${rule.number}`"
       @click="emit('copy', rule.number)"
     >

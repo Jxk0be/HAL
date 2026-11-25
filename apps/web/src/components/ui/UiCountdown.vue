@@ -42,6 +42,6 @@ const spoken = computed(() => {
         <span class="ml-0.5 text-xs text-muted">{{ p.label }}</span>
       </span>
     </template>
-    <span v-else class="text-gold">{{ endedLabel }}</span>
+    <span v-else class="text-accent">{{ endedLabel }}</span>
   </time>
 </template>

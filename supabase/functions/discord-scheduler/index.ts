@@ -8,6 +8,9 @@
  *    #announcements, reschedule notices to both team channels, check-in confirmations, and new
  *    disputes to #admin-only. Other types stay queued for later features.
  *
+ * 3. Live boards (board_sync.ts): #team-rosters, #standings, #match-schedule, #sub-board and the
+ *    weekly #player-of-the-week post, edited only when their content changes.
+ *
  * Every post is claimed in bot_events first, so overlapping runs never double-post.
  */
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
@@ -44,6 +47,7 @@ import { closeDisputeThread, ensureDisputeThread, postDisputeComment, reopenDisp
 import { handleEsubEvent } from '../_shared/esub_flow.ts'
 import { runAutoAnnouncements } from '../_shared/announcement_flow.ts'
 import { handleInviteEvent } from '../_shared/invite_flow.ts'
+import { syncBoards } from '../_shared/board_sync.ts'
 import { disputeAlert, mismatchAlert, teamPendingAlert, unreportedAlert, withAdminPing } from '../_shared/admin_alerts.ts'
 
 const HANDLED = [
@@ -79,7 +83,7 @@ interface Ctx {
   db: SupabaseClient
   siteUrl: string
   channels: ChannelSettings
-  /** HAL Admin role id: every admin alert pings it. */
+  /** BIL Admin role id: every admin alert pings it. */
   adminRole: string | null
   stats: Record<string, number>
 }
@@ -231,7 +235,7 @@ async function handleOutbox(ctx: Ctx, row: { id: number; type: string; payload: 
       const m = await loadMatch(ctx.db, matchId)
       if (!m) return
       const { data: caster } = await ctx.db.from('profiles').select('discord_username, activision_id').eq('id', String(p.caster_id)).maybeSingle()
-      const msg = await sendMessage(ctx.channels.announcements, liveMessage(m, String(p.url), caster?.discord_username ?? caster?.activision_id ?? 'a HAL caster', ctx.siteUrl))
+      const msg = await sendMessage(ctx.channels.announcements, liveMessage(m, String(p.url), caster?.discord_username ?? caster?.activision_id ?? 'a league caster', ctx.siteUrl))
       bump(ctx, 'live')
       return msg
     }
@@ -414,5 +418,7 @@ Deno.serve(async (req) => {
   } catch (err) {
     await logError(ctx, 'outbox', {}, err)
   }
+  // Boards last, so they already reflect results and changes handled above.
+  Object.assign(ctx.stats, await syncBoards(ctx.db, ctx.channels, ctx.siteUrl, new Date(), (family, err) => logError(ctx, family, {}, err)))
   return json({ ok: true, stats: ctx.stats })
 })

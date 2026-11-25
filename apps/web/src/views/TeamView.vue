@@ -60,11 +60,11 @@ watch(team, (t) => {
         <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:px-6 sm:py-14">
           <TeamLogo :tag="team.tag" :name="team.name" :logo-url="team.logoUrl" size="xl" decorative />
           <div class="min-w-0 flex-1">
-            <p class="eyebrow text-gold">{{ team.seasonName }}<template v-if="team.division"> · {{ team.division }}</template></p>
+            <p class="eyebrow text-accent">{{ team.seasonName }}<template v-if="team.division"> · {{ team.division }}</template></p>
             <h1 id="team-name" class="mt-1 font-heading text-4xl sm:text-5xl">{{ team.name }}</h1>
             <p class="mt-3 flex flex-wrap gap-2">
               <UiBadge variant="outline">{{ team.tag }}</UiBadge>
-              <UiBadge v-if="team.status === 'pending'" variant="gold">Awaiting approval</UiBadge>
+              <UiBadge v-if="team.status === 'pending'" variant="accent">Awaiting approval</UiBadge>
               <UiBadge v-if="team.status === 'removed'" variant="loss">Removed</UiBadge>
             </p>
           </div>
@@ -80,7 +80,7 @@ watch(team, (t) => {
           </dl>
           <div class="flex flex-wrap gap-2">
             <UiButton v-if="isMine" to="/my-team" variant="secondary">Manage team</UiButton>
-            <UiButton :href="site.discordInviteUrl">Join HAL Discord</UiButton>
+            <UiButton :href="site.discordInviteUrl">Join the Discord</UiButton>
           </div>
         </div>
       </section>
@@ -88,12 +88,12 @@ watch(team, (t) => {
       <div class="mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_22rem]">
         <div class="flex flex-col gap-8">
           <section aria-labelledby="roster-title">
-            <h2 id="roster-title" class="eyebrow mb-3 text-gold">Roster · {{ team.roster.length }} of {{ team.rules.max_roster }}</h2>
+            <h2 id="roster-title" class="eyebrow mb-3 text-accent">Roster · {{ team.roster.length }} of {{ team.rules.max_roster }}</h2>
             <RosterList :players="team.roster" :caption="`${team.name} roster`" link-players />
           </section>
 
           <section v-if="modeRecords.length" aria-labelledby="modes-title">
-            <h2 id="modes-title" class="eyebrow mb-3 text-gold">Record by mode</h2>
+            <h2 id="modes-title" class="eyebrow mb-3 text-accent">Record by mode</h2>
             <dl class="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-3">
               <div v-for="r in modeRecords" :key="r.mode" class="bg-surface p-4">
                 <dt class="eyebrow text-muted">{{ r.mode }}</dt>
@@ -110,7 +110,7 @@ watch(team, (t) => {
               <li v-for="m in upcoming" :key="m.id" class="flex items-center gap-3">
                 <TeamLogo :tag="opp(m).tag" :name="opp(m).name" :logo-url="opp(m).logoUrl" size="sm" decorative />
                 <span class="min-w-0 flex-1">
-                  <RouterLink :to="`/matches/${m.id}`" class="block truncate hover:text-gold">{{ side(m) === 'home' ? 'vs' : '@' }} {{ opp(m).name }}</RouterLink>
+                  <RouterLink :to="`/matches/${m.id}`" class="block truncate hover:text-accent">{{ side(m) === 'home' ? 'vs' : '@' }} {{ opp(m).name }}</RouterLink>
                   <span class="text-xs text-muted">Week {{ m.week }} · <LeagueTime :iso="m.scheduledAt" /></span>
                 </span>
               </li>
@@ -121,7 +121,7 @@ watch(team, (t) => {
             <ul v-else class="flex flex-col gap-3 text-sm">
               <li v-for="m in results" :key="m.id" class="flex items-center gap-3">
                 <ScoreChip :score="ours(m)" :opponent="theirs(m)" :result="m.status === 'forfeit' && m.forfeitTeamId === id ? 'FF' : undefined" />
-                <RouterLink :to="`/matches/${m.id}`" class="min-w-0 flex-1 truncate hover:text-gold">{{ side(m) === 'home' ? 'vs' : '@' }} {{ opp(m).name }}</RouterLink>
+                <RouterLink :to="`/matches/${m.id}`" class="min-w-0 flex-1 truncate hover:text-accent">{{ side(m) === 'home' ? 'vs' : '@' }} {{ opp(m).name }}</RouterLink>
                 <span class="text-xs text-muted">Wk {{ m.week }}</span>
               </li>
             </ul>

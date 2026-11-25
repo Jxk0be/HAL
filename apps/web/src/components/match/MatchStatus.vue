@@ -23,7 +23,7 @@ const labels: Record<MatchCardData['status'], string> = {
       :variant="
         match.status === 'confirmed' ? 'win'
         : match.status === 'disputed' || match.status === 'forfeit' || match.status === 'cancelled' ? 'loss'
-        : match.status === 'checkin_open' || match.status === 'live' ? 'gold'
+        : match.status === 'checkin_open' || match.status === 'live' ? 'accent'
         : 'neutral'
       "
     >

@@ -1,5 +1,5 @@
 /**
- * HAL Discord interactions endpoint (HTTP interactions; no gateway process).
+ * BIL Discord interactions endpoint (HTTP interactions; no gateway process).
  * Deploy with --no-verify-jwt: Discord can't send a Supabase JWT, so the Ed25519 signature check
  * below is the authentication. Set this function's URL as the app's Interactions Endpoint URL.
  *

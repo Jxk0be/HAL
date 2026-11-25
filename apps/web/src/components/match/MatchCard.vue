@@ -22,7 +22,7 @@ const label = computed(() => {
 </script>
 
 <template>
-  <article class="relative flex flex-col gap-3 rounded-lg border border-line bg-surface p-4 transition-colors hover:border-gold-dim" :aria-label="label">
+  <article class="relative flex flex-col gap-3 rounded-lg border border-line bg-surface p-4 transition-colors hover:border-accent-dim" :aria-label="label">
     <div class="flex items-center justify-between gap-2 text-xs text-muted">
       <span>
         <template v-if="match.stage === 'playoff'">Playoffs · </template>
@@ -38,14 +38,14 @@ const label = computed(() => {
         <span
           v-if="final"
           class="tnum w-6 text-right font-heading text-xl"
-          :class="won(side) ? 'text-gold' : 'text-muted'"
+          :class="won(side) ? 'text-accent' : 'text-muted'"
           aria-hidden="true"
         >{{ score(side) }}</span>
       </div>
     </div>
 
     <div v-if="!compact || match.broadcastLive" class="flex items-center justify-between gap-2">
-      <RouterLink :to="`/matches/${match.id}`" class="text-sm text-gold after:absolute after:inset-0 hover:text-gold-strong">
+      <RouterLink :to="`/matches/${match.id}`" class="text-sm text-accent after:absolute after:inset-0 hover:text-accent-strong">
         {{ final ? 'Match details' : 'Preview' }}<span class="sr-only">: {{ match.home.name }} vs {{ match.away.name }}</span>
       </RouterLink>
       <a
@@ -53,7 +53,7 @@ const label = computed(() => {
         :href="match.broadcastUrl"
         target="_blank"
         rel="noopener noreferrer"
-        class="relative z-10 rounded-md bg-gold px-3 py-1 font-heading text-xs tracking-wider text-on-gold hover:bg-gold-strong"
+        class="relative z-10 rounded-md bg-brand px-3 py-1 font-heading text-xs tracking-wider text-on-brand hover:bg-brand-strong"
       >
         <span class="text-loss" aria-hidden="true">●</span> LIVE · Watch<span class="sr-only"> live (opens in a new tab)</span>
       </a>
@@ -62,7 +62,7 @@ const label = computed(() => {
         :href="match.broadcastUrl"
         target="_blank"
         rel="noopener noreferrer"
-        class="relative z-10 text-xs text-muted hover:text-gold"
+        class="relative z-10 text-xs text-muted hover:text-accent"
       >
         Watch broadcast<span class="sr-only"> of {{ match.home.name }} vs {{ match.away.name }} (opens in a new tab)</span>
       </a>

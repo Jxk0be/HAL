@@ -9,6 +9,7 @@ import { useRulebook } from '@/composables/useRulebook'
 import { useActiveSeason } from '@/composables/useActiveSeason'
 import { useToast } from '@/composables/useToast'
 import { allRules, ruleMatches } from '@/lib/rulebook'
+import { site } from '@/config/site'
 
 const route = useRoute()
 const router = useRouter()
@@ -122,7 +123,7 @@ function mobileJump(number: string) {
     <!-- Header -->
     <header class="border-b border-line">
       <div class="mx-auto max-w-7xl px-4 pt-10 pb-8 sm:px-6 sm:pt-14">
-        <p class="eyebrow text-gold">{{ season?.name ?? "Heaven's Arena League" }}</p>
+        <p class="eyebrow text-accent">{{ season?.name ?? site.name }}</p>
         <h1 class="mt-2 font-heading text-4xl sm:text-6xl">Official Rulebook</h1>
         <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
           <span v-if="book.effective">Effective {{ book.effective }}</span>
@@ -148,11 +149,11 @@ function mobileJump(number: string) {
               <a
                 :href="`#${s.number}`"
                 class="-ml-px flex gap-3 border-l-2 py-1.5 pl-4 text-sm transition-colors"
-                :class="active === s.number && !searching ? 'border-gold text-text' : 'border-transparent text-muted hover:text-text'"
+                :class="active === s.number && !searching ? 'border-accent text-text' : 'border-transparent text-muted hover:text-text'"
                 :aria-current="active === s.number && !searching ? 'location' : undefined"
                 @click.prevent="jump(s.number)"
               >
-                <span class="tnum w-5 font-mono text-gold">{{ s.number }}</span>
+                <span class="tnum w-5 font-mono text-accent">{{ s.number }}</span>
                 <span>{{ s.title }}</span>
               </a>
             </li>
@@ -173,7 +174,7 @@ function mobileJump(number: string) {
           </UiInput>
           <div v-if="searching" class="flex items-center gap-3 text-sm" aria-live="polite">
             <span class="tnum text-muted">{{ results.length }} {{ results.length === 1 ? 'rule matches' : 'rules match' }} “{{ term.trim() }}”</span>
-            <button type="button" class="font-heading tracking-wider text-gold hover:text-gold-strong" @click="term = ''">Clear</button>
+            <button type="button" class="font-heading tracking-wider text-accent hover:text-accent-strong" @click="term = ''">Clear</button>
           </div>
 
           <details ref="mobileToc" class="group rounded-md border border-line bg-surface lg:hidden">
@@ -190,7 +191,7 @@ function mobileJump(number: string) {
                   class="flex gap-3 px-4 py-2.5 text-sm text-muted hover:bg-surface-2 hover:text-text"
                   @click.prevent="mobileJump(s.number)"
                 >
-                  <span class="tnum w-5 font-mono text-gold">{{ s.number }}</span>{{ s.title }}
+                  <span class="tnum w-5 font-mono text-accent">{{ s.number }}</span>{{ s.title }}
                 </a>
               </li>
             </ol>
@@ -204,7 +205,7 @@ function mobileJump(number: string) {
           </p>
           <section v-for="g in resultSections" :key="g.number" class="mb-6 rounded-lg border border-line bg-surface p-4 sm:p-6">
             <h2 class="mb-2 flex items-baseline gap-3 font-heading text-lg">
-              <span class="tnum font-mono text-gold">{{ g.number }}</span>{{ g.title }}
+              <span class="tnum font-mono text-accent">{{ g.number }}</span>{{ g.title }}
             </h2>
             <RuleRow v-for="r in g.rules" :key="r.number" :rule="r" :term="term" @copy="jump" />
           </section>
@@ -220,7 +221,7 @@ function mobileJump(number: string) {
             class="scroll-mt-24 rounded-lg border border-line bg-surface p-4 sm:p-8 print:border-0 print:p-0"
           >
             <header class="mb-4 flex items-baseline gap-4 border-b border-line pb-4">
-              <span class="tnum font-heading text-4xl leading-none text-gold sm:text-5xl print:text-black" aria-hidden="true">
+              <span class="tnum font-heading text-4xl leading-none text-accent sm:text-5xl print:text-black" aria-hidden="true">
                 {{ s.number.padStart(2, '0') }}
               </span>
               <h2 :id="`section-${s.number}-title`" class="font-heading text-2xl sm:text-3xl">

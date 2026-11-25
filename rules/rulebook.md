@@ -1,29 +1,29 @@
-# Heaven's Arena League Official Rulebook
+# Blackhat Invitational League Official Rulebook
 
-These rules govern Season 1 of Heaven's Arena League (HAL), a free-entry, NA-only Call of Duty: Modern Warfare 4 league. By registering, every player and captain agrees to them.
+These rules govern Season 1 of Blackhat Invitational League (BIL), a free-entry, NA-only Call of Duty: Modern Warfare 4 league. By registering, every player and captain agrees to them.
 
 Effective: November 20, 2026
 
 ## 1. General
 
-**1.1** HAL follows the current Call of Duty League (CDL) ruleset and Gentlemen's Agreements (GAs), except where this rulebook says otherwise. Where they conflict, this rulebook wins.
+**1.1** BIL follows the current Call of Duty League (CDL) ruleset and Gentlemen's Agreements (GAs), except where this rulebook says otherwise. Where they conflict, this rulebook wins.
 
 **1.2** All league times are set in Eastern Time (America/New_York). The website shows every time in your own time zone, with Eastern Time on hover.
 
 **1.3** League staff interpret these rules. Admin decisions are final.
 
-**1.4** Official league business happens on the HAL website and in the HAL Discord server. Agreements made anywhere else (private messages, other servers) do not count unless they are recorded on the site or with the bot.
+**1.4** Official league business happens on the BIL website and in the BIL Discord server. Agreements made anywhere else (private messages, other servers) do not count unless they are recorded on the site or with the bot.
 
 **1.5** Entry is free. There are no fees at any point in the season.
 
 ## 2. Eligibility
 
 > [!IMPORTANT]
-> You must be 18 or older to play in HAL, and HAL is controller only on every platform. You confirm both when you set up your profile, and you can't withdraw either confirmation.
+> You must be 18 or older to play in BIL, and BIL is controller only on every platform. You confirm both when you set up your profile, and you can't withdraw either confirmation.
 
 **2.1** Players must be 18 or older.
 
-**2.2** HAL is open to players in North America only.
+**2.2** BIL is open to players in North America only.
 
 **2.3** Controller only, on every platform. PC players are allowed if they play with a controller.
 
@@ -31,7 +31,7 @@ Effective: November 20, 2026
 
 **2.5** You log in with Discord and must set up your player profile before joining or creating a team: your Activision ID, your platform, and the confirmations in 2.1 and 2.3.
 
-**2.6** Your Activision ID must be your real, current ID. Each Activision ID can be registered to only one HAL account.
+**2.6** Your Activision ID must be your real, current ID. Each Activision ID can be registered to only one BIL account.
 
 **2.7** Players who are banned may not play, captain or join a team until the ban ends.
 
@@ -121,13 +121,13 @@ Effective: November 20, 2026
 
 ## 8. Game Settings, Maps and GAs
 
-**8.1** HAL follows the current CDL ruleset and Gentlemen's Agreement (GA) list for Modern Warfare 4, as updated during the season.
+**8.1** BIL follows the current CDL ruleset and Gentlemen's Agreement (GA) list for Modern Warfare 4, as updated during the season.
 
 **8.2** Mode order for a best-of-5: to be published by league staff.
 
 **8.3** Map pool for each mode: to be published by league staff.
 
-**8.4** HAL Gentlemen's Agreements: to be published by league staff.
+**8.4** BIL Gentlemen's Agreements: to be published by league staff.
 
 > [!NOTE]
 > League staff will publish the MW4 modes, map pool and GA list before the regular season. They are kept on the website and announced in Discord, and any change is recorded in the public audit log.
@@ -136,7 +136,7 @@ Effective: November 20, 2026
 
 ## 9. Reporting and Stats
 
-**9.1** HAL uses double-entry reporting. After every match, both captains submit the full scoreboard on the website or with the bot: the series score, and for every map the mode, map, final score, winner, a scoreboard screenshot, and each player's kills, deaths and score for all 8 players.
+**9.1** BIL uses double-entry reporting. After every match, both captains submit the full scoreboard on the website or with the bot: the series score, and for every map the mode, map, final score, winner, a scoreboard screenshot, and each player's kills, deaths and score for all 8 players.
 
 **9.2** The series result is confirmed when both captains' series and map scores agree. Standings update when a result is confirmed.
 
@@ -163,7 +163,7 @@ Effective: November 20, 2026
 ## 11. Conduct and Integrity
 
 > [!IMPORTANT]
-> Cheating devices (including Cronus, XIM and strike packs) are banned. A team caught using one is banned for the season, and the player is banned from HAL permanently.
+> Cheating devices (including Cronus, XIM and strike packs) are banned. A team caught using one is banned for the season, and the player is banned from BIL permanently.
 
 **11.1** Cheating devices and software: the team is banned for the season and the player is banned permanently.
 
@@ -185,7 +185,7 @@ Effective: November 20, 2026
 
 ## 13. Prizes
 
-**13.1** The champion receives $200: $50 for each of the 4 starters.
+**13.1** The champion receives $400: $100 for each of the 4 starters.
 
 **13.2** Prizes are paid by PayPal or Venmo within 7 days of the final.
 
@@ -193,9 +193,9 @@ Effective: November 20, 2026
 
 ## 14. League Staff and Conflicts of Interest
 
-**14.1** HAL staff roles are owner, admin and caster. Casters can only mark matches as broadcast and add their stream link.
+**14.1** BIL staff roles are owner, admin and caster. Casters can only mark matches as broadcast and add their stream link.
 
-**14.2** The league owner's team plays in HAL.
+**14.2** The league owner's team plays in BIL.
 
 **14.3** Staff never take staff actions on a match or team involving a team they are rostered on. This covers results, stats, mismatches, disputes, check-ins, reschedules, roster decisions and penalties. The league database enforces it, so a rostered staff member cannot override it.
 

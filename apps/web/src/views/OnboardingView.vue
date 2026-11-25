@@ -3,6 +3,7 @@ import { useRoute, useRouter } from 'vue-router'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import ProfileForm from '@/components/profile/ProfileForm.vue'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
+import UiButton from '@/components/ui/UiButton.vue'
 import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
@@ -14,7 +15,7 @@ const router = useRouter()
 const toast = useToast()
 
 async function done() {
-  toast.success("You're all set. Welcome to HAL.")
+  toast.success("You're all set. Welcome to Blackhat.")
   await router.replace(safeNext(route.query.next, '/profile'))
 }
 </script>
@@ -41,6 +42,10 @@ async function done() {
         submit-label="Finish setup"
         @saved="done"
       />
+      <div v-else-if="auth.profileError" role="alert" class="rounded-md border border-loss/40 bg-loss-soft px-4 py-3 text-sm text-loss">
+        Your profile couldn't be loaded. Refresh the page; if it keeps happening, tell an admin.
+        <UiButton size="sm" variant="secondary" class="mt-3 block" @click="auth.refresh()">Try again</UiButton>
+      </div>
       <UiSkeleton v-else :lines="6" />
     </div>
   </div>

@@ -17,7 +17,7 @@ import { isStreamUrl } from '@/lib/broadcast'
 import { toZoned } from '@/lib/time'
 
 /**
- * Casting desk for casters and admins. HAL has no stream of its own: casters stream on their own
+ * Casting desk for casters and admins. The league has no stream of its own: casters stream on their own
  * channel and paste the link here. Casters can only change broadcasts; everything is logged.
  */
 const auth = useAuthStore()
@@ -76,11 +76,11 @@ async function goLive() {
       <UiSkeleton v-if="loading" :lines="6" />
       <UiEmptyState v-else-if="!groups.length" title="Nothing to cast this week" description="Matches for today and the next 7 days appear here." />
       <section v-for="g in groups" :key="g.title" :aria-labelledby="`cast-${g.title}`">
-        <h2 :id="`cast-${g.title}`" class="eyebrow mb-3 text-gold">{{ g.title }}</h2>
+        <h2 :id="`cast-${g.title}`" class="eyebrow mb-3 text-accent">{{ g.title }}</h2>
         <ul class="flex flex-col divide-y divide-line rounded-lg border border-line bg-surface">
           <li v-for="m in g.items" :key="m.id" class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 text-sm" :class="isRecused(m.home.id, m.away.id) ? 'opacity-70' : ''">
             <span class="min-w-48 flex-1">
-              <RouterLink :to="`/matches/${m.id}`" class="font-heading text-lg hover:text-gold">{{ m.home.tag }} vs {{ m.away.tag }}</RouterLink>
+              <RouterLink :to="`/matches/${m.id}`" class="font-heading text-lg hover:text-accent">{{ m.home.tag }} vs {{ m.away.tag }}</RouterLink>
               <span class="block text-xs text-muted">Week {{ m.week }} · <LeagueTime :iso="m.scheduledAt" /></span>
             </span>
             <UiBadge v-if="m.live" variant="live">Live</UiBadge>

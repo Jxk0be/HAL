@@ -40,7 +40,7 @@ export function inviteDm(i: InviteInfo, siteUrl: string): MessagePayload {
         title: `${i.team.name} [${i.team.tag}] invited you`,
         url: `${siteUrl}/teams/${i.team.id}`,
         description:
-          `**${i.captain}** invited you to join **${i.team.name}**${i.role ? ` as a ${i.role}` : ''} in Heaven's Arena League.\n` +
+          `**${i.captain}** invited you to join **${i.team.name}**${i.role ? ` as a ${i.role}` : ''} in Blackhat Invitational League.\n` +
           `Accept below or on your [profile](${siteUrl}/profile). The invite expires ${when(i.expiresAt)}.\n` +
           'Accepting puts you on the roster and cancels your other invites this season (3.6).',
       }),

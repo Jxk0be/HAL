@@ -75,10 +75,10 @@ const showForm = computed(() => props.captainOf && open.value && (!mine.value ||
             </p>
             <ul class="mt-2 grid gap-2 sm:grid-cols-2">
               <li v-for="p in players" :key="p.userId">
-                <label class="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2" :class="picked.includes(p.userId) ? 'border-gold bg-gold-soft' : 'border-line-strong'">
+                <label class="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2" :class="picked.includes(p.userId) ? 'border-accent bg-accent-soft' : 'border-line-strong'">
                   <input
                     type="checkbox"
-                    class="size-4 accent-[var(--color-gold)]"
+                    class="size-4 accent-[var(--color-accent)]"
                     :checked="picked.includes(p.userId)"
                     :disabled="!picked.includes(p.userId) && picked.length >= 4"
                     @change="toggle(p.userId)"

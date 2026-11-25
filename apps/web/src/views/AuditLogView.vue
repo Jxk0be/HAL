@@ -34,7 +34,7 @@ const when = (iso: string | null) =>
     <PageHeader
       eyebrow="Transparency"
       title="Audit Log"
-      description="Every action taken by league staff or the HAL bot, in public. Private details are never shown."
+      description="Every action taken by league staff or the league bot, in public. Private details are never shown."
     />
     <div class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6">
       <div class="flex flex-wrap gap-3">
@@ -47,7 +47,7 @@ const when = (iso: string | null) =>
         <li v-for="r in rows" :key="r.id ?? 0" class="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-start sm:gap-4">
           <time :datetime="r.created_at ?? undefined" class="tnum shrink-0 text-xs text-muted sm:w-40 sm:pt-0.5">{{ when(r.created_at) }}</time>
           <p class="min-w-0 flex-1 text-sm break-words">{{ r.summary }}</p>
-          <UiBadge :variant="r.actor_role === 'system' ? 'neutral' : 'gold'" class="self-start">{{ r.actor_role === 'system' ? 'bot' : r.actor_role }}</UiBadge>
+          <UiBadge :variant="r.actor_role === 'system' ? 'neutral' : 'accent'" class="self-start">{{ r.actor_role === 'system' ? 'bot' : r.actor_role }}</UiBadge>
         </li>
       </ol>
       <UiPagination v-model="page" :pages="log.pages()" :total="total" label="Audit log pages" />

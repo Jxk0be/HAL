@@ -62,13 +62,13 @@ export async function loadMatch(db: SupabaseClient, id: string): Promise<BotMatc
   return data ? toBotMatch(data) : null
 }
 
-export interface ChannelSettings {
-  lfg: string | null
-  disputes: string | null
-  results: string | null
-  announcements: string | null
-  admin: string | null
-}
+export const CHANNEL_KEYS = ['lfg', 'disputes', 'results', 'announcements', 'admin', 'rosters', 'standings', 'schedule', 'subs', 'potw'] as const
+export type ChannelKey = (typeof CHANNEL_KEYS)[number]
+/**
+ * Channel ids set in Admin -> Discord. lfg is #free-agents; rosters/standings/schedule/subs/potw
+ * are the live boards (#team-rosters, #standings, #match-schedule, #sub-board, #player-of-the-week).
+ */
+export type ChannelSettings = Record<ChannelKey, string | null>
 
 /** Discord ids of a team's current roster (emergency subs excluded), for whole-team pings. */
 export async function loadRosterDiscordIds(db: SupabaseClient, teamId: string): Promise<string[]> {
@@ -82,7 +82,7 @@ export async function loadRosterDiscordIds(db: SupabaseClient, teamId: string): 
   return (data ?? []).map((r: any) => r.profile?.discord_id as string | null).filter((x): x is string => Boolean(x))
 }
 
-/** The HAL Admin role id (stored by discord-sync in app_settings.discord), for admin pings. */
+/** The BIL Admin role id (stored by discord-sync in app_settings.discord), for admin pings. */
 export async function loadAdminRoleId(db: SupabaseClient): Promise<string | null> {
   const { data } = await db.from('app_settings').select('value').eq('key', 'discord').maybeSingle()
   // deno-lint-ignore no-explicit-any
@@ -91,8 +91,8 @@ export async function loadAdminRoleId(db: SupabaseClient): Promise<string | null
 
 export async function loadChannels(db: SupabaseClient): Promise<ChannelSettings> {
   const { data } = await db.from('app_settings').select('value').eq('key', 'discord_channels').maybeSingle()
-  const v = (data?.value ?? {}) as Partial<Record<keyof ChannelSettings, string>>
-  return { lfg: v.lfg || null, disputes: v.disputes || null, results: v.results || null, announcements: v.announcements || null, admin: v.admin || null }
+  const v = (data?.value ?? {}) as Partial<Record<ChannelKey, string>>
+  return Object.fromEntries(CHANNEL_KEYS.map((k) => [k, v[k] || null])) as ChannelSettings
 }
 
 /** Claim a post before sending it. Returns the event id, or null if it was already claimed. */

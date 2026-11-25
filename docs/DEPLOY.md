@@ -1,6 +1,6 @@
-# Deploying HAL
+# Deploying BIL
 
-HAL runs on three services:
+BIL runs on three services:
 
 | Piece | Where | How it deploys |
 |---|---|---|
@@ -29,7 +29,7 @@ Node 22 and pnpm (from `package.json` `packageManager`) are picked automatically
 
 | Name | Value | Status |
 |---|---|---|
-| `DISCORD_APP_ID` | Discord Developer Portal → HAL → Application ID | Set |
+| `DISCORD_APP_ID` | Discord Developer Portal → BIL → Application ID | Set |
 | `DISCORD_PUBLIC_KEY` | Developer Portal → General Information → Public Key | Set |
 | `DISCORD_BOT_TOKEN` | Developer Portal → Bot → Token | Set |
 | `DISCORD_GUILD_ID` | Your server ID (Developer Mode → right-click server → Copy Server ID) | Set |
@@ -59,23 +59,23 @@ These let GitHub Actions lint the database, apply migrations and deploy the Edge
 
 ### In the app (Admin → Discord → Channels, owner only)
 
-Channel IDs for `#lfg-free-agents`, `#results`, `#announcements`, `#disputes` and `#admin-only`.
+Channel IDs for the ten bot channels (see `docs/discord-server-text.md`, step 7).
 
 ## 2. First deploy, in order
 
 1. **GitHub secrets**, then **push** `main`. The `deploy` job should pass and change nothing the first time (every migration is already applied).
-2. **Netlify:** Add new site → Import from Git → pick the HAL repository. Netlify reads `netlify.toml` (base `/`, build `pnpm --filter web build`, publish `apps/web/dist`). Add the `VITE_` variables, then deploy. Note the site URL.
+2. **Netlify:** Add new site → Import from Git → pick the BIL repository. Netlify reads `netlify.toml` (base `/`, build `pnpm --filter web build`, publish `apps/web/dist`). Add the `VITE_` variables, then deploy. Note the site URL.
 3. **Point everything at the live URL:**
    - Netlify: set `VITE_SITE_URL` to the site URL and redeploy.
    - Supabase Edge Function secret `SITE_URL`: the same URL.
    - Supabase → Authentication → URL Configuration: **Site URL** = the site URL; **Redirect URLs** add `https://<your-site>/auth/callback` (keep `http://localhost:5174/auth/callback` for local development).
-4. **Discord Developer Portal → HAL:**
+4. **Discord Developer Portal → BIL:**
    - General Information → **Interactions Endpoint URL**: `https://lluwzpwiybvgnsimpwey.supabase.co/functions/v1/discord-interactions` (Discord sends a test request; it must save without errors).
    - OAuth2 → Redirects: `https://lluwzpwiybvgnsimpwey.supabase.co/auth/v1/callback` (Supabase's Discord login callback; already set if login works locally).
 5. **Slash commands:** `pnpm commands:register` (from the repo root, with `.env` filled in). It should print `/ping, /link, /help, /lfg, /reschedule, /report, /dispute`.
 6. **Owner:** log in on the live site with Discord, then run `supabase/snippets/make_owner.sql` in the SQL editor for your account (already done for the current project).
-7. **Channels:** Admin → Discord → Channels: paste the five channel IDs. Then press **Resync Discord** once.
-8. **Check:** Admin → Health shows no errors and every scheduled job as `succeeded` after a few minutes. In Discord, `/ping` answers "HAL bot online."
+7. **Channels:** Admin → Discord → Channels: paste the ten channel IDs. Then press **Resync Discord** once. The full server setup, in order, is in `docs/discord-server-text.md`.
+8. **Check:** Admin → Health shows no errors and every scheduled job as `succeeded` after a few minutes. In Discord, `/ping` answers "Blackhat bot online."
 
 ## 3. Every later deploy
 

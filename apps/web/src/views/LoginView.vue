@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import HalWordmark from '@/components/brand/HalWordmark.vue'
+import BrandLogo from '@/components/brand/BrandLogo.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
@@ -33,10 +33,10 @@ async function login() {
 
 <template>
   <div class="mx-auto flex max-w-md flex-col items-center px-4 py-20 text-center sm:py-28">
-    <HalWordmark :size="140" />
-    <h1 class="mt-8 font-heading text-4xl">Log in to HAL</h1>
+    <BrandLogo :size="190" variant="full" />
+    <h1 class="mt-8 font-heading text-4xl">Log in to Blackhat</h1>
     <p class="mt-3 text-muted">
-      HAL uses your Discord account. Signing in puts you on the free agent list so captains can
+      Blackhat uses your Discord account. Signing in puts you on the free agent list so captains can
       invite you to their team.
     </p>
     <UiButton size="lg" class="mt-8" :loading="busy" @click="login">Continue with Discord</UiButton>

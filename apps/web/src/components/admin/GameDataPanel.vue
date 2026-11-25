@@ -94,8 +94,8 @@ function moveMode(index: number, dir: -1 | 1) {
           <li v-for="(m, i) in g.modes.value" :key="m.id" class="group flex items-center gap-1">
             <button
               type="button"
-              class="flex min-w-0 flex-1 items-center gap-2 rounded-md border px-3 py-2 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-gold"
-              :class="m.id === selectedId ? 'border-gold-dim bg-gold-soft text-text' : 'border-line bg-surface hover:border-line-strong'"
+              class="flex min-w-0 flex-1 items-center gap-2 rounded-md border px-3 py-2 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-accent"
+              :class="m.id === selectedId ? 'border-accent-dim bg-accent-soft text-text' : 'border-line bg-surface hover:border-line-strong'"
               :aria-pressed="m.id === selectedId"
               @click="selectedId = m.id"
             >
@@ -105,14 +105,14 @@ function moveMode(index: number, dir: -1 | 1) {
             <span class="flex flex-col">
               <button
                 type="button"
-                class="grid h-4 w-6 place-items-center text-xs text-muted hover:text-gold disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-gold"
+                class="grid h-4 w-6 place-items-center text-xs text-muted hover:text-accent disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-accent"
                 :disabled="i === 0 || g.busy.value"
                 :aria-label="`Move ${m.name} up`"
                 @click="moveMode(i, -1)"
               ><span aria-hidden="true">▲</span></button>
               <button
                 type="button"
-                class="grid h-4 w-6 place-items-center text-xs text-muted hover:text-gold disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-gold"
+                class="grid h-4 w-6 place-items-center text-xs text-muted hover:text-accent disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-accent"
                 :disabled="i === g.modes.value.length - 1 || g.busy.value"
                 :aria-label="`Move ${m.name} down`"
                 @click="moveMode(i, 1)"

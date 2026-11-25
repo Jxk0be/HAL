@@ -77,7 +77,7 @@ const expires = (iso: string) => new Date(iso).toLocaleDateString(undefined, { m
                 <span class="truncate">{{ r.activisionId ?? 'Profile not set up yet' }}</span>
               </p>
             </div>
-            <UiBadge v-if="pendingIds.has(r.id)" variant="gold">Invited</UiBadge>
+            <UiBadge v-if="pendingIds.has(r.id)" variant="accent">Invited</UiBadge>
             <UiButton
               v-else
               size="sm"

@@ -112,7 +112,7 @@ async function cancel(m: AdminMatch) {
     <ul v-else class="flex flex-col divide-y divide-line rounded-lg border border-line bg-surface">
       <li v-for="m in filtered" :key="m.id" class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 text-sm" :class="isRecused(m.homeTeamId, m.awayTeamId) ? 'opacity-70' : ''">
         <span class="min-w-48 flex-1">
-          <RouterLink :to="`/matches/${m.id}`" class="font-medium hover:text-gold">{{ team(m.homeTeamId).tag }} vs {{ team(m.awayTeamId).tag }}</RouterLink>
+          <RouterLink :to="`/matches/${m.id}`" class="font-medium hover:text-accent">{{ team(m.homeTeamId).tag }} vs {{ team(m.awayTeamId).tag }}</RouterLink>
           <span class="block text-xs text-muted">Week {{ m.week }}<template v-if="m.stage === 'playoff'"> · playoffs</template> · <LeagueTime :iso="m.scheduledAt" /></span>
         </span>
         <UiBadge :variant="m.status === 'confirmed' ? 'win' : ['disputed', 'forfeit', 'cancelled'].includes(m.status) ? 'loss' : 'neutral'">{{ m.status.replace('_', ' ') }}</UiBadge>

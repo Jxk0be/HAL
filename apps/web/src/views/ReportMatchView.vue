@@ -133,13 +133,13 @@ function discard() {
 
     <template v-else>
       <header class="flex flex-col gap-4 border-b border-line pb-6">
-        <p class="eyebrow text-gold">Report match · Week {{ match.week }}</p>
+        <p class="eyebrow text-accent">Report match · Week {{ match.week }}</p>
         <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
           <span class="flex items-center gap-3">
             <TeamLogo :tag="match.home.tag" :name="match.home.name" :logo-url="match.home.logoUrl" decorative />
             <span class="font-heading text-2xl">{{ match.home.name }}</span>
           </span>
-          <span class="tnum font-heading text-3xl text-gold" aria-label="Series score">{{ series.home }} – {{ series.away }}</span>
+          <span class="tnum font-heading text-3xl text-accent" aria-label="Series score">{{ series.home }} – {{ series.away }}</span>
           <span class="flex items-center gap-3">
             <TeamLogo :tag="match.away.tag" :name="match.away.name" :logo-url="match.away.logoUrl" decorative />
             <span class="font-heading text-2xl">{{ match.away.name }}</span>
@@ -148,7 +148,7 @@ function discard() {
         <p class="text-sm text-muted">
           Scheduled <LeagueTime :iso="match.scheduledAt" />. You’re reporting for
           <strong class="text-text">{{ mySide === 'home' ? match.home.name : match.away.name }}</strong>.
-          <RouterLink :to="`/matches/${match.id}`" class="text-gold hover:text-gold-strong">Match page</RouterLink>
+          <RouterLink :to="`/matches/${match.id}`" class="text-accent hover:text-accent-strong">Match page</RouterLink>
         </p>
       </header>
 
@@ -173,10 +173,10 @@ function discard() {
       </UiEmptyState>
 
       <form v-else class="mt-6 flex flex-col gap-6" novalidate @submit.prevent="submit">
-        <div v-if="fromDiscord" class="rounded-md border border-gold-dim bg-gold-soft px-4 py-3 text-sm">
+        <div v-if="fromDiscord" class="rounded-md border border-accent-dim bg-accent-soft px-4 py-3 text-sm">
           Maps and screenshots came from your <strong>/report</strong> in Discord. Check them, enter the player stats and submit to finish your report.
         </div>
-        <div v-if="restoredDraft" class="flex flex-wrap items-center justify-between gap-3 rounded-md border border-gold-dim bg-gold-soft px-4 py-3 text-sm">
+        <div v-if="restoredDraft" class="flex flex-wrap items-center justify-between gap-3 rounded-md border border-accent-dim bg-accent-soft px-4 py-3 text-sm">
           <span>Restored your unsent draft from this device.</span>
           <UiButton size="sm" variant="ghost" @click="discard">Discard draft</UiButton>
         </div>

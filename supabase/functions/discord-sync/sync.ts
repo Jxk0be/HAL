@@ -31,13 +31,15 @@ import {
   teamChannelName,
   teamChannelOverwrites,
   teamRolePlacement,
+  teamVoiceChannelName,
+  teamVoiceOverwrites,
   type DiscordSettings,
   type FixedRoles,
 } from './plan.ts'
 import { postTeamGuide } from './guides.ts'
 
 const ACTIVE = ['signups', 'regular', 'playoffs']
-const REASON = 'HAL role sync'
+const REASON = 'BIL role sync'
 
 export interface SyncEnv {
   db: SupabaseClient
@@ -179,8 +181,9 @@ export async function syncUser(
 }
 
 // ---- Teams -------------------------------------------------------------------
-export async function removeTeamDiscord(env: SyncEnv, roleId: string | null, channelId: string | null) {
+export async function removeTeamDiscord(env: SyncEnv, roleId: string | null, channelId: string | null, voiceChannelId: string | null = null) {
   if (channelId) await ignoreMissing(deleteChannel(channelId, REASON))
+  if (voiceChannelId) await ignoreMissing(deleteChannel(voiceChannelId, REASON))
   if (roleId) await ignoreMissing(deleteRole(env.guildId, roleId, REASON))
 }
 
@@ -194,7 +197,7 @@ export async function syncTeam(
   const { db, guildId } = env
   const { data: team } = await db
     .from('teams')
-    .select('id, name, tag, status, discord_role_id, discord_channel_id, season:seasons!inner(status)')
+    .select('id, name, tag, status, discord_role_id, discord_channel_id, discord_voice_channel_id, season:seasons!inner(status)')
     .eq('id', teamId)
     .maybeSingle()
   if (!team) return
@@ -202,9 +205,9 @@ export async function syncTeam(
   // deno-lint-ignore no-explicit-any
   const live = team.status === 'approved' && ACTIVE.includes((team.season as any).status)
   if (!live) {
-    if (team.discord_role_id || team.discord_channel_id) {
-      await removeTeamDiscord(env, team.discord_role_id, team.discord_channel_id)
-      await db.from('teams').update({ discord_role_id: null, discord_channel_id: null }).eq('id', teamId)
+    if (team.discord_role_id || team.discord_channel_id || team.discord_voice_channel_id) {
+      await removeTeamDiscord(env, team.discord_role_id, team.discord_channel_id, team.discord_voice_channel_id)
+      await db.from('teams').update({ discord_role_id: null, discord_channel_id: null, discord_voice_channel_id: null }).eq('id', teamId)
     }
     stats.teams++
     return
@@ -266,6 +269,38 @@ export async function syncTeam(
   if (channelId !== team.discord_channel_id) {
     await db.from('teams').update({ discord_role_id: roleId, discord_channel_id: channelId }).eq('id', teamId)
   }
+
+  // Voice channel: same rules as the text channel. Optional extra, so a failure is logged and the
+  // sync carries on (the text channel and roles matter more).
+  try {
+    const voiceOverwrites = teamVoiceOverwrites({
+      guildId,
+      teamRoleId: roleId,
+      adminRoleId: settings.roles.admin,
+      botUserId: env.botUserId,
+    })
+    const voiceName = teamVoiceChannelName(team.tag, team.name)
+    let voiceId =
+      team.discord_voice_channel_id && channelNames.has(team.discord_voice_channel_id) ? team.discord_voice_channel_id : null
+    if (voiceId) {
+      const rename = channelNames.get(voiceId) !== voiceName ? { name: voiceName } : {}
+      await editChannel(voiceId, { ...rename, parent_id: settings.team_category_id, permission_overwrites: voiceOverwrites }, REASON)
+    } else {
+      voiceId = (
+        await createChannel(
+          guildId,
+          { name: voiceName, type: 2, parent_id: settings.team_category_id, permission_overwrites: voiceOverwrites },
+          REASON,
+        )
+      ).id
+    }
+    if (voiceId !== team.discord_voice_channel_id) {
+      await db.from('teams').update({ discord_voice_channel_id: voiceId }).eq('id', teamId)
+    }
+  } catch (err) {
+    stats.errors++
+    await logError(db, 'team_voice_channel', { team_id: teamId }, err)
+  }
   stats.teams++
 
   if (opts.syncMembers !== false) {
@@ -293,11 +328,11 @@ export async function fullResync(env: SyncEnv): Promise<SyncStats> {
   // Every team that is live, or that still has Discord ids to clean up.
   const { data: teams } = await db
     .from('teams')
-    .select('id, status, discord_role_id, season:seasons!inner(status)')
+    .select('id, status, discord_role_id, discord_voice_channel_id, season:seasons!inner(status)')
   for (const t of teams ?? []) {
     // deno-lint-ignore no-explicit-any
     const live = t.status === 'approved' && ACTIVE.includes((t.season as any).status)
-    if (!live && !t.discord_role_id) continue
+    if (!live && !t.discord_role_id && !t.discord_voice_channel_id) continue
     try {
       // No shared guildRoles here: moving a team role shifts other roles' positions, so each team
       // reads the current order.

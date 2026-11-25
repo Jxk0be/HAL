@@ -108,12 +108,12 @@ const posted = (iso: string | null) =>
           </div>
         </template>
       </UiCard>
-      <p v-else-if="auth.isSignedIn && !auth.isOnboarded" class="rounded-md border border-gold-dim/40 bg-gold-soft px-4 py-3 text-sm">
-        <RouterLink to="/onboarding" class="text-gold hover:text-gold-strong">Finish your profile</RouterLink>
+      <p v-else-if="auth.isSignedIn && !auth.isOnboarded" class="rounded-md border border-accent-dim/40 bg-accent-soft px-4 py-3 text-sm">
+        <RouterLink to="/onboarding" class="text-accent hover:text-accent-strong">Finish your profile</RouterLink>
         to appear on the free agent board.
       </p>
       <p v-else-if="!auth.isSignedIn" class="text-sm text-muted">
-        <RouterLink to="/login" class="text-gold hover:text-gold-strong">Log in with Discord</RouterLink>
+        <RouterLink to="/login" class="text-accent hover:text-accent-strong">Log in with Discord</RouterLink>
         to see Discord names, post as a free agent or invite players.
       </p>
 
@@ -146,13 +146,13 @@ const posted = (iso: string | null) =>
           <div class="flex items-start gap-3">
             <UiAvatar :src="p.avatarUrl" :name="p.name" size="md" decorative />
             <div class="min-w-0 flex-1">
-              <RouterLink :to="`/players/${p.id}`" class="block truncate font-medium hover:text-gold">{{ p.name }}</RouterLink>
+              <RouterLink :to="`/players/${p.id}`" class="block truncate font-medium hover:text-accent">{{ p.name }}</RouterLink>
               <p class="mt-0.5 flex items-center gap-2 text-xs text-muted">
                 <PlatformBadge :platform="p.platform" />
                 <span v-if="p.discordUsername" class="truncate">{{ p.activisionId }}</span>
               </p>
             </div>
-            <UiBadge v-if="p.role" variant="gold">{{ p.role }}</UiBadge>
+            <UiBadge v-if="p.role" variant="accent">{{ p.role }}</UiBadge>
           </div>
           <dl v-if="p.availability || p.note" class="mt-4 flex flex-col gap-2 text-sm">
             <div v-if="p.availability">
@@ -178,7 +178,7 @@ const posted = (iso: string | null) =>
                 Take down<span class="sr-only"> {{ p.name }}'s post</span>
               </UiButton>
               <template v-if="isCaptain && p.id !== auth.user?.id">
-                <UiBadge v-if="invited.has(p.id)" variant="gold">Invited</UiBadge>
+                <UiBadge v-if="invited.has(p.id)" variant="accent">Invited</UiBadge>
                 <UiButton v-else-if="spots.open.value > 0" size="sm" :disabled="actions.busy.value" @click="invite(p)">
                   Invite to team<span class="sr-only"> {{ p.name }}</span>
                 </UiButton>

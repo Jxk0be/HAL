@@ -10,7 +10,7 @@ const m = {
   away: { id: 'b', name: 'Bravo', tag: 'BRV' },
 }
 
-Deno.test('admin alerts ping only the HAL Admin role', () => {
+Deno.test('admin alerts ping only the BIL Admin role', () => {
   const p = withAdminPing(mismatchAlert(m, 3, SITE), '42')
   assertEquals(p.content, '<@&42>')
   assertEquals(p.allowed_mentions, { parse: [], roles: ['42'] })

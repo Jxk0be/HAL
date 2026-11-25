@@ -28,7 +28,7 @@ const sizes = {
 
 <template>
   <span
-    class="inline-grid shrink-0 place-items-center overflow-hidden rounded-md border border-gold-dim/60 bg-surface-2 font-heading tracking-wider text-gold"
+    class="inline-grid shrink-0 place-items-center overflow-hidden rounded-md border border-accent-dim/60 bg-surface-2 font-heading tracking-wider text-accent"
     :class="sizes[size]"
     :role="decorative ? undefined : 'img'"
     :aria-label="decorative ? undefined : `${name ?? tag} logo`"

@@ -35,7 +35,7 @@ onMounted(async () => {
 <template>
   <div class="mx-auto flex max-w-md flex-col items-center px-4 py-24 text-center">
     <template v-if="!failed">
-      <span class="size-8 animate-spin rounded-full border-2 border-gold border-r-transparent" aria-hidden="true" />
+      <span class="size-8 animate-spin rounded-full border-2 border-accent border-r-transparent" aria-hidden="true" />
       <p class="mt-6 text-muted" role="status">Signing you in…</p>
     </template>
     <template v-else>

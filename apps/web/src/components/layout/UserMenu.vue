@@ -53,7 +53,7 @@ async function logout() {
       <button
         ref="trigger"
         type="button"
-        class="flex items-center gap-2 rounded-full border border-line-strong py-0.5 pr-2.5 pl-0.5 hover:border-gold-dim"
+        class="flex items-center gap-2 rounded-full border border-line-strong py-0.5 pr-2.5 pl-0.5 hover:border-accent-dim"
         :aria-expanded="open"
         :aria-controls="`${id}-menu`"
         aria-haspopup="true"
@@ -84,7 +84,7 @@ async function logout() {
         </RouterLink>
         <RouterLink
           v-if="auth.isStaff"
-          class="block px-4 py-2 text-sm text-gold hover:bg-surface-3"
+          class="block px-4 py-2 text-sm text-accent hover:bg-surface-3"
           to="/admin"
           @click="open = false"
         >
@@ -92,7 +92,7 @@ async function logout() {
         </RouterLink>
         <RouterLink
           v-if="auth.isOwner"
-          class="block px-4 py-2 text-sm text-gold hover:bg-surface-3"
+          class="block px-4 py-2 text-sm text-accent hover:bg-surface-3"
           to="/admin/discord"
           @click="open = false"
         >

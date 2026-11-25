@@ -27,13 +27,13 @@ defineProps<{
       </thead>
       <tbody>
         <template v-for="(r, i) in rows" :key="r.team_id">
-          <tr class="border-b border-line hover:bg-surface-2" :class="i + 1 === cutoff ? 'border-b-2 border-b-gold-dim' : ''">
-            <td class="tnum px-3 py-3 text-right font-mono" :class="i < cutoff ? 'text-gold' : 'text-muted'">{{ r.rank }}</td>
+          <tr class="border-b border-line hover:bg-surface-2" :class="i + 1 === cutoff ? 'border-b-2 border-b-accent-dim' : ''">
+            <td class="tnum px-3 py-3 text-right font-mono" :class="i < cutoff ? 'text-accent' : 'text-muted'">{{ r.rank }}</td>
             <td class="px-3 py-3">
-              <RouterLink :to="`/teams/${r.team_id}`" class="flex items-center gap-3 hover:text-gold">
+              <RouterLink :to="`/teams/${r.team_id}`" class="flex items-center gap-3 hover:text-accent">
                 <TeamLogo :tag="r.tag" :name="r.name" :logo-url="r.logo_url" size="sm" decorative />
                 <span class="truncate font-medium">{{ r.name }}</span>
-                <span v-if="r.needs_admin_decision" class="text-xs text-gold" title="Still tied after every tiebreak; league staff decide the order">*</span>
+                <span v-if="r.needs_admin_decision" class="text-xs text-accent" title="Still tied after every tiebreak; league staff decide the order">*</span>
               </RouterLink>
             </td>
             <td class="tnum px-3 py-3 text-right font-medium">{{ r.wins }}–{{ r.losses }}</td>

@@ -8,6 +8,7 @@ import { disputeAutocomplete, disputeCommand, disputeModal } from './dispute.ts'
 import { helpCommand } from './help.ts'
 import { esubButton } from './esub.ts'
 import { inviteButton } from './invite.ts'
+import { subsButton } from './subs.ts'
 
 /**
  * Command, component, modal and autocomplete handlers. Later steps register more here:
@@ -17,7 +18,7 @@ export const registry: Registry = {
   commands: {
     ping: {
       public: true,
-      run: () => ephemeral('HAL bot online.', 'success'),
+      run: () => ephemeral('Blackhat bot online.', 'success'),
     },
     link: {
       public: true,
@@ -25,7 +26,7 @@ export const registry: Registry = {
         const profile = await deps.getProfileByDiscordId(user.id)
         if (!profile) {
           return ephemeral(
-            `You're not on HAL yet. [Log in with Discord](${deps.siteUrl}/login) to create your player profile.`,
+            `You're not on Blackhat yet. [Log in with Discord](${deps.siteUrl}/login) to create your player profile.`,
           )
         }
         return {
@@ -34,7 +35,7 @@ export const registry: Registry = {
           payload: {
             embeds: [
               halEmbed({
-                title: profile.activisionId ?? profile.discordUsername ?? 'Your HAL profile',
+                title: profile.activisionId ?? profile.discordUsername ?? 'Your Blackhat profile',
                 url: `${deps.siteUrl}/players/${profile.id}`,
                 description: `[Public profile](${deps.siteUrl}/players/${profile.id}) · [Edit my profile](${deps.siteUrl}/profile)`,
               }),
@@ -55,6 +56,7 @@ export const registry: Registry = {
     reschedule: rescheduleButton,
     esub: esubButton,
     invite: inviteButton,
+    subs: subsButton,
   },
   modals: {
     lfg: lfgModalHandler,

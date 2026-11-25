@@ -25,9 +25,9 @@ const subs = useMatchEmergencySubs(() => props.match, () => props.captainOf)
 const { requests, roster, busy } = subs
 const open = computed(() => Boolean(props.captainOf) && ['scheduled', 'checkin_open', 'live'].includes(props.match.status))
 
-const STATE: Record<EsubState, { label: string; variant: 'neutral' | 'gold' | 'win' | 'loss' }> = {
+const STATE: Record<EsubState, { label: string; variant: 'neutral' | 'accent' | 'win' | 'loss' }> = {
   waiting: { label: 'Waiting for the player', variant: 'neutral' },
-  accepted: { label: 'Accepted, waiting for an admin', variant: 'gold' },
+  accepted: { label: 'Accepted, waiting for an admin', variant: 'accent' },
   approved: { label: 'Approved', variant: 'win' },
   declined: { label: 'Player declined', variant: 'loss' },
   denied: { label: 'Admin denied', variant: 'loss' },
@@ -123,7 +123,7 @@ async function backIn(userId: string, name: string) {
         <fieldset v-if="markable.length" class="flex flex-col gap-1.5">
           <legend class="mb-1 text-sm font-medium">Who can't play?</legend>
           <label v-for="p in markable" :key="p.userId" class="flex items-center gap-2 text-sm">
-            <input v-model="markOut" type="checkbox" :value="p.userId" class="size-4 accent-[var(--color-gold)]" />
+            <input v-model="markOut" type="checkbox" :value="p.userId" class="size-4 accent-[var(--color-accent)]" />
             {{ p.name }}
           </label>
           <UiInput v-if="markOut.length" v-model="reason" label="Why (shown to admins)" placeholder="e.g. Sick, working late" />
@@ -143,9 +143,9 @@ async function backIn(userId: string, name: string) {
               v-for="c in results"
               :key="c.id"
               class="flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm"
-              :class="picked?.id === c.id ? 'border-gold bg-gold-soft' : 'border-line hover:border-line-strong'"
+              :class="picked?.id === c.id ? 'border-accent bg-accent-soft' : 'border-line hover:border-line-strong'"
             >
-              <input v-model="picked" type="radio" name="esub-player" :value="c" class="accent-[var(--color-gold)]" />
+              <input v-model="picked" type="radio" name="esub-player" :value="c" class="accent-[var(--color-accent)]" />
               <span class="min-w-0 flex-1 truncate font-medium">{{ c.activisionId ?? 'Free agent' }}</span>
               <span class="text-xs text-muted">{{ [c.role, c.platform].filter(Boolean).join(' · ') }}</span>
             </label>

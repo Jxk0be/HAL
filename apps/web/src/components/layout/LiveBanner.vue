@@ -25,7 +25,7 @@ onUnmounted(() => clearInterval(timer))
 <template>
   <div
     v-if="current"
-    class="border-y border-gold-dim bg-surface print:hidden"
+    class="border-y border-accent-dim bg-surface print:hidden"
     role="region"
     aria-label="Live broadcasts"
     @mouseenter="hovering = true"
@@ -39,7 +39,7 @@ onUnmounted(() => clearInterval(timer))
         LIVE
       </span>
       <p class="min-w-0 flex-1 truncate">
-        <RouterLink :to="`/matches/${current.matchId}`" class="font-heading tracking-wide hover:text-gold">
+        <RouterLink :to="`/matches/${current.matchId}`" class="font-heading tracking-wide hover:text-accent">
           {{ current.homeTag }} <span class="text-faint">vs</span> {{ current.awayTag }}
         </RouterLink>
         <span class="hidden text-muted sm:inline"> · cast by {{ current.caster }}</span>
@@ -48,7 +48,7 @@ onUnmounted(() => clearInterval(timer))
       <button
         v-if="live.length > 1"
         type="button"
-        class="shrink-0 rounded-sm px-1.5 text-xs text-muted hover:text-text focus-visible:outline-2 focus-visible:outline-gold"
+        class="shrink-0 rounded-sm px-1.5 text-xs text-muted hover:text-text focus-visible:outline-2 focus-visible:outline-accent"
         :aria-label="paused ? 'Resume rotating live matches' : 'Pause rotating live matches'"
         @click="paused = !paused"
       >
@@ -58,7 +58,7 @@ onUnmounted(() => clearInterval(timer))
         :href="current.url"
         target="_blank"
         rel="noopener noreferrer"
-        class="shrink-0 rounded-sm bg-gold px-2.5 py-0.5 font-heading text-xs tracking-wider text-on-gold hover:bg-gold-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+        class="shrink-0 rounded-sm bg-brand px-2.5 py-0.5 font-heading text-xs tracking-wider text-on-brand hover:bg-brand-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         Watch<span class="sr-only"> {{ current.homeName }} vs {{ current.awayName }} (opens in a new tab)</span>
       </a>

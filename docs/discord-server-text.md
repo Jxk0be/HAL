@@ -1,48 +1,182 @@
-# Discord server text
+# Discord server: setup guide and channel text
 
-Copy-paste text for the channels the bot doesn't write. Each block below is one Discord message
-(under Discord's 2000-character limit). Replace `https://YOUR-SITE` with the live site URL.
+How to build the Blackhat Invitational League server from scratch and connect it to the bot and the
+site, in order. Part 1 is the walkthrough; parts 2–4 are copy-paste text and reference.
+Each text block is one Discord message (under the 2000-character limit). Replace `https://YOUR-SITE`
+with the live site URL and `#channel` placeholders with real channel mentions.
 
-The bot writes the rest itself: Admin → Discord → **Post channel guides** pins a "how this channel
-works" message in #lfg, #results, #disputes, the staff channel and every team channel, and `/help`
-answers privately in any channel.
-
-The website rulebook is the official version. The #rules summary below quotes it by section number;
+The website rulebook is the official version. The #rules summary quotes it by section number;
 when the rulebook changes, update the summary in the same edit.
+
+What stays the same from the old server: the bot application, its token, its Interactions Endpoint
+URL and the Supabase project. What changes: the server ID, the channel IDs and the invite link.
 
 ---
 
-## #start-here
+## 1. Setup, in order
 
-### Message 1
+### Step 1: Rename the bot (Discord Developer Portal)
+1. https://discord.com/developers/applications → your bot's application.
+2. **General Information:** name `Blackhat Bot`, app icon = `apps/web/src/assets/brand/emblem.png`.
+   Check **Interactions Endpoint URL** still reads
+   `https://lluwzpwiybvgnsimpwey.supabase.co/functions/v1/discord-interactions` (it belongs to the
+   app, not the server, so it should still be there).
+3. **Bot:** same username and avatar. Leave the token alone: it didn't change.
+
+Do this before inviting the bot: its role in the server is named after it when it joins.
+
+### Step 2: Create the server
+1. Discord → **+** → Create My Own → For a club or community. Name it `Blackhat Invitational League`,
+   icon = `emblem.png`.
+2. Server Settings → **Enable Community** and follow the prompts. Community is needed for Onboarding,
+   rules screening, announcement channels and Stage channels.
+3. User Settings → Advanced → turn on **Developer Mode** (gives you "Copy ID" on right-click).
+4. Right-click the server icon → **Copy Server ID**.
+
+### Step 3: Point the bot at the new server
+1. Supabase dashboard → Edge Functions → **Secrets** → edit `DISCORD_GUILD_ID` → paste the new server ID.
+   If the site URL changed (Netlify rename), update `SITE_URL` here too.
+2. On your computer, set `DISCORD_GUILD_ID` to the same ID in the repo-root `.env`.
+
+### Step 4: Invite the bot
+Open this link and pick the new server. It asks for exactly the permissions the bot uses:
+
+https://discord.com/oauth2/authorize?client_id=1573484470487744522&permissions=361082646032&scope=bot%20applications.commands
+
+(View Channels, Manage Roles, Manage Channels, Send Messages, Send Messages in Threads, Create Private
+Threads, Manage Threads, Manage Messages (to pin its guides), Embed Links, Attach Files, Read Message
+History, Mention @everyone (only for announcements you opt into), Connect, Speak, Video, Use Voice
+Activity. The voice permissions let it give each team access to its private voice channel.)
+
+### Step 5: Register the slash commands
+From the repo root: `pnpm commands:register`. It should list `/ping, /link, /help, /lfg, /reschedule,
+/report, /dispute`. Type `/ping` in any channel: "Blackhat bot online." means the bot is hooked up.
+
+### Step 6: Create the categories and channels
+Make them as listed below (create a category, then its channels inside it). **Don't** create the
+Captain, Player, Free Agent, BIL Admin, BIL Caster or team roles, or the Team Channels category: the
+bot makes those in step 8.
+
+✍️ = you post the text from part 2 · 🤖 = the bot posts and keeps it up to date · 🔒 = read-only for @everyone
+
+| Category | Channel | Who writes | Admin → Discord field |
+|---|---|---|---|
+| **INFO** | #start-here 🔒 | ✍️ | — |
+| | #rules 🔒 | ✍️ | — |
+| | #announcements 🔒 | staff + 🤖 season posts, "Now live" | #announcements |
+| **LEAGUE** | #team-rosters 🔒 | 🤖 one post per approved team | #team-rosters |
+| | #standings 🔒 | 🤖 one table per division | #standings |
+| | #match-schedule 🔒 | 🤖 one post per week | #match-schedule |
+| | #results 🔒 | 🤖 confirmed results | #results |
+| | #player-of-the-week 🔒 | 🤖 Mondays at noon ET | #player-of-the-week |
+| **COMMUNITY** | #general | everyone | — |
+| | #free-agents | 🤖 `/lfg post` cards | #free-agents |
+| | #teams-recruiting | captains | — |
+| | #sub-board 🔒 | 🤖 teams short for a match, with an **I'm available** button | #sub-board |
+| | #clips | everyone | — |
+| | #suggestions | everyone | — |
+| **SUPPORT** | #disputes 🔒 | 🤖 private threads from `/dispute` | #disputes |
+| **STAFF** (private) | #admin-only | 🤖 alerts that ping BIL Admin | #admin-only |
+| | #audit-log | staff notes (the full log is public on the site) | — |
+| **VOICE** | 🔊 Lobby | everyone | — |
+| | 🔊 Waiting Room | players waiting on staff (check-in or dispute help) | — |
+| | 🔊 Casting Stage (Stage channel) | casters speak, everyone listens | — |
+| | 🔊 Admin (private) | staff | — |
+| **TEAM CHANNELS** | created by the bot | 🤖 a private text + voice channel per approved team | — |
+
+### Step 7: Connect the channels on the website
+1. Log in on the site → **Admin → Discord** → **Channels** card.
+2. For each field, right-click the matching channel in Discord → **Copy Channel ID** → paste.
+   Ten fields: #announcements, #results, #free-agents, #disputes, #admin-only, #team-rosters,
+   #standings, #match-schedule, #sub-board, #player-of-the-week. Press **Save channels**.
+
+### Step 8: Let the bot build its roles
+On the same page press **Resync Discord**. The bot creates the roles **BIL Admin, BIL Caster,
+Captain, Player, Free Agent** and the **Team Channels** category, and gives you BIL Admin (you're the
+league owner). It's safe to run again any time something looks out of sync.
+
+### Step 9: Order the roles
+Server Settings → Roles, drag them into this order (top = most powerful). The bot can only manage
+roles **below** its own, so its role must sit above everything it hands out:
+
+1. **Blackhat Bot** (the bot's own role, created when it joined)
+2. **BIL Admin**: tick *Display role members separately*
+3. **BIL Caster**
+4. **Captain**: tick *Display role members separately*
+5. *team roles* (one per approved team; the bot places them here automatically)
+6. **Player**
+7. **Free Agent**
+8. @everyone
+
+Role permissions (Server Settings → Roles → the role → Permissions). The bot uses roles for access
+and labels, so they need very little:
+- **BIL Admin:** Manage Messages, Manage Threads, Timeout Members, Kick Members, Mute Members, Move
+  Members, Manage Nicknames, View Audit Log. Not Administrator: admins don't need to edit roles or
+  channels, the bot does that.
+- **BIL Caster, Captain, Player, Free Agent, team roles:** nothing beyond @everyone.
+- **@everyone:** keep Discord's defaults (View Channels, Send Messages, Use Application Commands,
+  Connect, Speak...). Turn **off** Mention @everyone.
+
+### Step 10: Channel permissions
+Edit Channel → Permissions → add the role → set the box:
+- **🔒 read-only channels** (#start-here, #rules, #announcements, everything in LEAGUE, #sub-board,
+  #disputes): @everyone → **Send Messages ✗**, **Create Public Threads ✗**. The bot still posts (its
+  own role allows it) and the #sub-board buttons still work. In #disputes keep **Send Messages in
+  Threads ✓** so captains can talk in their private dispute threads.
+- **#free-agents:** @everyone → **Send Messages ✗**, **Use Application Commands ✓**. Only `/lfg` cards appear.
+- **#teams-recruiting:** optional slow mode of 6 hours, so each captain's post stays visible.
+- **STAFF category and 🔊 Admin:** @everyone → **View Channel ✗**; BIL Admin → **View Channel ✓**.
+  Sync the channels inside to the category.
+- **🔊 Casting Stage:** a Stage channel; add BIL Caster (and BIL Admin) as **Stage Moderators**.
+- **Team Channels category:** leave it alone. The bot sets each team channel so only that team,
+  BIL Admin and the bot can see it.
+
+### Step 11: Post the text and the guides
+1. Paste the messages from part 2 into #start-here, #rules and the "pin this" channels, then pin them.
+   Set the channel topics from part 3.
+2. Admin → Discord → **Post channel guides**. The bot pins a "how this channel works" message (with the
+   commands that work there) in #free-agents, #results, #disputes, #admin-only and every team channel.
+3. The live boards (#team-rosters, #standings, #match-schedule, #sub-board, #player-of-the-week) fill
+   in by themselves within 5 minutes once there's data: approved teams, a running season, results.
+
+### Step 12: Invite link and website
+1. Server name → **Invite People** → Edit invite link → Expire After **Never**, Max Uses **No limit**.
+2. Netlify → Site configuration → Environment variables → `VITE_DISCORD_INVITE_URL` = that link →
+   redeploy (Deploys → Trigger deploy). Every "Join the Discord" button on the site uses it.
+
+### Step 13: Check it works
+- `/ping` → "Blackhat bot online." · `/help` in a few channels → a private explanation for each.
+- `/link` → your profile link.
+- You have the **BIL Admin** role.
+- Admin → Discord → **Bot and sync errors** is empty. If not, the error names the problem (most often
+  a wrong channel ID, or the bot's role sitting too low in step 9).
+
+## 2. Channel text
+
+### #start-here
 
 ```
-# Welcome to Heaven's Arena League 👼
-HAL is a free-entry, NA-only Call of Duty: MW4 league on the CDL ruleset. Controller only, 18+. Best-of-5 series twice a week, with a $200 prize for the champions.
+# Welcome to the Blackhat Invitational League 🕶️
+A free-entry, NA-only Call of Duty: MW4 league on the CDL ruleset. Controller only, 18+. Best-of-5 series twice a week, with a $400 prize for the champions.
 
 ## Get set up (2 minutes)
 **1.** Log in on the site with Discord: https://YOUR-SITE/login
 **2.** Finish your profile: Activision ID, platform, and the 18+ and controller confirmations.
-**3.** That's it. Your roles here update by themselves: **Free Agent** until you join a team, then your team's role and private channel.
+**3.** Done. Your roles here update by themselves: **Free Agent** until you join a team, then your team's role and private text + voice channels.
 
 ## Find a team
-• Free agents: post in <#LFG_CHANNEL_ID> with `/lfg post`. It also shows on https://YOUR-SITE/free-agents
-• Captains: invite players from the site or press **Invite to team** on a post.
-• Want to start a team? Create one on the site while signups are open.
+• Free agents: `/lfg post` in #free-agents. It also shows on https://YOUR-SITE/free-agents
+• Captains: post what you need in #teams-recruiting, invite from the site, or press **Invite to team** on a #free-agents card.
+• Starting a team? Create it on the site while signups are open. It's approved once you have 4 players.
 
-## Useful links
-📖 Rules: https://YOUR-SITE/rules
-📅 Schedule: https://YOUR-SITE/matches
-🏆 Standings: https://YOUR-SITE/standings
+## Around the server
+📋 #team-rosters · 🏆 #standings · 📅 #match-schedule · ✅ #results · ⭐ #player-of-the-week
+🆘 #sub-board: teams short for a match. Not on a team? Press **I'm available**.
 
 Stuck? Type `/help` in any channel.
 ```
 
----
-
-## #rules
-
-### Message 1: server rules
+### #rules: message 1 (server rules)
 
 ```
 # Server rules
@@ -50,13 +184,13 @@ Stuck? Type `/help` in any channel.
 **2. No cheating talk.** No selling, promoting or asking about cheats, Cronus/XIM/strike packs, boosting or account sharing.
 **3. Keep channels on topic.** Results and league business go through the bot and the site, not DMs.
 **4. No spam or self-promo** outside the channels made for it.
-**5. Use your real Activision ID** and keep your Discord linked to one HAL account.
+**5. Use your real Activision ID** and keep your Discord linked to one Blackhat account.
 **6. Staff decisions are final.** Disagree with a ruling? Use `/dispute` (captains) instead of arguing in public channels.
 
 Breaking these can mean a warning, a mute, or removal from the server and the league (rulebook 11.3, 12.1).
 ```
 
-### Message 2: league rules everyone needs to know
+### #rules: message 2 (league rules, short version)
 
 ```
 # League rules: the short version
@@ -65,13 +199,13 @@ Every staff action is public on the audit log: https://YOUR-SITE/audit-log
 
 **Eligibility**
 • 18+, North America only, controller only on every platform. PC players may be asked to screen-share (2.1–2.4).
-• One HAL account per Activision ID. Cheating devices = player banned permanently, team banned for the season (2.6, 11.1).
+• One account per Activision ID. Cheating devices = player banned permanently, team banned for the season (2.6, 11.1).
 
 **Rosters**
-• Up to 4 starters + 3 subs. One team per player per season (3.1–3.2).
+• Up to 4 starters + 3 subs. One team per player per season. Teams need 4 players to be approved (3.1–3.5).
 • 3 roster changes per season once the regular season starts. Rosters lock about 2 weeks before playoffs (3.9–3.10).
-• Leave or get dropped: 7 days before you can join another team in the same division (3.11).
 • A player must be on the roster 24 hours before a match to play in it (4.2).
+• Short-handed? Mark who's out on the match page and request up to 2 emergency subs who aren't on a team (4.3).
 
 **Matches**
 • Default nights: Tuesday and Thursday, 9:00 PM Eastern. Every match is a best-of-5 (5.3, 6.1).
@@ -80,26 +214,90 @@ Every staff action is public on the audit log: https://YOUR-SITE/audit-log
 
 **After the match**
 • Both captains report with screenshots, on the site or with `/report`. Confirmed when both agree (9.1–9.2).
-• No report from one side after 24h? The other report stands (9.4).
 • Disputes: captains only, within 24 hours, with evidence. `/dispute` opens a private thread with the admins (10.1–10.3).
 • 2 forfeits in a season = removed from the league (12.2).
 ```
 
+### #teams-recruiting (pin this)
+
+```
+# Teams recruiting
+Captains: post what you're looking for. One post per team, refresh it instead of spamming.
+
+**Template**
+Team: [TAG] Name
+Looking for: AR / SMG / Flex · starter or sub
+Platform / region: PS5 · East
+Times: Tue & Thu 9 PM ET + scrims Sun
+DM the captain or reply here.
+
+Players: you can also `/lfg post` in #free-agents so captains find you, and invites come to your DMs with Accept / Decline.
+```
+
+### #sub-board (pin this)
+
+```
+# Sub board
+When a team marks players out of a match and drops below 4, the bot posts here.
+
+**Free agents:** not on a team this season? Press **I'm available** on a post. The captain is told, picks a sub on the match page, you accept in your DMs, and an admin approves (rule 4.3).
+**Can't make it after all?** Press **Withdraw**.
+
+Posts disappear once the team is covered or the match starts.
+```
+
+### #clips (pin this)
+
+```
+# Clips
+Post your best plays from league matches and scrims: Medal, YouTube, Twitch or Streamable links, or upload directly.
+Tag your team and the match if you can. Staff pick favourites for #announcements and socials.
+Keep it to clips. Banter goes in #general.
+```
+
+### #suggestions (pin this)
+
+```
+# Suggestions
+Ideas for the league, the site or the server go here, one idea per message.
+React 👍 / 👎 so staff can see what people want. Staff reply in a thread when something is planned or turned down.
+Bug on the site? Include the page, what you pressed, and a screenshot.
+```
+
+### #player-of-the-week (pin this)
+
+```
+# Player of the Week
+Every Monday at noon ET the bot posts last week's top performer: best average score with at least 2 maps played, plus two honourable mentions. Stats come from confirmed match reports only.
+Full season stats: https://YOUR-SITE/leaderboard
+```
+
 ---
 
-## Channel topics (Edit Channel → Topic)
+## 3. Channel topics (Edit Channel → Topic)
 
 | Channel | Topic |
 |---|---|
 | #start-here | New here? Log in on the site with Discord and your roles set themselves up. |
 | #rules | Short version here, official rulebook on the site. |
 | #announcements | League news from staff and the bot. |
-| #lfg-free-agents | Free agents: /lfg post · Captains: press Invite to team on a post · /help |
+| #team-rosters | Every approved team, kept up to date by the bot. |
+| #standings | Live division tables. Updated after every confirmed result. |
+| #match-schedule | This week's matches in your time zone, with results as they land. |
 | #results | Confirmed results, posted by the bot. Wrong? Captains /dispute in your team channel. |
+| #player-of-the-week | Monday noon ET: last week's top performer. |
+| #free-agents | Free agents: /lfg post · Captains: press Invite to team on a card · /help |
+| #teams-recruiting | Captains: who you need, one post per team. |
+| #sub-board | Teams short for a match. Not on a team? Press I'm available. |
+| #clips | Your best plays. Links or uploads. |
+| #suggestions | One idea per message. 👍 / 👎 to vote. |
 | #disputes | Private dispute threads. Open one with /dispute from your team channel. |
 
-## Discord settings worth turning on
+## 4. Discord settings worth turning on
 
-- **Server Settings → Safety Setup / Onboarding → Rules Screening:** paste the six server rules so new members accept them before they can talk.
-- **#rules, #start-here, #announcements, #results:** deny Send Messages for @everyone (the bot and staff can still post).
-- **Bot role:** give it **Pin Messages** (or Manage Messages) in Server Settings → Roles, so it can pin its guides in every channel, team channels included. Without it the guides are still posted, just not pinned.
+- **Server Settings → Safety Setup / Onboarding → Rules Screening:** paste the six server rules so new
+  members accept them before they can talk.
+- **Onboarding → Default channels:** #start-here, #rules, #announcements, #general, #free-agents, #match-schedule, #standings.
+- **Server Settings → Overview:** banner can use `apps/web/public/og.png`.
+- **Invite link:** Server name → Invite People → Edit invite link → Expire After: **Never**, then put
+  it in Netlify as `VITE_DISCORD_INVITE_URL`.

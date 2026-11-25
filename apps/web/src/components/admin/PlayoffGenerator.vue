@@ -131,9 +131,9 @@ async function create() {
         </p>
         <ol class="mt-3 flex flex-col divide-y divide-line rounded-lg border border-line bg-surface">
           <li v-for="(id, i) in seeds" :key="id" class="flex items-center gap-3 px-4 py-2 text-sm">
-            <span class="tnum w-6 font-mono text-gold">{{ i + 1 }}</span>
+            <span class="tnum w-6 font-mono text-accent">{{ i + 1 }}</span>
             <span class="flex-1">{{ name(id) }}</span>
-            <UiBadge v-if="needsDecision.includes(id)" variant="gold">Tied: admin decides</UiBadge>
+            <UiBadge v-if="needsDecision.includes(id)" variant="accent">Tied: admin decides</UiBadge>
             <span v-if="canEdit" class="flex gap-1">
               <UiButton size="sm" variant="ghost" :disabled="i === 0" @click="move(i, -1)">↑<span class="sr-only"> Move {{ name(id) }} up</span></UiButton>
               <UiButton size="sm" variant="ghost" :disabled="i === seeds.length - 1" @click="move(i, 1)">↓<span class="sr-only"> Move {{ name(id) }} down</span></UiButton>

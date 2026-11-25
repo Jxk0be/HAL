@@ -22,13 +22,13 @@ const expires = (iso: string) => new Date(iso).toLocaleDateString(undefined, { m
 
 <template>
   <UiCard v-if="!loading && invites.length > 0" eyebrow="Recruiting" title="Team invites">
-    <p v-if="!auth.isOnboarded" class="mb-4 text-sm text-gold">Finish your profile below before accepting an invite.</p>
+    <p v-if="!auth.isOnboarded" class="mb-4 text-sm text-accent">Finish your profile below before accepting an invite.</p>
     <ul class="flex flex-col gap-3">
       <li v-for="i in invites" :key="i.id" class="flex flex-wrap items-center gap-3 rounded-md border border-line bg-surface-2/50 p-3">
         <TeamLogo :tag="i.team.tag" :name="i.team.name" :logo-url="i.team.logoUrl" size="md" decorative />
         <div class="min-w-0 flex-1">
           <p class="truncate font-medium">
-            <RouterLink :to="`/teams/${i.team.id}`" class="hover:text-gold">{{ i.team.name }}</RouterLink>
+            <RouterLink :to="`/teams/${i.team.id}`" class="hover:text-accent">{{ i.team.name }}</RouterLink>
           </p>
           <p class="text-xs text-muted">
             From {{ i.captainName ?? 'the captain' }} · expires {{ expires(i.expiresAt) }}

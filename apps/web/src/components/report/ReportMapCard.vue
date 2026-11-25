@@ -83,7 +83,7 @@ const players = computed({
     <header class="flex flex-wrap items-center justify-between gap-2">
       <h2 :id="`map-${number}-title`" class="font-heading text-xl">
         Map {{ number }}
-        <span v-if="winner" class="ml-2 text-sm text-gold">{{ winner }} win</span>
+        <span v-if="winner" class="ml-2 text-sm text-accent">{{ winner }} win</span>
       </h2>
       <UiButton v-if="removable" variant="danger" size="sm" @click="emit('remove')">Remove map {{ number }}</UiButton>
     </header>
@@ -93,7 +93,7 @@ const players = computed({
         <span class="font-medium">Mode</span>
         <select
           :value="model.modeId"
-          class="h-10 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:border-gold focus-visible:outline-2 focus-visible:outline-gold"
+          class="h-10 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent"
           @change="setMode(($event.target as HTMLSelectElement).value)"
         >
           <option value="">Choose mode…</option>
@@ -105,7 +105,7 @@ const players = computed({
         <select
           :value="model.mapId"
           :disabled="!model.modeId"
-          class="h-10 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:border-gold focus-visible:outline-2 focus-visible:outline-gold disabled:opacity-50"
+          class="h-10 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent disabled:opacity-50"
           @change="model = { ...model, mapId: ($event.target as HTMLSelectElement).value }"
         >
           <option value="">{{ model.modeId ? 'Choose map…' : 'Choose a mode first' }}</option>
@@ -118,7 +118,7 @@ const players = computed({
           :value="model.homeScore ?? ''"
           inputmode="numeric"
           autocomplete="off"
-          class="tnum h-10 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:border-gold focus-visible:outline-2 focus-visible:outline-gold"
+          class="tnum h-10 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent"
           @input="setScore('homeScore', ($event.target as HTMLInputElement).value)"
         />
       </label>
@@ -128,7 +128,7 @@ const players = computed({
           :value="model.awayScore ?? ''"
           inputmode="numeric"
           autocomplete="off"
-          class="tnum h-10 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:border-gold focus-visible:outline-2 focus-visible:outline-gold"
+          class="tnum h-10 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent"
           @input="setScore('awayScore', ($event.target as HTMLInputElement).value)"
         />
       </label>
@@ -139,7 +139,7 @@ const players = computed({
       <p class="text-sm font-medium">Scoreboard screenshots <span class="text-muted">(required, up to {{ MAX_SCREENSHOTS }})</span></p>
       <div
         class="mt-2 flex flex-wrap items-stretch gap-3 rounded-md border border-dashed p-3 transition-colors"
-        :class="dragging ? 'border-gold bg-gold-soft' : 'border-line-strong'"
+        :class="dragging ? 'border-accent bg-accent-soft' : 'border-line-strong'"
         @dragover.prevent="dragging = true"
         @dragleave="dragging = false"
         @drop.prevent="onDrop"
@@ -151,7 +151,7 @@ const players = computed({
           <span v-else class="grid h-20 w-32 place-items-center rounded-sm border border-line text-xs text-muted">Uploaded</span>
           <button
             type="button"
-            class="absolute -top-2 -right-2 grid size-6 place-items-center rounded-full border border-line-strong bg-surface-3 text-xs hover:border-loss hover:text-loss focus-visible:outline-2 focus-visible:outline-gold"
+            class="absolute -top-2 -right-2 grid size-6 place-items-center rounded-full border border-line-strong bg-surface-3 text-xs hover:border-loss hover:text-loss focus-visible:outline-2 focus-visible:outline-accent"
             :aria-label="`Remove map ${number} screenshot`"
             @click="removeShot(path)"
           >

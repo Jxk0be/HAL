@@ -1,5 +1,5 @@
 /**
- * Keeps #lfg-free-agents in step with free_agent_posts. Used by /lfg (discord-interactions) and by
+ * Keeps #free-agents in step with free_agent_posts. Used by /lfg (discord-interactions) and by
  * discord-scheduler when the site changes a post (lfg_changed / lfg_deleted outbox events).
  */
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
@@ -78,7 +78,7 @@ export async function publishLfg(
       // Deleted by hand: post it again below.
     }
   }
-  if (!lfgChannelId) throw new Error('No #lfg-free-agents channel set (Admin → Discord)')
+  if (!lfgChannelId) throw new Error('No #free-agents channel set (Admin → Discord)')
   const msg = await sendMessage(lfgChannelId, payload)
   await db.rpc('lfg_set_message', { p_post_id: post.id, p_channel_id: lfgChannelId, p_message_id: msg.id })
   return { channelId: lfgChannelId, messageId: msg.id }

@@ -19,7 +19,7 @@ const id = useId()
 <template>
   <div class="flex flex-col gap-1.5">
     <label :for="id" class="eyebrow text-muted" :class="hideLabel ? 'sr-only' : ''">
-      {{ label }}<span v-if="required" class="text-gold" aria-hidden="true"> *</span>
+      {{ label }}<span v-if="required" class="text-accent" aria-hidden="true"> *</span>
     </label>
     <div class="relative">
       <select
@@ -29,7 +29,7 @@ const id = useId()
         :disabled="disabled"
         :aria-invalid="error ? true : undefined"
         :aria-describedby="error || hint ? `${id}-desc` : undefined"
-        class="h-10 w-full appearance-none rounded-md border bg-surface-2 pr-9 pl-3 text-sm text-text transition-colors focus:border-gold-dim focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-0 disabled:opacity-50"
+        class="h-10 w-full appearance-none rounded-md border bg-surface-2 pr-9 pl-3 text-sm text-text transition-colors focus:border-accent-dim focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-0 disabled:opacity-50"
         :class="error ? 'border-loss' : 'border-line-strong'"
       >
         <option v-if="placeholder" value="" disabled>{{ placeholder }}</option>

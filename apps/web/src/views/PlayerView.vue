@@ -57,7 +57,7 @@ const statSlots = computed(() => {
         <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:px-6 sm:py-14">
           <UiAvatar :src="player.avatarUrl" :name="player.name" size="lg" decorative />
           <div class="min-w-0 flex-1">
-            <p class="eyebrow text-gold">Player</p>
+            <p class="eyebrow text-accent">Player</p>
             <h1 id="player-name" class="mt-1 truncate font-heading text-4xl sm:text-5xl">{{ player.name }}</h1>
             <p class="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted">
               <PlatformBadge :platform="player.platform" />
@@ -71,7 +71,7 @@ const statSlots = computed(() => {
 
       <div class="mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[20rem_1fr]">
         <UiCard eyebrow="This season" title="Team">
-          <RouterLink v-if="player.team" :to="`/teams/${player.team.id}`" class="flex items-center gap-3 hover:text-gold">
+          <RouterLink v-if="player.team" :to="`/teams/${player.team.id}`" class="flex items-center gap-3 hover:text-accent">
             <TeamLogo :tag="player.team.tag" :name="player.team.name" :logo-url="player.team.logoUrl" decorative />
             <span class="min-w-0">
               <span class="block truncate font-medium">{{ player.team.name }}</span>
@@ -80,13 +80,13 @@ const statSlots = computed(() => {
           </RouterLink>
           <p v-else class="text-sm text-muted">
             {{ player.isFreeAgent ? 'Free agent, looking for a team.' : 'Not on a team.' }}
-            <RouterLink v-if="player.isFreeAgent" to="/free-agents" class="text-gold hover:text-gold-strong">See free agents</RouterLink>
+            <RouterLink v-if="player.isFreeAgent" to="/free-agents" class="text-accent hover:text-accent-strong">See free agents</RouterLink>
           </p>
         </UiCard>
 
         <div class="flex flex-col gap-6">
           <section aria-labelledby="stats-title">
-            <h2 id="stats-title" class="eyebrow mb-3 text-gold">Season stats</h2>
+            <h2 id="stats-title" class="eyebrow mb-3 text-accent">Season stats</h2>
             <dl class="grid grid-cols-2 overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-4" style="gap: 1px">
               <div v-for="s in statSlots" :key="s.label" class="bg-surface p-4">
                 <dt class="eyebrow text-muted">{{ s.label }}</dt>
@@ -110,7 +110,7 @@ const statSlots = computed(() => {
                   :class="h.won ? 'bg-win-soft text-win' : 'bg-loss-soft text-loss'"
                   :aria-label="h.won ? 'Win' : 'Loss'"
                 >{{ h.won ? 'W' : 'L' }}</span>
-                <RouterLink :to="`/matches/${h.matchId}`" class="min-w-0 flex-1 truncate hover:text-gold">vs {{ h.opponent }}</RouterLink>
+                <RouterLink :to="`/matches/${h.matchId}`" class="min-w-0 flex-1 truncate hover:text-accent">vs {{ h.opponent }}</RouterLink>
                 <span class="tnum text-xs text-muted">{{ h.kills }}–{{ h.deaths }} over {{ h.maps }} {{ h.maps === 1 ? 'map' : 'maps' }}</span>
                 <span class="text-xs text-muted"><LeagueTime :iso="h.scheduledAt" /></span>
               </li>

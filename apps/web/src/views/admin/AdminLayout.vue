@@ -25,12 +25,12 @@ const links = computed(() =>
 <template>
   <div class="mx-auto flex max-w-[90rem] flex-col lg:flex-row">
     <nav aria-label="Admin" class="border-b border-line lg:sticky lg:top-16 lg:h-[calc(100dvh-4rem)] lg:w-56 lg:shrink-0 lg:border-r lg:border-b-0">
-      <p class="eyebrow hidden px-5 pt-8 pb-3 text-gold lg:block">Admin</p>
+      <p class="eyebrow hidden px-5 pt-8 pb-3 text-accent lg:block">Admin</p>
       <ul class="flex gap-1 overflow-x-auto px-4 py-2 lg:flex-col lg:overflow-visible lg:px-3 lg:py-0">
         <li v-for="l in links" :key="l.to" class="shrink-0">
           <RouterLink
             :to="l.to"
-            class="block rounded-md px-3 py-2 text-sm whitespace-nowrap text-muted transition-colors hover:bg-surface-2 hover:text-text focus-visible:outline-2 focus-visible:outline-gold"
+            class="block rounded-md px-3 py-2 text-sm whitespace-nowrap text-muted transition-colors hover:bg-surface-2 hover:text-text focus-visible:outline-2 focus-visible:outline-accent"
             :active-class="l.exact ? '' : 'bg-surface-2 text-text'"
             :exact-active-class="'bg-surface-2 text-text'"
           >

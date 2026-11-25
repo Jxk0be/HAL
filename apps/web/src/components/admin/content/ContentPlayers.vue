@@ -84,11 +84,11 @@ async function clearFlag(p: ContentPlayer) {
       <li v-if="!players.length" class="px-4 py-3 text-sm text-muted">{{ query ? 'No players found.' : 'Nobody is banned or flagged.' }}</li>
       <li v-for="p in players" :key="p.id" class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 text-sm">
         <span class="min-w-48 flex-1">
-          <RouterLink :to="`/players/${p.id}`" class="font-medium hover:text-gold">{{ p.name }}</RouterLink>
+          <RouterLink :to="`/players/${p.id}`" class="font-medium hover:text-accent">{{ p.name }}</RouterLink>
           <span class="block text-xs text-muted">{{ p.activisionId ?? 'No Activision ID' }}<template v-if="p.team"> · {{ p.team.tag }}</template></span>
         </span>
         <UiBadge v-if="banned(p)" variant="loss">Banned until <LeagueTime :iso="p.bannedUntil!" /></UiBadge>
-        <UiBadge v-if="p.statsFlag" variant="gold" :title="p.statsFlag.note ?? undefined">Incomplete data</UiBadge>
+        <UiBadge v-if="p.statsFlag" variant="accent" :title="p.statsFlag.note ?? undefined">Incomplete data</UiBadge>
         <RecusedNotice v-if="p.team && isRecused(p.team.id)" />
         <span v-else-if="p.id !== auth.profile?.id" class="flex flex-wrap gap-1.5">
           <UiButton size="sm" variant="ghost" @click="openFlag(p)">{{ p.statsFlag ? 'Edit stats note' : 'Mark stats incomplete' }}</UiButton>
@@ -103,11 +103,11 @@ async function clearFlag(p: ContentPlayer) {
       <form class="flex flex-col gap-4" @submit.prevent="save">
         <label v-if="!form.lift" class="flex flex-col gap-1.5 text-sm">
           <span class="font-medium">Banned through (Eastern)</span>
-          <input v-model="form.until" type="date" class="h-10 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:outline-2 focus-visible:outline-gold" />
+          <input v-model="form.until" type="date" class="h-10 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:outline-2 focus-visible:outline-accent" />
         </label>
         <label class="flex flex-col gap-1.5 text-sm">
           <span class="font-medium">Reason (rule number and what happened)</span>
-          <textarea v-model="form.reason" rows="3" class="rounded-md border border-line-strong bg-surface-2 px-3 py-2 focus-visible:outline-2 focus-visible:outline-gold" />
+          <textarea v-model="form.reason" rows="3" class="rounded-md border border-line-strong bg-surface-2 px-3 py-2 focus-visible:outline-2 focus-visible:outline-accent" />
         </label>
         <p class="text-xs text-muted">A banned player can’t join or play for a team. The reason is recorded as a public penalty.</p>
         <PublicLogNotice />
@@ -121,7 +121,7 @@ async function clearFlag(p: ContentPlayer) {
     <UiModal v-model="flagOpen" :title="flagTarget ? `Mark ${flagTarget.name}'s stats incomplete` : 'Mark stats incomplete'" size="sm">
       <form class="flex flex-col gap-4" @submit.prevent="saveFlag">
         <p class="text-sm text-muted">
-          Shows an <span class="text-gold">Incomplete data</span> mark on their row of this season's leaderboard. Their stats stay
+          Shows an <span class="text-accent">Incomplete data</span> mark on their row of this season's leaderboard. Their stats stay
           listed. Use it when we couldn't get their numbers for a match.
         </p>
         <UiInput v-model="flagNote" label="Note (shown publicly when hovering the mark)" placeholder="e.g. Week 3 vs ELO: scoreboard lost" hint="Optional, up to 200 characters." />

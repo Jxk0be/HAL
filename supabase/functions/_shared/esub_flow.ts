@@ -3,7 +3,7 @@
  * bot_events (keyed on the match and the requesting team) makes each post happen once:
  *   esub:<id>       the DM to the player (its message id is kept so answers can edit it)
  *   esub_new:<id>   the #admin-only heads-up when the captain asks
- *   esub_admin:<id> the #admin-only post once the player accepted (pings HAL Admin)
+ *   esub_admin:<id> the #admin-only post once the player accepted (pings BIL Admin)
  *   esub_done:<id>  the outcome in the team's channel (declined / approved / denied)
  *   esub_dm2:<id>   the decision DM to the player
  */
@@ -134,7 +134,7 @@ export async function handleEsubEvent(
     await closeInviteDm(db, r, siteUrl)
     const admin = (await loadChannels(db)).admin
     if (!admin) return
-    // Ready to approve: always ping HAL Admin.
+    // Ready to approve: always ping BIL Admin.
     const role = await loadAdminRoleId(db)
     await postOnce(db, r, 'esub_admin', async () => {
       const msg = await sendMessage(admin, esubAdminMessage(r, siteUrl, 'accepted', role))

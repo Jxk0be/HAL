@@ -96,14 +96,14 @@ const images = computed(() =>
           Opened by {{ tag(dispute.teamId) }} <LeagueTime :iso="dispute.createdAt" />
         </p>
         <p class="whitespace-pre-line">{{ dispute.reason }}</p>
-        <p v-if="dispute.resolution" class="rounded-md border border-line bg-surface-2 px-3 py-2"><strong class="text-gold">Decision:</strong> {{ dispute.resolution }}</p>
+        <p v-if="dispute.resolution" class="rounded-md border border-line bg-surface-2 px-3 py-2"><strong class="text-accent">Decision:</strong> {{ dispute.resolution }}</p>
 
         <div v-if="dispute.evidence.length" class="flex flex-col gap-2">
           <p class="eyebrow text-muted">Evidence <span class="normal-case tracking-normal">(teams and staff only)</span></p>
           <ScreenshotViewer v-if="images.length" :images="images" label="Dispute evidence" />
           <ul class="flex flex-col gap-1">
             <li v-for="e in dispute.evidence.filter((x) => x.url)" :key="e.id">
-              <a :href="e.url!" target="_blank" rel="noopener noreferrer" class="text-gold hover:text-gold-strong">{{ e.note || e.url }}</a>
+              <a :href="e.url!" target="_blank" rel="noopener noreferrer" class="text-accent hover:text-accent-strong">{{ e.note || e.url }}</a>
             </li>
           </ul>
         </div>
@@ -114,7 +114,7 @@ const images = computed(() =>
             <li v-for="c in dispute.comments" :key="c.id" class="rounded-md border border-line bg-surface-2 px-3 py-2">
               <p class="flex flex-wrap items-center gap-2 text-xs text-muted">
                 <span class="font-medium text-text">{{ c.author }}</span>
-                <UiBadge v-if="c.staff" variant="gold">Staff</UiBadge>
+                <UiBadge v-if="c.staff" variant="accent">Staff</UiBadge>
                 <LeagueTime :iso="c.createdAt" />
               </p>
               <p class="mt-1 whitespace-pre-line">{{ c.body }}</p>
@@ -123,7 +123,7 @@ const images = computed(() =>
           <form v-if="canComment" class="flex flex-col gap-2" @submit.prevent="send">
             <label class="flex flex-col gap-1.5">
               <span class="sr-only">Add a comment</span>
-              <textarea v-model="comment" rows="2" maxlength="2000" placeholder="Add details, timestamps or a reply…" class="rounded-md border border-line-strong bg-surface-2 px-3 py-2 focus-visible:border-gold focus-visible:outline-2 focus-visible:outline-gold" />
+              <textarea v-model="comment" rows="2" maxlength="2000" placeholder="Add details, timestamps or a reply…" class="rounded-md border border-line-strong bg-surface-2 px-3 py-2 focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent" />
             </label>
             <UiButton type="submit" size="sm" class="self-start" :loading="busy" :disabled="!comment.trim()">Post comment</UiButton>
           </form>
@@ -140,13 +140,13 @@ const images = computed(() =>
       <form class="flex flex-col gap-4 text-sm" @submit.prevent="submit">
         <label class="flex flex-col gap-1.5">
           <span class="font-medium">What is it about?</span>
-          <select v-model="form.category" class="h-10 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:outline-2 focus-visible:outline-gold">
+          <select v-model="form.category" class="h-10 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:outline-2 focus-visible:outline-accent">
             <option v-for="c in DISPUTE_CATEGORIES" :key="c.value" :value="c.value">{{ c.label }}</option>
           </select>
         </label>
         <label class="flex flex-col gap-1.5">
           <span class="font-medium">What happened? <span class="font-normal text-muted">(shown publicly)</span></span>
-          <textarea v-model="form.description" rows="4" maxlength="4000" class="rounded-md border border-line-strong bg-surface-2 px-3 py-2 focus-visible:outline-2 focus-visible:outline-gold" />
+          <textarea v-model="form.description" rows="4" maxlength="4000" class="rounded-md border border-line-strong bg-surface-2 px-3 py-2 focus-visible:outline-2 focus-visible:outline-accent" />
         </label>
         <div class="flex flex-col gap-1.5">
           <span class="font-medium">Screenshots <span class="font-normal text-muted">(optional, up to 6)</span></span>
@@ -161,8 +161,8 @@ const images = computed(() =>
         <div class="flex flex-col gap-2">
           <span class="font-medium">Video or clip links <span class="font-normal text-muted">(optional, https://)</span></span>
           <div v-for="(l, i) in form.links" :key="i" class="grid gap-2 sm:grid-cols-[2fr_1fr]">
-            <input v-model="l.url" type="url" placeholder="https://youtu.be/…" :aria-label="`Link ${i + 1}`" class="h-9 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:outline-2 focus-visible:outline-gold" />
-            <input v-model="l.note" placeholder="What it shows" :aria-label="`Link ${i + 1} note`" class="h-9 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:outline-2 focus-visible:outline-gold" />
+            <input v-model="l.url" type="url" placeholder="https://youtu.be/…" :aria-label="`Link ${i + 1}`" class="h-9 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:outline-2 focus-visible:outline-accent" />
+            <input v-model="l.note" placeholder="What it shows" :aria-label="`Link ${i + 1} note`" class="h-9 rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:outline-2 focus-visible:outline-accent" />
           </div>
           <UiButton v-if="form.links.length < 4" size="sm" variant="ghost" class="self-start" @click="form.links.push({ url: '', note: '' })">Add another link</UiButton>
         </div>

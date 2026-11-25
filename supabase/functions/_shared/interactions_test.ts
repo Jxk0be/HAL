@@ -121,7 +121,7 @@ Deno.test('parseCustomId', () => {
 Deno.test('/ping and /link', async () => {
   const unlinked = makeDeps(false).deps
   const ping = await route(base(InteractionType.APPLICATION_COMMAND, { name: 'ping' }), halRegistry, unlinked)
-  assert(JSON.stringify(ping.response.data).includes('HAL bot online'))
+  assert(JSON.stringify(ping.response.data).includes('Blackhat bot online'))
   const notLinked = await route(base(InteractionType.APPLICATION_COMMAND, { name: 'link' }), halRegistry, unlinked)
   assert(JSON.stringify(notLinked.response.data).includes('https://hal.example/login'))
   const linked = await route(base(InteractionType.APPLICATION_COMMAND, { name: 'link' }), halRegistry, makeDeps(true).deps)

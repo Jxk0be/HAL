@@ -23,7 +23,7 @@ withDefaults(
       :class="padded ? '' : 'px-5 pt-5 sm:px-6 sm:pt-6'"
     >
       <div>
-        <p v-if="eyebrow" class="eyebrow text-gold">{{ eyebrow }}</p>
+        <p v-if="eyebrow" class="eyebrow text-accent">{{ eyebrow }}</p>
         <h2 v-if="title" class="font-heading text-xl text-text">{{ title }}</h2>
       </div>
       <div v-if="$slots.actions" class="shrink-0">

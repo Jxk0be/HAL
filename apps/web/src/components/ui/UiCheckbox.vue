@@ -24,12 +24,12 @@ const id = useId()
         :required="required"
         :aria-invalid="error ? true : undefined"
         :aria-describedby="description || error ? `${id}-desc` : undefined"
-        class="peer size-5 cursor-pointer appearance-none rounded-sm border bg-surface-2 transition-colors checked:border-gold checked:bg-gold disabled:cursor-not-allowed disabled:opacity-60"
+        class="peer size-5 cursor-pointer appearance-none rounded-sm border bg-surface-2 transition-colors checked:border-brand checked:bg-brand disabled:cursor-not-allowed disabled:opacity-60"
         :class="error ? 'border-loss' : 'border-line-strong'"
       />
       <svg
         viewBox="0 0 16 16"
-        class="pointer-events-none absolute inset-0 m-auto hidden size-3.5 text-on-gold peer-checked:block"
+        class="pointer-events-none absolute inset-0 m-auto hidden size-3.5 text-on-brand peer-checked:block"
         fill="none"
         aria-hidden="true"
       >
@@ -38,7 +38,7 @@ const id = useId()
     </span>
     <div class="text-sm">
       <label :for="id" class="text-text" :class="disabled ? 'cursor-not-allowed' : 'cursor-pointer'">
-        {{ label }}<span v-if="required" class="text-gold" aria-hidden="true"> *</span>
+        {{ label }}<span v-if="required" class="text-accent" aria-hidden="true"> *</span>
       </label>
       <p
         v-if="description || error"

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-type Variant = 'neutral' | 'gold' | 'win' | 'loss' | 'outline' | 'live'
+type Variant = 'neutral' | 'accent' | 'win' | 'loss' | 'outline' | 'live'
 
 withDefaults(defineProps<{ variant?: Variant }>(), { variant: 'neutral' })
 
 const variants: Record<Variant, string> = {
   neutral: 'bg-surface-3 text-muted border-line-strong',
-  gold: 'bg-gold-soft text-gold border-gold-dim',
+  accent: 'bg-accent-soft text-accent border-accent-dim',
   win: 'bg-win-soft text-win border-win/40',
   loss: 'bg-loss-soft text-loss border-loss/40',
   outline: 'bg-transparent text-text border-line-strong',

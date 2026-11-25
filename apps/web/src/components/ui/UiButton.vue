@@ -22,8 +22,8 @@ const props = withDefaults(
 )
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-gold text-on-gold hover:bg-gold-strong border border-gold hover:border-gold-strong',
-  secondary: 'bg-surface-2 text-text border border-line-strong hover:border-gold-dim hover:bg-surface-3',
+  primary: 'bg-brand text-on-brand hover:bg-brand-strong border border-brand hover:border-brand-strong',
+  secondary: 'bg-surface-2 text-text border border-line-strong hover:border-accent-dim hover:bg-surface-3',
   ghost: 'bg-transparent text-text border border-transparent hover:bg-surface-2',
   danger: 'bg-transparent text-loss border border-loss/50 hover:bg-loss-soft hover:border-loss',
 }

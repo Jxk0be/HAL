@@ -6,11 +6,15 @@ import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiModal from '@/components/ui/UiModal.vue'
 import UiInput from '@/components/ui/UiInput.vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
+import RecusedNotice from '@/components/admin/RecusedNotice.vue'
 import type { AdminTeam } from '@/composables/useSeasonAdmin'
+import { useRecusal } from '@/composables/useAdmin'
 
 defineProps<{ pending: AdminTeam[]; busy: boolean }>()
 const emit = defineEmits<{ review: [teamId: string, approve: boolean, note: string | null] }>()
 
+/** Admins never review their own team (rule 14.3); the database refuses it too. */
+const { isRecused } = useRecusal()
 const denying = ref<AdminTeam | null>(null)
 const open = ref(false)
 const note = ref('')
@@ -37,7 +41,7 @@ const created = (iso: string) => new Date(iso).toLocaleDateString(undefined, { m
       <li v-for="t in pending" :key="t.id" class="flex flex-wrap items-center gap-4 rounded-lg border border-line bg-surface p-4">
         <TeamLogo :tag="t.tag" :name="t.name" decorative />
         <div class="min-w-0 flex-1">
-          <RouterLink :to="`/teams/${t.id}`" class="font-medium hover:text-gold">{{ t.name }}</RouterLink>
+          <RouterLink :to="`/teams/${t.id}`" class="font-medium hover:text-accent">{{ t.name }}</RouterLink>
           <p class="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted">
             <UiBadge variant="outline">{{ t.tag }}</UiBadge>
             Captain {{ t.captainName }} · <span class="tnum">{{ t.rosterSize }}</span> {{ t.rosterSize === 1 ? 'player' : 'players' }} · registered {{ created(t.createdAt) }}
@@ -46,7 +50,8 @@ const created = (iso: string) => new Date(iso).toLocaleDateString(undefined, { m
             </UiBadge>
           </p>
         </div>
-        <div class="flex gap-2">
+        <RecusedNotice v-if="isRecused(t.id)" />
+        <div v-else class="flex gap-2">
           <UiButton size="sm" variant="danger" :disabled="busy" @click="askDeny(t)">Deny<span class="sr-only"> {{ t.name }}</span></UiButton>
           <UiButton
             size="sm"

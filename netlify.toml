@@ -18,7 +18,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    # Only the hosts HAL talks to. Add a host here before using it in the app, or production blocks it.
+    # Only the hosts BIL talks to. Add a host here before using it in the app, or production blocks it.
     #  - Supabase: API, Auth, Storage (logos, signed screenshot URLs), Realtime (wss)
     #  - Discord CDN: player avatars
     #  - Google Fonts: allowed for future use (fonts are self-hosted via Fontsource today)

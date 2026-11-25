@@ -88,19 +88,19 @@ watch(match, (m) => {
           </div>
           <h1 id="match-title" class="sr-only">{{ match.home.name }} vs {{ match.away.name }}</h1>
           <div class="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-            <RouterLink :to="`/teams/${match.home.id}`" class="flex flex-col items-center gap-3 text-center hover:text-gold">
+            <RouterLink :to="`/teams/${match.home.id}`" class="flex flex-col items-center gap-3 text-center hover:text-accent">
               <TeamLogo :tag="match.home.tag" :name="match.home.name" :logo-url="match.home.logoUrl" size="xl" decorative />
               <span class="font-heading text-xl sm:text-2xl">{{ match.home.name }}</span>
             </RouterLink>
             <div class="tnum text-center font-heading text-5xl sm:text-7xl" :aria-label="final ? `Series ${series('home')} to ${series('away')}` : 'Not played yet'">
               <template v-if="final">
-                <span :class="match.winnerTeamId === match.home.id ? 'text-gold' : 'text-muted'">{{ series('home') }}</span>
+                <span :class="match.winnerTeamId === match.home.id ? 'text-accent' : 'text-muted'">{{ series('home') }}</span>
                 <span class="mx-2 text-faint">–</span>
-                <span :class="match.winnerTeamId === match.away.id ? 'text-gold' : 'text-muted'">{{ series('away') }}</span>
+                <span :class="match.winnerTeamId === match.away.id ? 'text-accent' : 'text-muted'">{{ series('away') }}</span>
               </template>
               <span v-else class="text-2xl text-muted sm:text-3xl">vs</span>
             </div>
-            <RouterLink :to="`/teams/${match.away.id}`" class="flex flex-col items-center gap-3 text-center hover:text-gold">
+            <RouterLink :to="`/teams/${match.away.id}`" class="flex flex-col items-center gap-3 text-center hover:text-accent">
               <TeamLogo :tag="match.away.tag" :name="match.away.name" :logo-url="match.away.logoUrl" size="xl" decorative />
               <span class="font-heading text-xl sm:text-2xl">{{ match.away.name }}</span>
             </RouterLink>
@@ -130,7 +130,7 @@ watch(match, (m) => {
         <DisputePanel v-if="auth.isSignedIn" :match="match" :captain-of="captainOf" :staff="neutralStaff" @changed="reload()" />
         <UiCard v-else-if="dispute" eyebrow="Dispute" :title="dispute.status === 'open' ? 'Under review' : 'Resolved'">
           <p class="text-sm text-muted">{{ dispute.reason }}</p>
-          <p v-if="dispute.resolution" class="mt-3 text-sm"><strong class="text-gold">Decision:</strong> {{ dispute.resolution }}</p>
+          <p v-if="dispute.resolution" class="mt-3 text-sm"><strong class="text-accent">Decision:</strong> {{ dispute.resolution }}</p>
         </UiCard>
 
         <RescheduleCard :match="match" :captain-of="captainOf" @changed="reload()" />
@@ -140,7 +140,7 @@ watch(match, (m) => {
         <EmergencySubCard :match="match" :captain-of="captainOf" />
 
         <section aria-labelledby="maps-title">
-          <h2 id="maps-title" class="eyebrow mb-3 text-gold">Maps</h2>
+          <h2 id="maps-title" class="eyebrow mb-3 text-accent">Maps</h2>
           <UiEmptyState
             v-if="maps.length === 0"
             :title="final ? 'No map details' : 'Not played yet'"
@@ -149,12 +149,12 @@ watch(match, (m) => {
           <div v-else class="flex flex-col gap-4">
             <article v-for="m in maps" :key="m.id" class="overflow-hidden rounded-lg border border-line bg-surface" :aria-labelledby="`map-${m.number}`">
               <header class="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3">
-                <span class="tnum font-mono text-sm text-gold">{{ m.number }}</span>
+                <span class="tnum font-mono text-sm text-accent">{{ m.number }}</span>
                 <h3 :id="`map-${m.number}`" class="flex-1 font-heading text-lg">{{ m.mode }} · {{ m.map }}</h3>
                 <span v-if="m.homeScore !== null" class="tnum font-heading text-lg">
-                  <span :class="(m.homeScore ?? 0) > (m.awayScore ?? 0) ? 'text-gold' : 'text-muted'">{{ m.homeScore }}</span>
+                  <span :class="(m.homeScore ?? 0) > (m.awayScore ?? 0) ? 'text-accent' : 'text-muted'">{{ m.homeScore }}</span>
                   <span class="text-faint"> – </span>
-                  <span :class="(m.awayScore ?? 0) > (m.homeScore ?? 0) ? 'text-gold' : 'text-muted'">{{ m.awayScore }}</span>
+                  <span :class="(m.awayScore ?? 0) > (m.homeScore ?? 0) ? 'text-accent' : 'text-muted'">{{ m.awayScore }}</span>
                 </span>
               </header>
               <div v-if="m.players.length" class="overflow-x-auto">
@@ -172,7 +172,7 @@ watch(match, (m) => {
                   </thead>
                   <tbody>
                     <tr v-for="p in m.players" :key="p.userId" class="border-b border-line last:border-b-0">
-                      <td class="px-4 py-2"><RouterLink :to="`/players/${p.userId}`" class="hover:text-gold">{{ p.name }}</RouterLink></td>
+                      <td class="px-4 py-2"><RouterLink :to="`/players/${p.userId}`" class="hover:text-accent">{{ p.name }}</RouterLink></td>
                       <td class="hidden px-4 py-2 text-muted sm:table-cell">{{ teamName(p.teamId) }}</td>
                       <td class="tnum px-4 py-2 text-right">{{ p.kills }}</td>
                       <td class="tnum px-4 py-2 text-right">{{ p.deaths }}</td>
@@ -187,11 +187,11 @@ watch(match, (m) => {
         </section>
 
         <section v-if="screenshots.length" aria-labelledby="shots-title">
-          <h2 id="shots-title" class="eyebrow mb-1 text-gold">Screenshots</h2>
+          <h2 id="shots-title" class="eyebrow mb-1 text-accent">Screenshots</h2>
           <p class="mb-3 text-xs text-muted">Visible to the two teams and league staff only. Until the result is confirmed, each team sees just its own.</p>
           <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <li v-for="s in screenshots" :key="s.path">
-              <a :href="s.url" target="_blank" rel="noopener noreferrer" class="block overflow-hidden rounded-md border border-line hover:border-gold-dim">
+              <a :href="s.url" target="_blank" rel="noopener noreferrer" class="block overflow-hidden rounded-md border border-line hover:border-accent-dim">
                 <img :src="s.url" :alt="`Scoreboard screenshot from ${teamName(s.teamId)}`" class="aspect-video w-full object-cover" loading="lazy" />
               </a>
             </li>

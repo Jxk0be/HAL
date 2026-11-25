@@ -191,7 +191,7 @@ export function useAuditLog(pageSize = 30) {
   const total = ref(0)
   const loading = ref(true)
   const table = ref<string>('')
-  /** Actor name search; 'bot' matches the HAL bot (system) entries. */
+  /** Actor name search; 'bot' matches the bot (system) entries. */
   const actor = ref('')
   async function load() {
     loading.value = true

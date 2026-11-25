@@ -56,8 +56,9 @@ const roleLabel = computed(() => {
               <dt class="eyebrow text-muted">Status</dt>
               <dd class="mt-1 flex flex-wrap gap-1">
                 <UiBadge v-if="auth.isBanned" variant="loss">Banned</UiBadge>
+                <UiBadge v-else-if="!auth.isPlayer" variant="accent">Staff only</UiBadge>
                 <UiBadge v-else-if="!auth.isOnboarded" variant="outline">Setup needed</UiBadge>
-                <UiBadge v-else-if="auth.team" variant="gold">{{ roleLabel }}</UiBadge>
+                <UiBadge v-else-if="auth.team" variant="accent">{{ roleLabel }}</UiBadge>
                 <UiBadge v-else-if="auth.profile?.is_free_agent" variant="win">Free agent</UiBadge>
                 <UiBadge v-else>Not listed</UiBadge>
               </dd>

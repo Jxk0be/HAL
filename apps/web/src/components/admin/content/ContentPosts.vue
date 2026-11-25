@@ -37,7 +37,7 @@ async function remove(p: ContentPost) {
       <li v-if="!shown.length" class="px-4 py-3 text-sm text-muted">No posts.</li>
       <li v-for="p in shown" :key="p.id" class="flex flex-wrap items-start gap-x-4 gap-y-2 px-4 py-3 text-sm">
         <span class="min-w-48 flex-1">
-          <RouterLink :to="`/players/${p.userId}`" class="font-medium hover:text-gold">{{ p.player }}</RouterLink>
+          <RouterLink :to="`/players/${p.userId}`" class="font-medium hover:text-accent">{{ p.player }}</RouterLink>
           <span class="block text-xs text-muted">{{ p.platform }}<template v-if="p.role"> · {{ p.role }}</template> · <LeagueTime :iso="p.createdAt" /></span>
           <span v-if="p.note" class="mt-1 block text-muted">{{ p.note }}</span>
         </span>

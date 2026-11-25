@@ -1,7 +1,9 @@
 /** Site-wide config. League copy and links live here, not hard-coded in components. */
 export const site = {
-  name: "Heaven's Arena League",
-  shortName: 'HAL',
+  name: 'Blackhat Invitational League',
+  shortName: 'BIL',
+  /** The two lines of the logo lockup. */
+  wordmark: ['Blackhat', 'Invitational League'],
   tagline: 'Competitive Call of Duty for NA controller players.',
   discordInviteUrl: import.meta.env.VITE_DISCORD_INVITE_URL,
   leagueTimezone: 'America/New_York',

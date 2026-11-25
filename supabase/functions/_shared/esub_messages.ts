@@ -73,7 +73,7 @@ const outLine = (r: EsubRequest) =>
 
 /**
  * #admin-only. "requested": heads-up when the captain asks (nothing to do yet). "accepted": the
- * player said yes and an admin needs to approve; pings the HAL Admin role (pingRoleId).
+ * player said yes and an admin needs to approve; pings the BIL Admin role (pingRoleId).
  */
 export function esubAdminMessage(
   r: EsubRequest,

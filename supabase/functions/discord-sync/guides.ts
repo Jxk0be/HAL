@@ -51,7 +51,7 @@ async function upsertGuide(
   const msg = await sendMessage(channelId, payload)
   ids[channelId] = msg.id
   try {
-    await pinMessage(channelId, msg.id, 'HAL channel guide')
+    await pinMessage(channelId, msg.id, 'Channel guide')
     return 'posted'
   } catch {
     return 'posted_unpinned'

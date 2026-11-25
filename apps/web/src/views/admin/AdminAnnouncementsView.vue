@@ -60,7 +60,7 @@ async function toggle(r: AnnouncementRow) {
       <p v-else-if="error" class="text-sm text-loss" role="alert">{{ error }}</p>
       <UiEmptyState v-else-if="!season" title="No season running" description="Announcements use the season in signups, regular season or playoffs." />
       <template v-else>
-        <p v-if="!channelSet" class="rounded-md border border-gold-dim bg-gold-soft px-4 py-3 text-sm">
+        <p v-if="!channelSet" class="rounded-md border border-accent-dim bg-accent-soft px-4 py-3 text-sm">
           Set the <strong>#announcements</strong> channel ID on Admin → Discord before posting.
         </p>
         <article v-for="r in rows" :key="r.key" class="rounded-lg border border-line bg-surface">
@@ -79,7 +79,7 @@ async function toggle(r: AnnouncementRow) {
               <label class="flex cursor-pointer items-center gap-2 text-sm">
                 <input
                   type="checkbox"
-                  class="size-4 accent-[var(--color-gold)]"
+                  class="size-4 accent-[var(--color-accent)]"
                   :checked="r.auto"
                   :disabled="busyKey === r.key"
                   @change="toggle(r)"
@@ -94,7 +94,7 @@ async function toggle(r: AnnouncementRow) {
           <div class="px-4 py-3">
             <p v-if="r.unavailable" class="text-sm text-muted">{{ r.unavailable }}</p>
             <template v-else>
-              <p class="font-heading text-base text-gold">{{ r.title }}</p>
+              <p class="font-heading text-base text-accent">{{ r.title }}</p>
               <p class="mt-1 text-sm whitespace-pre-line text-muted">{{ previewText(r.description) }}</p>
             </template>
           </div>
@@ -109,7 +109,7 @@ async function toggle(r: AnnouncementRow) {
     <UiModal v-model="open" :title="confirming ? `Post “${confirming.label}”?` : 'Post announcement?'" size="sm">
       <p class="text-sm text-muted">It goes to #announcements as shown in the preview, with today's countdown.</p>
       <label class="mt-4 flex items-center gap-2 text-sm">
-        <input v-model="everyone" type="checkbox" class="size-4 accent-[var(--color-gold)]" />
+        <input v-model="everyone" type="checkbox" class="size-4 accent-[var(--color-accent)]" />
         Ping @everyone
       </label>
       <template #footer>

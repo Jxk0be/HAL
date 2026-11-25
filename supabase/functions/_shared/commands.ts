@@ -18,12 +18,12 @@ export interface CommandDefinition {
 }
 
 export const COMMANDS: CommandDefinition[] = [
-  { name: 'ping', description: 'Check that the HAL bot is online', type: 1, dm_permission: false },
-  { name: 'link', description: 'Get the link to your HAL profile', type: 1, dm_permission: false },
-  { name: 'help', description: 'What this channel is for and which HAL commands work here', type: 1, dm_permission: false },
+  { name: 'ping', description: 'Check that the bot is online', type: 1, dm_permission: false },
+  { name: 'link', description: 'Get the link to your Blackhat profile', type: 1, dm_permission: false },
+  { name: 'help', description: 'What this channel is for and which bot commands work here', type: 1, dm_permission: false },
   {
     name: 'lfg',
-    description: 'Free agent posts in #lfg-free-agents',
+    description: 'Free agent posts in #free-agents',
     type: 1,
     dm_permission: false,
     options: [

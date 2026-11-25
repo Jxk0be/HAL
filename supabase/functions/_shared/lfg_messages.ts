@@ -45,7 +45,7 @@ export function lfgPostMessage(p: LfgPost, siteUrl: string): MessagePayload {
   }
 }
 
-/** The /lfg post modal (Discord allows 5 inputs; HAL uses 3), prefilled when editing. */
+/** The /lfg post modal (Discord allows 5 inputs; BIL uses 3), prefilled when editing. */
 export function lfgModal(existing: { role: string | null; availability: string | null; note: string | null } | null) {
   const input = (custom_id: string, label: string, style: 1 | 2, max: number, value: string | null, placeholder: string) => ({
     type: 1,
@@ -89,7 +89,7 @@ export function inviteDm(captain: string, team: string, siteUrl: string): Messag
       halEmbed({
         title: `${team} invited you to join`,
         url: `${siteUrl}/profile`,
-        description: `**${captain}** invited you to **${team}** in Heaven's Arena League.\n[Accept or decline on your profile](${siteUrl}/profile). Invites expire after a few days.`,
+        description: `**${captain}** invited you to **${team}** in Blackhat Invitational League.\n[Accept or decline on your profile](${siteUrl}/profile). Invites expire after a few days.`,
       }),
     ],
   }

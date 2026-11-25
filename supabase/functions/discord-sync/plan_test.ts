@@ -1,5 +1,5 @@
 import { assertEquals } from 'jsr:@std/assert@1'
-import { desiredRoles, roleDiff, teamChannelName, teamChannelOverwrites, teamRolePlacement, type FixedRoles } from './plan.ts'
+import { desiredRoles, roleDiff, teamChannelName, teamChannelOverwrites, teamRolePlacement, teamVoiceChannelName, teamVoiceOverwrites, type FixedRoles } from './plan.ts'
 
 // Matches the real server: bot 7, admin 6, caster 5, captain 4, player 3, free agent 2, new team role 1.
 const guildRoles = [
@@ -45,12 +45,12 @@ Deno.test('free agents need a complete profile and no ban', () => {
   assertEquals([...desiredRoles({ ...base, isFreeAgent: true, banned: true }, fixed)], [])
 })
 
-Deno.test('staff roles map to HAL Admin and HAL Caster', () => {
+Deno.test('staff roles map to BIL Admin and BIL Caster', () => {
   assertEquals([...desiredRoles({ ...base, staffRoles: ['owner'] }, fixed)], ['adm'])
   assertEquals([...desiredRoles({ ...base, staffRoles: ['caster'] }, fixed)], ['cst'])
 })
 
-Deno.test('roleDiff only removes roles HAL manages', () => {
+Deno.test('roleDiff only removes roles BIL manages', () => {
   const managed = new Set(['cap', 'fa', 'adm', 'cst', 'ply', 't1', 't2'])
   const diff = roleDiff(['booster', 'fa', 't2'], new Set(['t1', 'ply']), managed)
   assertEquals(diff, { add: ['t1', 'ply'], remove: ['fa', 't2'] })
@@ -70,4 +70,19 @@ Deno.test('team channel is hidden from everyone but the team, admins and the bot
   assertEquals(o[0], { id: 'g', type: 0, deny: '1024' })
   assertEquals(o.map((x) => x.id), ['g', 't', 'a', 'b'])
   assertEquals(o[3]?.type, 1)
+})
+
+Deno.test('team voice channel name keeps spaces and capitals', () => {
+  assertEquals(teamVoiceChannelName('tV', 'Team Vectorize'), '🔊 【tV】 Team Vectorize')
+  assertEquals(teamVoiceChannelName('', ''), '🔊 Team')
+  assertEquals(teamVoiceChannelName('AB', 'x'.repeat(200)).length <= 100, true)
+})
+
+Deno.test('team voice channel is private: hidden and no connect for everyone else', () => {
+  const o = teamVoiceOverwrites({ guildId: 'g', teamRoleId: 't', adminRoleId: 'a', botUserId: 'b' })
+  assertEquals(o[0], { id: 'g', type: 0, deny: String((1n << 10n) | (1n << 20n)) })
+  assertEquals(o.map((x) => x.id), ['g', 't', 'a', 'b'])
+  const team = BigInt(o[1]!.allow!)
+  for (const bit of [10n, 20n, 21n, 9n, 25n]) assertEquals((team & (1n << bit)) !== 0n, true)
+  assertEquals(o[3], { id: 'b', type: 1, allow: '1024' })
 })

@@ -144,7 +144,7 @@ function shots(n: number) {
           <!-- Open fields -->
           <section aria-labelledby="open-title">
             <div class="mb-3 flex flex-wrap items-end justify-between gap-2">
-              <h2 id="open-title" class="eyebrow text-gold">To settle ({{ open.length }})</h2>
+              <h2 id="open-title" class="eyebrow text-accent">To settle ({{ open.length }})</h2>
               <p class="text-xs text-muted">
                 Keys: <kbd class="kbd">1</kbd> {{ match.home.tag }} value · <kbd class="kbd">2</kbd> {{ match.away.tag }} value ·
                 <kbd class="kbd">E</kbd> enter a value · <kbd class="kbd">N</kbd> next
@@ -157,7 +157,7 @@ function shots(n: number) {
                 :id="`mm-${r.id}`"
                 :key="r.id"
                 class="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border bg-surface px-4 py-3"
-                :class="i === active ? 'border-gold' : 'border-line'"
+                :class="i === active ? 'border-accent' : 'border-line'"
                 @click="active = i"
               >
                 <span class="min-w-40 flex-1">
@@ -205,7 +205,7 @@ function shots(n: number) {
 
           <!-- Both reports, side by side, per map -->
           <section aria-labelledby="reports-title" class="flex flex-col gap-6">
-            <h2 id="reports-title" class="eyebrow text-gold">Both reports</h2>
+            <h2 id="reports-title" class="eyebrow text-accent">Both reports</h2>
             <article v-for="n in mapNumbers" :key="n" class="rounded-lg border border-line bg-surface p-4" :aria-labelledby="`rep-map-${n}`">
               <h3 :id="`rep-map-${n}`" class="font-heading text-lg">Map {{ n }}</h3>
               <div class="mt-3 grid gap-4 md:grid-cols-2">

@@ -76,12 +76,12 @@ const asRow = (r: unknown) => r as LeaderboardRow
             <span class="flex items-center gap-2.5">
               <UiAvatar :src="asRow(row).avatar_url" :name="asRow(row).activision_id" size="xs" decorative />
               <span class="min-w-0">
-                <RouterLink :to="`/players/${asRow(row).user_id}`" class="block truncate font-medium hover:text-gold">
+                <RouterLink :to="`/players/${asRow(row).user_id}`" class="block truncate font-medium hover:text-accent">
                   {{ asRow(row).activision_id ?? 'Unknown player' }}
                 </RouterLink>
                 <span
                   v-if="asRow(row).incomplete"
-                  class="mt-0.5 inline-flex items-center gap-1 rounded-sm border border-gold-dim px-1.5 text-[0.65rem] font-semibold tracking-wide text-gold uppercase"
+                  class="mt-0.5 inline-flex items-center gap-1 rounded-sm border border-accent-dim px-1.5 text-[0.65rem] font-semibold tracking-wide text-accent uppercase"
                   :title="asRow(row).incomplete_reason ?? undefined"
                 >
                   Incomplete data<span class="sr-only">: {{ asRow(row).incomplete_reason }}</span>
@@ -90,12 +90,12 @@ const asRow = (r: unknown) => r as LeaderboardRow
             </span>
           </template>
           <template #cell-team_tag="{ row }">
-            <RouterLink v-if="asRow(row).team_id" :to="`/teams/${asRow(row).team_id}`" class="font-medium text-gold hover:text-gold-strong">
+            <RouterLink v-if="asRow(row).team_id" :to="`/teams/${asRow(row).team_id}`" class="font-medium text-accent hover:text-accent-strong">
               {{ asRow(row).team_tag }}<span class="sr-only"> ({{ asRow(row).team_name }})</span>
             </RouterLink>
             <span v-else class="text-muted">Free agent</span>
           </template>
-          <template #cell-kills="{ row }"><span class="font-semibold text-gold">{{ asRow(row).kills }}</span></template>
+          <template #cell-kills="{ row }"><span class="font-semibold text-accent">{{ asRow(row).kills }}</span></template>
           <template #cell-kd="{ row }"><span class="font-semibold">{{ formatKd(asRow(row).kd) }}</span></template>
           <template #cell-plus_minus="{ row }">
             <span :class="asRow(row).plus_minus > 0 ? 'text-win' : asRow(row).plus_minus < 0 ? 'text-loss' : ''">{{ formatPlusMinus(asRow(row).plus_minus) }}</span>
@@ -106,7 +106,7 @@ const asRow = (r: unknown) => r as LeaderboardRow
         <p class="text-xs text-muted">
           {{ shown.length }} {{ shown.length === 1 ? 'player' : 'players' }}.
           <template v-if="incompleteCount">
-            <span class="text-gold">Incomplete data</span> means some of a player's numbers are missing or still being checked;
+            <span class="text-accent">Incomplete data</span> means some of a player's numbers are missing or still being checked;
             hover it for the reason. Their totals cover the maps we have.
           </template>
           K/D with no deaths is shown as kills.

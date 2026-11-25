@@ -43,7 +43,7 @@ const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyl
     <PageHeader
       eyebrow="Owner"
       title="Discord sync"
-      description="Team roles, private team channels and the Captain, Player, Free Agent, HAL Admin and HAL Caster roles follow the database automatically."
+      description="Team roles, private team channels and the Captain, Player, Free Agent, BIL Admin and BIL Caster roles follow the database automatically."
     >
       <template #actions>
         <UiButton :href="site.discordInviteUrl" variant="secondary" size="sm">Open server</UiButton>
@@ -74,7 +74,7 @@ const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyl
       </UiCard>
       <UiCard eyebrow="Help" title="Channel guides">
         <p class="text-sm text-muted">
-          Posts a pinned "how this channel works" message, with the commands that work there, in #lfg, #results,
+          Posts a pinned "how this channel works" message, with the commands that work there, in #free-agents, #results,
           #disputes, the staff channel and every team channel. Running it again edits the same messages, so do it
           after the bot's commands or the channel IDs below change. New team channels get theirs automatically.
         </p>
@@ -101,7 +101,7 @@ const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyl
         <ul v-else class="flex flex-col divide-y divide-line">
           <li v-for="e in errors" :key="e.id" class="py-3 text-sm">
             <p class="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <span class="font-mono text-xs text-gold">{{ e.action }}</span>
+              <span class="font-mono text-xs text-accent">{{ e.action }}</span>
               <time class="text-xs text-muted" :datetime="e.createdAt">{{ when(e.createdAt) }}</time>
             </p>
             <p class="mt-1 break-words text-muted">{{ e.error }}</p>

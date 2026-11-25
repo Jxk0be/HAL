@@ -43,7 +43,7 @@ export function desiredRoles(state: UserState, fixed: FixedRoles): Set<string> {
 }
 
 /**
- * Role changes for a member. Only roles HAL manages are ever removed; anything else a member has
+ * Role changes for a member. Only roles BIL manages are ever removed; anything else a member has
  * (Nitro booster, community roles) is left alone.
  */
 export function roleDiff(
@@ -94,7 +94,7 @@ export function teamChannelName(tag: string, name: string): string {
 }
 
 /**
- * Private team channel: hidden from everyone except the team, HAL Admin and the bot.
+ * Private team channel: hidden from everyone except the team, BIL Admin and the bot.
  * The bot's overwrite only lets it see and post: its server-wide Manage Channels already covers
  * editing and deleting. Discord rejects overwrites that grant Manage Channels/Manage Permissions
  * unless the bot is an Administrator, so they must not be included.
@@ -117,6 +117,37 @@ export function teamChannelOverwrites(opts: {
     { id: opts.teamRoleId, type: 0, allow: member },
     { id: opts.adminRoleId, type: 0, allow: member },
     { id: opts.botUserId, type: 1, allow: member },
+  ]
+}
+
+/**
+ * Voice channel name, e.g. "🔊 【tV】 Team Vectorize". Voice channels keep spaces and capitals, so
+ * plain text reads better than the bold letters used for the text channel.
+ */
+export function teamVoiceChannelName(tag: string, name: string): string {
+  const t = tag.trim()
+  const n = name.trim()
+  return `🔊 ${t ? `【${t}】 ` : ''}${n || 'Team'}`.slice(0, 100)
+}
+
+/**
+ * Private team voice channel: same people as the text channel. The team and admins can join,
+ * talk, stream and use voice activity. These are all default @everyone permissions, so the bot
+ * already holds them and Discord accepts the overwrite. The bot only needs to see the channel to
+ * keep it in sync.
+ */
+export function teamVoiceOverwrites(opts: {
+  guildId: string
+  teamRoleId: string
+  adminRoleId: string
+  botUserId: string
+}): PermissionOverwrite[] {
+  const member = perms(PERMISSIONS.VIEW_CHANNEL, PERMISSIONS.CONNECT, PERMISSIONS.SPEAK, PERMISSIONS.STREAM, PERMISSIONS.USE_VAD)
+  return [
+    { id: opts.guildId, type: 0, deny: perms(PERMISSIONS.VIEW_CHANNEL, PERMISSIONS.CONNECT) }, // @everyone
+    { id: opts.teamRoleId, type: 0, allow: member },
+    { id: opts.adminRoleId, type: 0, allow: member },
+    { id: opts.botUserId, type: 1, allow: perms(PERMISSIONS.VIEW_CHANNEL) },
   ]
 }
 
@@ -151,8 +182,8 @@ export function teamRolePlacement(roles: RolePosition[], roleId: string, playerI
 
 /** Fixed role names and colours (created on first full_resync if missing). */
 export const FIXED_ROLE_SPECS: Record<keyof FixedRoles, { name: string; color: number }> = {
-  admin: { name: 'HAL Admin', color: 0xf8b800 },
-  caster: { name: 'HAL Caster', color: 0x8fb8ff },
+  admin: { name: 'BIL Admin', color: 0xd91f2b },
+  caster: { name: 'BIL Caster', color: 0x8fb8ff },
   captain: { name: 'Captain', color: 0xffd23f },
   player: { name: 'Player', color: 0x9b978d },
   free_agent: { name: 'Free Agent', color: 0x4fb07c },

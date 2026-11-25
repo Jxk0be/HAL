@@ -141,7 +141,14 @@ const lockDate = computed(() =>
       <!-- No team yet -->
       <template v-else-if="!team">
         <UiEmptyState
-          v-if="!season"
+          v-if="!auth.isPlayer"
+          title="Staff-only account"
+          description="You run the league but don't play, so you can't create or join a team. The owner can change this under Admin → Roles."
+        >
+          <UiButton to="/admin" variant="secondary">Admin</UiButton>
+        </UiEmptyState>
+        <UiEmptyState
+          v-else-if="!season"
           title="Team registration isn't open yet"
           description="Signups open before Season 1. Join the Discord to hear first."
         >
@@ -178,7 +185,7 @@ const lockDate = computed(() =>
           <TeamLogo :tag="team.tag" :name="team.name" :logo-url="team.logoUrl" size="lg" decorative />
           <div class="flex flex-wrap items-center gap-2">
             <UiBadge variant="outline">{{ team.tag }}</UiBadge>
-            <UiBadge v-if="team.status === 'pending'" variant="gold">Awaiting approval</UiBadge>
+            <UiBadge v-if="team.status === 'pending'" variant="accent">Awaiting approval</UiBadge>
             <UiBadge v-else-if="team.status === 'approved'" variant="win">Approved</UiBadge>
             <UiBadge v-else variant="loss">Removed</UiBadge>
             <UiBadge v-if="team.division">{{ team.division }}</UiBadge>

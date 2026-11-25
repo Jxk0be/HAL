@@ -80,24 +80,20 @@ export function useDiscordSync() {
   return { running, lastStats, errors, loadingErrors, resync, reloadErrors: loadErrors, postingGuides, guideStats, postGuides }
 }
 
-export interface BotChannels {
-  lfg: string
-  disputes: string
-  results: string
-  announcements: string
-  admin: string
-}
+export const BOT_CHANNEL_KEYS = ['lfg', 'disputes', 'results', 'announcements', 'admin', 'rosters', 'standings', 'schedule', 'subs', 'potw'] as const
+export type BotChannels = Record<(typeof BOT_CHANNEL_KEYS)[number], string>
+const emptyChannels = (): BotChannels => Object.fromEntries(BOT_CHANNEL_KEYS.map((k) => [k, ''])) as BotChannels
 
-/** Channel IDs the bot posts to (#results, #announcements, #admin-only). Owner edits. */
+/** Channel IDs the bot posts to (#results, #announcements, #admin-only, the live boards...). Owner edits. */
 export function useBotChannels() {
-  const channels = ref<BotChannels>({ lfg: '', disputes: '', results: '', announcements: '', admin: '' })
+  const channels = ref<BotChannels>(emptyChannels())
   const loading = ref(true)
   const saving = ref(false)
 
   async function load() {
     const { data } = await supabase.from('app_settings').select('value').eq('key', 'discord_channels').maybeSingle()
     const v = (data?.value ?? {}) as Partial<BotChannels>
-    channels.value = { lfg: v.lfg ?? '', disputes: v.disputes ?? '', results: v.results ?? '', announcements: v.announcements ?? '', admin: v.admin ?? '' }
+    channels.value = Object.fromEntries(BOT_CHANNEL_KEYS.map((k) => [k, v[k] ?? ''])) as BotChannels
     loading.value = false
   }
 

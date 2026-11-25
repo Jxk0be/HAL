@@ -52,7 +52,7 @@ function onKeydown(e: KeyboardEvent, index: number) {
         class="-mb-px flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 font-heading text-sm tracking-wider transition-colors"
         :class="
           model === tab.value
-            ? 'border-gold text-text'
+            ? 'border-accent text-text'
             : 'border-transparent text-muted hover:text-text'
         "
         @click="select(i)"

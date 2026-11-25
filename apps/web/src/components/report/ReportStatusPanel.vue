@@ -34,10 +34,10 @@ const state = computed(() => {
   const mine = props.myTeamSide === 'home' ? s.homeReportedAt : props.myTeamSide === 'away' ? s.awayReportedAt : null
   const theirs = props.myTeamSide === 'home' ? s.awayReportedAt : props.myTeamSide === 'away' ? s.homeReportedAt : null
   if (mine && !theirs) {
-    return { label: 'Waiting for opponent', variant: 'gold' as const, text: 'Your report is in. If the other captain hasn’t reported 24 hours after the match time, yours is accepted.' }
+    return { label: 'Waiting for opponent', variant: 'accent' as const, text: 'Your report is in. If the other captain hasn’t reported 24 hours after the match time, yours is accepted.' }
   }
   if (!mine && theirs) {
-    return { label: 'Your report is due', variant: 'gold' as const, text: 'Your opponent has reported. Submit yours so the result can be confirmed.' }
+    return { label: 'Your report is due', variant: 'accent' as const, text: 'Your opponent has reported. Submit yours so the result can be confirmed.' }
   }
   return { label: 'Not reported yet', variant: 'neutral' as const, text: 'Both captains submit the full scoreboard after the match.' }
 })

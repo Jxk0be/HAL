@@ -70,7 +70,7 @@ export interface InteractionResponse {
   data?: MessagePayload | { choices: { name: string; value: string }[] } | Record<string, unknown>
 }
 
-/** A HAL player linked to the Discord user (null if they never logged in to the site). */
+/** A BIL player linked to the Discord user (null if they never logged in to the site). */
 export interface HalProfile {
   id: string
   discordUsername: string | null
@@ -86,7 +86,7 @@ export interface Deps {
 export interface Context {
   interaction: Interaction
   user: DiscordUser
-  /** Present unless the handler is marked `public` (works without a HAL account). */
+  /** Present unless the handler is marked `public` (works without a BIL account). */
   profile: HalProfile | null
   deps: Deps
   /** custom_id parts for components and modals: "feature:action:id". */
@@ -106,7 +106,7 @@ export type Reply =
   | { kind: 'deferred'; ephemeral?: boolean; newMessage?: boolean; work: () => Promise<MessagePayload> }
 
 export interface Handler {
-  /** Works without a linked HAL profile (e.g. /ping). */
+  /** Works without a linked BIL profile (e.g. /ping). */
   public?: boolean
   run(ctx: Context): Reply | Promise<Reply>
 }
@@ -179,7 +179,7 @@ function toResponse(reply: Reply, i: Interaction, deps: Deps): RouteResult {
 
 export function notLinkedReply(siteUrl: string): Reply {
   return ephemeral(
-    `Your Discord account isn't linked to HAL yet. [Log in on the HAL site](${siteUrl}/login) with Discord, then try again.`,
+    `Your Discord account isn't linked to Blackhat yet. [Log in on the site](${siteUrl}/login) with Discord, then try again.`,
     'error',
   )
 }

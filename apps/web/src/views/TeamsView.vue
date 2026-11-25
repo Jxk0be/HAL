@@ -31,15 +31,15 @@ const { teams, loading, error } = useTeamList()
         <li v-for="t in teams" :key="t.id">
           <RouterLink
             :to="`/teams/${t.id}`"
-            class="group flex h-full items-center gap-4 rounded-lg border border-line bg-surface p-5 transition-colors hover:border-gold-dim"
+            class="group flex h-full items-center gap-4 rounded-lg border border-line bg-surface p-5 transition-colors hover:border-accent-dim"
           >
             <TeamLogo :tag="t.tag" :name="t.name" :logo-url="t.logoUrl" size="lg" decorative />
             <div class="min-w-0 flex-1">
-              <p class="truncate font-heading text-xl group-hover:text-gold">{{ t.name }}</p>
+              <p class="truncate font-heading text-xl group-hover:text-accent">{{ t.name }}</p>
               <p class="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted">
                 <UiBadge variant="outline">{{ t.tag }}</UiBadge>
                 <UiBadge v-if="t.division">{{ t.division }}</UiBadge>
-                <UiBadge v-if="t.status === 'pending'" variant="gold">Pending</UiBadge>
+                <UiBadge v-if="t.status === 'pending'" variant="accent">Pending</UiBadge>
               </p>
               <p class="mt-2 text-xs text-muted">
                 <span class="tnum">{{ t.rosterSize }}</span> players · Record <span class="tnum">0–0</span>

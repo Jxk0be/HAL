@@ -75,7 +75,7 @@ const tiles = computed(() => {
             <p v-if="!health.bot_errors.length" class="text-sm text-muted">No bot errors.</p>
             <ul v-else class="flex flex-col divide-y divide-line text-sm">
               <li v-for="e in health.bot_errors" :key="e.id" class="py-3">
-                <p class="flex flex-wrap gap-x-3 text-xs"><span class="font-mono text-gold">{{ e.action }}</span><span class="text-muted">{{ when(e.at) }}</span></p>
+                <p class="flex flex-wrap gap-x-3 text-xs"><span class="font-mono text-accent">{{ e.action }}</span><span class="text-muted">{{ when(e.at) }}</span></p>
                 <p class="mt-1 break-words text-muted">{{ e.error }}</p>
               </li>
             </ul>

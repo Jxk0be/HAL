@@ -72,8 +72,8 @@ const respond = (r: RescheduleRequest, accept: boolean) =>
   run(rescheduleActions.respond(r.id, accept), accept ? 'Accepted. The match time is updated.' : 'Declined. The match stays at its time.')
 const cancel = (r: RescheduleRequest) => run(rescheduleActions.cancel(r.id), 'Request cancelled.')
 
-const STATUS: Record<RescheduleRequest['status'], { label: string; variant: 'win' | 'loss' | 'neutral' | 'gold' }> = {
-  pending: { label: 'Pending', variant: 'gold' },
+const STATUS: Record<RescheduleRequest['status'], { label: string; variant: 'win' | 'loss' | 'neutral' | 'accent' }> = {
+  pending: { label: 'Pending', variant: 'accent' },
   accepted: { label: 'Accepted', variant: 'win' },
   declined: { label: 'Declined', variant: 'loss' },
   expired: { label: 'Expired', variant: 'neutral' },
@@ -84,7 +84,7 @@ const STATUS: Record<RescheduleRequest['status'], { label: string; variant: 'win
 <template>
   <UiCard v-if="pending || history.length || (captainOf && open)" eyebrow="Match time" title="Reschedule">
     <div class="flex flex-col gap-4 text-sm">
-      <div v-if="pending" class="rounded-md border border-gold-dim bg-gold-soft p-3">
+      <div v-if="pending" class="rounded-md border border-accent-dim bg-accent-soft p-3">
         <p>
           <strong>{{ tag(pending.teamId) }}</strong> asked to move the match to
           <strong><LeagueTime :iso="pending.proposedAt" :timezone="timezone" /></strong>
@@ -110,7 +110,7 @@ const STATUS: Record<RescheduleRequest['status'], { label: string; variant: 'win
               type="datetime-local"
               :min="min"
               :max="max"
-              class="h-10 max-w-xs rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:border-gold focus-visible:outline-2 focus-visible:outline-gold"
+              class="h-10 max-w-xs rounded-md border border-line-strong bg-surface-2 px-3 focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-accent"
               aria-describedby="reschedule-help"
             />
           </label>

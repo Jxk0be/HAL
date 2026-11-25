@@ -42,7 +42,7 @@ export function disputeOpeningMessage(d: OpeningInput, siteUrl: string): Message
   return {
     content: [
       d.captainIds.length ? `Captains: ${d.captainIds.map((id) => `<@${id}>`).join(' ')}` : null,
-      d.adminIds.length ? `HAL Admin: ${d.adminIds.map((id) => `<@${id}>`).join(' ')}` : 'HAL Admin: no admins available (all recused). The owner will step in.',
+      d.adminIds.length ? `BIL Admin: ${d.adminIds.map((id) => `<@${id}>`).join(' ')}` : 'BIL Admin: no admins available (all recused). The owner will step in.',
     ]
       .filter(Boolean)
       .join('\n'),

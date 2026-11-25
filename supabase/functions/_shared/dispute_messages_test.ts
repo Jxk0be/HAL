@@ -23,7 +23,7 @@ Deno.test('thread names are short and identify the match', () => {
 Deno.test('the opening post pings only the captains and non-recused admins', () => {
   const msg = disputeOpeningMessage(base, 'https://hal.example')
   assertEquals(msg.allowed_mentions, { users: ['1', '2', '9'] })
-  assertEquals(msg.content, 'Captains: <@1> <@2>\nHAL Admin: <@9>')
+  assertEquals(msg.content, 'Captains: <@1> <@2>\nBIL Admin: <@9>')
   assertEquals(msg.embeds![0]!.fields![0]!.value, '• [clip](https://youtu.be/x)')
   // deno-lint-ignore no-explicit-any
   assertEquals((msg.components![0] as any).components[0].url, 'https://hal.example/admin/disputes')
