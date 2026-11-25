@@ -17,6 +17,7 @@ import { postAllGuides, siteUrl } from './guides.ts'
 import { postAnnouncementNow, previewAnnouncements } from '../_shared/announcement_flow.ts'
 import type { AnnouncementKey } from '../_shared/announcements.ts'
 import { emptyStats, ensureSettings, fullResync, logError, removeTeamDiscord, syncTeam, syncUser, type SyncEnv } from './sync.ts'
+import { refreshMatchPost } from '../_shared/eights_flow.ts'
 
 declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void } | undefined
 
@@ -160,6 +161,12 @@ Deno.serve(async (req) => {
           await syncUser(env, String(body.user_id), settings, stats)
           break
         }
+        case 'eights_votes_closed':
+          // pg_cron (eights_tick) closed 8s mode votes whose 2 minutes ran out: show the mode and map.
+          for (const id of (body.match_ids as string[] | undefined) ?? []) {
+            await refreshMatchPost(env.db, id).catch((err) => logError(env.db, action, { match_id: id }, err))
+          }
+          break
         case 'audit_log':
           // Posting audit entries to #audit-log is a later step.
           break

@@ -78,8 +78,9 @@ function moveMode(index: number, dir: -1 | 1) {
   <div class="flex flex-col gap-6">
     <p class="text-sm text-muted">
       Add each mode, select it, then add the maps played in that mode. The report form only offers a
-      mode’s maps. Removing a map takes it out of that mode only; deactivate a mode instead of
-      deleting it, so old results keep their modes.
+      mode’s maps, and 8s lobbies vote between the active modes that have at least one map, then get a
+      random map from that mode. Removing a map takes it out of that mode only; deactivate a mode
+      instead of deleting it, so old results keep their modes.
     </p>
     <UiSkeleton v-if="g.loading.value" :lines="5" />
 

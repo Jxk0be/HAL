@@ -80,7 +80,21 @@ export function useDiscordSync() {
   return { running, lastStats, errors, loadingErrors, resync, reloadErrors: loadErrors, postingGuides, guideStats, postGuides }
 }
 
-export const BOT_CHANNEL_KEYS = ['lfg', 'disputes', 'results', 'announcements', 'admin', 'rosters', 'standings', 'schedule', 'subs', 'potw'] as const
+export const BOT_CHANNEL_KEYS = [
+  'lfg',
+  'disputes',
+  'results',
+  'announcements',
+  'admin',
+  'rosters',
+  'standings',
+  'schedule',
+  'subs',
+  'potw',
+  'eights',
+  'eights_team_a',
+  'eights_team_b',
+] as const
 export type BotChannels = Record<(typeof BOT_CHANNEL_KEYS)[number], string>
 const emptyChannels = (): BotChannels => Object.fromEntries(BOT_CHANNEL_KEYS.map((k) => [k, ''])) as BotChannels
 

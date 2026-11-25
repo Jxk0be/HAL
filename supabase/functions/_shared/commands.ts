@@ -32,6 +32,17 @@ export const COMMANDS: CommandDefinition[] = [
     ],
   },
   {
+    name: '8s',
+    description: '8s pick-up games: queue up, or see the leaderboard',
+    type: 1,
+    dm_permission: false,
+    options: [
+      { type: 1, name: 'join', description: 'Join the 8s queue' },
+      { type: 1, name: 'leave', description: 'Leave the 8s queue' },
+      { type: 1, name: 'leaderboard', description: 'Most 8s wins (then win %)' },
+    ],
+  },
+  {
     name: 'reschedule',
     description: 'Ask the other team to move a match (captains, 24h before the default time)',
     type: 1,

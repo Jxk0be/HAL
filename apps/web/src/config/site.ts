@@ -18,5 +18,6 @@ export const mainNav = [
   { label: 'Teams', to: '/teams' },
   { label: 'Players', to: '/players' },
   { label: 'Free Agents', to: '/free-agents' },
+  { label: 'Maps', to: '/maps' },
   { label: 'Rules', to: '/rules' },
 ] as const

@@ -15,6 +15,7 @@ const year = new Date().getFullYear()
       <nav aria-label="Footer">
         <ul class="grid grid-cols-2 gap-x-10 gap-y-2 text-sm sm:flex sm:gap-6">
           <li><RouterLink to="/rules" class="text-muted hover:text-text">Rules</RouterLink></li>
+          <li><RouterLink to="/maps" class="text-muted hover:text-text">Map pool</RouterLink></li>
           <li><RouterLink to="/audit-log" class="text-muted hover:text-text">Audit Log</RouterLink></li>
           <li>
             <a :href="site.discordInviteUrl" target="_blank" rel="noopener noreferrer" class="text-muted hover:text-text">

@@ -251,3 +251,10 @@ export const editChannel = (
   patch: { name?: string; parent_id?: string; topic?: string; permission_overwrites?: PermissionOverwrite[] },
   reason?: string,
 ) => discordRequest('PATCH', `/channels/${channelId}`, { body: patch, reason })
+
+/** "Target user is not connected to voice": the bot can only move people already in a voice channel. */
+export const NOT_IN_VOICE = 40032
+
+/** Moves a member into a voice channel (needs Move Members, and Connect on the target channel). */
+export const moveMember = (guildId: string, userId: string, channelId: string, reason?: string) =>
+  discordRequest('PATCH', `/guilds/${guildId}/members/${userId}`, { body: { channel_id: channelId }, reason })

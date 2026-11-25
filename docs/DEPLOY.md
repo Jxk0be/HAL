@@ -74,7 +74,7 @@ Channel IDs for the ten bot channels (see `docs/discord-server-text.md`, step 7)
    - OAuth2 → Redirects: `https://lluwzpwiybvgnsimpwey.supabase.co/auth/v1/callback` (Supabase's Discord login callback; already set if login works locally).
 5. **Slash commands:** `pnpm commands:register` (from the repo root, with `.env` filled in). It should print `/ping, /link, /help, /lfg, /reschedule, /report, /dispute`.
 6. **Owner:** log in on the live site with Discord, then run `supabase/snippets/make_owner.sql` in the SQL editor for your account (already done for the current project).
-7. **Channels:** Admin → Discord → Channels: paste the ten channel IDs. Then press **Resync Discord** once. The full server setup, in order, is in `docs/discord-server-text.md`.
+7. **Channels:** Admin → Discord → Channels: paste the channel IDs (ten league channels plus the three 8s ones). Then press **Resync Discord** once. The full server setup, in order, is in `docs/discord-server-text.md`.
 8. **Check:** Admin → Health shows no errors and every scheduled job as `succeeded` after a few minutes. In Discord, `/ping` answers "Blackhat bot online."
 
 ## 3. Every later deploy

@@ -717,6 +717,245 @@ export type Database = {
           },
         ]
       }
+      eights_matches: {
+        Row: {
+          channel_id: string | null
+          created_at: string
+          id: string
+          map_id: string | null
+          map_name: string | null
+          message_id: string | null
+          mode_id: string | null
+          mode_name: string | null
+          number: number
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          vote_ends_at: string | null
+          winner: string | null
+        }
+        Insert: {
+          channel_id?: string | null
+          created_at?: string
+          id?: string
+          map_id?: string | null
+          map_name?: string | null
+          message_id?: string | null
+          mode_id?: string | null
+          mode_name?: string | null
+          number?: never
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          vote_ends_at?: string | null
+          winner?: string | null
+        }
+        Update: {
+          channel_id?: string | null
+          created_at?: string
+          id?: string
+          map_id?: string | null
+          map_name?: string | null
+          message_id?: string | null
+          mode_id?: string | null
+          mode_name?: string | null
+          number?: never
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          vote_ends_at?: string | null
+          winner?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eights_matches_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eights_matches_mode_id_fkey"
+            columns: ["mode_id"]
+            isOneToOne: false
+            referencedRelation: "game_modes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eights_matches_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eights_matches_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eights_matches_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eights_players: {
+        Row: {
+          match_id: string
+          team: string
+          user_id: string
+        }
+        Insert: {
+          match_id: string
+          team: string
+          user_id: string
+        }
+        Update: {
+          match_id?: string
+          team?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eights_players_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "eights_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eights_players_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eights_players_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eights_players_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eights_queue: {
+        Row: {
+          joined_at: string
+          user_id: string
+        }
+        Insert: {
+          joined_at?: string
+          user_id: string
+        }
+        Update: {
+          joined_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eights_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eights_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eights_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eights_reports: {
+        Row: {
+          created_at: string
+          match_id: string
+          updated_at: string
+          user_id: string
+          winner: string
+        }
+        Insert: {
+          created_at?: string
+          match_id: string
+          updated_at?: string
+          user_id: string
+          winner: string
+        }
+        Update: {
+          created_at?: string
+          match_id?: string
+          updated_at?: string
+          user_id?: string
+          winner?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eights_reports_match_id_user_id_fkey"
+            columns: ["match_id", "user_id"]
+            isOneToOne: true
+            referencedRelation: "eights_players"
+            referencedColumns: ["match_id", "user_id"]
+          },
+        ]
+      }
+      eights_votes: {
+        Row: {
+          created_at: string
+          match_id: string
+          mode_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          match_id: string
+          mode_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          match_id?: string
+          mode_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eights_votes_match_id_user_id_fkey"
+            columns: ["match_id", "user_id"]
+            isOneToOne: true
+            referencedRelation: "eights_players"
+            referencedColumns: ["match_id", "user_id"]
+          },
+          {
+            foreignKeyName: "eights_votes_mode_id_fkey"
+            columns: ["mode_id"]
+            isOneToOne: false
+            referencedRelation: "game_modes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       free_agent_posts: {
         Row: {
           active: boolean
@@ -3080,6 +3319,41 @@ export type Database = {
           tag: string
           team_id: string
           wins: number
+        }[]
+      }
+      eights_close_vote: { Args: { p_match_id: string }; Returns: boolean }
+      eights_join: { Args: { p_user_id: string }; Returns: Json }
+      eights_leaderboard: {
+        Args: { p_limit?: number }
+        Returns: {
+          discord_id: string
+          losses: number
+          name: string
+          played: number
+          user_id: string
+          win_pct: number
+          wins: number
+        }[]
+      }
+      eights_leave: { Args: { p_user_id: string }; Returns: boolean }
+      eights_report: {
+        Args: { p_match_id: string; p_user_id: string; p_winner: string }
+        Returns: Json
+      }
+      eights_resolve: {
+        Args: { p_actor: string; p_match_id: string; p_winner: string }
+        Returns: undefined
+      }
+      eights_tick: { Args: never; Returns: undefined }
+      eights_vote: {
+        Args: { p_match_id: string; p_mode_id: string; p_user_id: string }
+        Returns: Json
+      }
+      eights_vote_modes: {
+        Args: never
+        Returns: {
+          id: string
+          name: string
         }[]
       }
       eligible_checkin_players: {

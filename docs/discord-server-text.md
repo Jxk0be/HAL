@@ -41,15 +41,19 @@ Do this before inviting the bot: its role in the server is named after it when i
 ### Step 4: Invite the bot
 Open this link and pick the new server. It asks for exactly the permissions the bot uses:
 
-https://discord.com/oauth2/authorize?client_id=1573484470487744522&permissions=361082646032&scope=bot%20applications.commands
+https://discord.com/oauth2/authorize?client_id=1573484470487744522&permissions=361099423248&scope=bot%20applications.commands
 
 (View Channels, Manage Roles, Manage Channels, Send Messages, Send Messages in Threads, Create Private
 Threads, Manage Threads, Manage Messages (to pin its guides), Embed Links, Attach Files, Read Message
 History, Mention @everyone (only for announcements you opt into), Connect, Speak, Video, Use Voice
-Activity. The voice permissions let it give each team access to its private voice channel.)
+Activity, Move Members. The voice permissions let it give each team access to its private voice channel;
+Move Members lets it put 8s players into their team's voice channel.)
+
+**Bot already in the server?** Opening the link again and authorising updates its role's permissions.
+Or tick **Move Members** on the Blackhat Bot role (Server Settings → Roles) yourself.
 
 ### Step 5: Register the slash commands
-From the repo root: `pnpm commands:register`. It should list `/ping, /link, /help, /lfg, /reschedule,
+From the repo root: `pnpm commands:register`. It should list `/ping, /link, /help, /lfg, /8s, /reschedule,
 /report, /dispute`. Type `/ping` in any channel: "Blackhat bot online." means the bot is hooked up.
 
 ### Step 6: Create the categories and channels
@@ -82,13 +86,18 @@ bot makes those in step 8.
 | | 🔊 Waiting Room | players waiting on staff (check-in or dispute help) | — |
 | | 🔊 Casting Stage (Stage channel) | casters speak, everyone listens | — |
 | | 🔊 Admin (private) | staff | — |
+| **8s** | #lf-8s | 🤖 queue post (Join / Leave / Leaderboard) and a post per match; players can chat | #lf-8s |
+| | 🔊 8s Waiting Room | queued players wait here so the bot can move them | — |
+| | 🔊 8s Team A | 🤖 Team A is moved here when a match starts | 🔊 8s Team A |
+| | 🔊 8s Team B | 🤖 Team B is moved here | 🔊 8s Team B |
 | **TEAM CHANNELS** | created by the bot | 🤖 a private text + voice channel per approved team | — |
 
 ### Step 7: Connect the channels on the website
 1. Log in on the site → **Admin → Discord** → **Channels** card.
 2. For each field, right-click the matching channel in Discord → **Copy Channel ID** → paste.
-   Ten fields: #announcements, #results, #free-agents, #disputes, #admin-only, #team-rosters,
-   #standings, #match-schedule, #sub-board, #player-of-the-week. Press **Save channels**.
+   Thirteen fields: #announcements, #results, #free-agents, #disputes, #admin-only, #team-rosters,
+   #standings, #match-schedule, #sub-board, #player-of-the-week, and for 8s #lf-8s, 🔊 8s Team A and
+   🔊 8s Team B (right-click the voice channels the same way). Press **Save channels**.
 
 ### Step 8: Let the bot build its roles
 On the same page press **Resync Discord**. The bot creates the roles **BIL Admin, BIL Caster,
@@ -122,10 +131,10 @@ Edit Category/Channel → Permissions → add the role → set the box.
 
 **Do this first: let the bot through.** A ✗ on @everyone in a channel also blocks the bot (Discord
 applies channel denies over the permissions a role has server-wide). So before denying anything,
-on each of the **INFO, LEAGUE, COMMUNITY, SUPPORT and STAFF** categories add the **Blackhat Bot**
+on each of the **INFO, LEAGUE, COMMUNITY, SUPPORT, STAFF and 8s** categories add the **Blackhat Bot**
 role and tick ✓: View Channel, Send Messages, Send Messages in Threads, Create Private Threads,
 Manage Threads, Embed Links, Attach Files, Read Message History, Manage Messages (to pin), Mention
-@everyone. Then make every channel inside **sync to its category** (Edit Channel → Permissions →
+@everyone, and on **8s** also Connect and Move Members (it moves players into 🔊 8s Team A/B). Then make every channel inside **sync to its category** (Edit Channel → Permissions →
 Sync Now), so the bot's ✓ reaches it. If a channel shows "not synced", give the bot the same ✓ on
 that channel too.
 
@@ -138,6 +147,8 @@ Then the restrictions:
   includes slash commands (Discord hides the message box). Players post with the **Post as free agent** /
   **Remove my post** buttons on the bot's pinned guide (step 11), or `/lfg post` from any other channel;
   the card always lands here.
+- **8s voice channels:** a user limit of 8 on Team A/B is fine (the bot can move people into a full
+  channel only if it has Move Members there, which the category ✓ above gives it).
 - **#teams-recruiting:** optional slow mode of 6 hours, so each captain's post stays visible.
 - **STAFF category and 🔊 Admin:** @everyone → **View Channel ✗**; BIL Admin → **View Channel ✓**.
   Sync the channels inside to the category.
@@ -152,6 +163,7 @@ Then the restrictions:
    commands that work there) in #free-agents, #results, #disputes, #admin-only and every team channel.
 3. The live boards (#team-rosters, #standings, #match-schedule, #sub-board, #player-of-the-week) fill
    in by themselves within 5 minutes once there's data: approved teams, a running season, results.
+   The 8s queue post appears in #lf-8s within 5 minutes of saving its channel ID.
 
 ### Step 12: Invite link and website
 1. Server name → **Invite People** → Edit invite link → Expire After **Never**, Max Uses **No limit**.
@@ -175,7 +187,7 @@ Then the restrictions:
 
 ```
 # Welcome to the Blackhat Invitational League 🕶️
-A free-entry, NA-only Call of Duty: MW4 league on the CDL ruleset. Controller only, 18+. Best-of-5 series twice a week, with a $400 prize for the champions.
+A free-entry, NA-only Call of Duty: MW4 league on the CDL ruleset. Controller only, 18+. Best-of-5 series twice a week, with a $250 prize for the champions.
 
 ## Get set up (2 minutes)
 **1.** Log in on the site with Discord: https://YOUR-SITE/login
@@ -190,6 +202,7 @@ A free-entry, NA-only Call of Duty: MW4 league on the CDL ruleset. Controller on
 ## Around the server
 📋 #team-rosters · 🏆 #standings · 📅 #match-schedule · ✅ #results · ⭐ #player-of-the-week
 🆘 #sub-board: teams short for a match. Not on a team? Press **I'm available**.
+🎮 #lf-8s: casual 8s. Press **Join queue**, wait in 🔊 8s Waiting Room, and the bot picks the teams. Then vote on the mode; the map comes from https://YOUR-SITE/maps
 
 Stuck? Type `/help` in any channel.
 ```
@@ -304,7 +317,7 @@ Full season stats: https://YOUR-SITE/leaderboard
 | #match-schedule | This week's matches in your time zone, with results as they land. |
 | #results | Confirmed results, posted by the bot. Wrong? Captains /dispute in your team channel. |
 | #player-of-the-week | Monday noon ET: last week's top performer. |
-| #free-agents | Free agents: press Post as free agent on the pinned message · Captains: press Invite to team on a card |
+| #free-agents | Free agents: press Post as free agent on the pinned message (or /lfg post from any channel) · Captains: press Invite to team on a card |
 | #teams-recruiting | Captains: who you need, one post per team. |
 | #sub-board | Teams short for a match. Not on a team? Press I'm available. |
 | #clips | Your best plays. Links or uploads. |

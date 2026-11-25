@@ -97,6 +97,18 @@ export function useSeasonAdmin() {
     return { ok: true }
   }
 
+  /** Owner: starts a new season as a draft (every setting has a default; edit them next, then open signups). */
+  async function createSeason(rawName: string): Promise<Result> {
+    const name = rawName.trim()
+    if (!name) return { ok: false, message: 'Give the season a name.' }
+    const r = await run(
+      () => supabase.from('seasons').insert({ name, status: 'draft' }),
+      "Couldn't create the season. Only the owner can, and the name has to be new.",
+    )
+    if (r.ok) await load()
+    return r
+  }
+
   async function saveSeason(patch: SeasonPatch): Promise<Result> {
     if (!season.value) return { ok: false, message: 'No season to save.' }
     const id = season.value.id
@@ -165,6 +177,7 @@ export function useSeasonAdmin() {
     busy,
     reload: load,
     saveSeason,
+    createSeason,
     addDivision,
     renameDivision,
     splitDivisions,

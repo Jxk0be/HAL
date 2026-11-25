@@ -185,7 +185,7 @@ Effective: November 20, 2026
 
 ## 13. Prizes
 
-**13.1** The champion receives $400: $100 for each of the 4 starters.
+**13.1** The champion receives $250: $62.50 for each of the 4 starters.
 
 **13.2** Prizes are paid by PayPal or Venmo within 7 days of the final.
 

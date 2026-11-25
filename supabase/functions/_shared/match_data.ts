@@ -62,11 +62,26 @@ export async function loadMatch(db: SupabaseClient, id: string): Promise<BotMatc
   return data ? toBotMatch(data) : null
 }
 
-export const CHANNEL_KEYS = ['lfg', 'disputes', 'results', 'announcements', 'admin', 'rosters', 'standings', 'schedule', 'subs', 'potw'] as const
+export const CHANNEL_KEYS = [
+  'lfg',
+  'disputes',
+  'results',
+  'announcements',
+  'admin',
+  'rosters',
+  'standings',
+  'schedule',
+  'subs',
+  'potw',
+  'eights',
+  'eights_team_a',
+  'eights_team_b',
+] as const
 export type ChannelKey = (typeof CHANNEL_KEYS)[number]
 /**
  * Channel ids set in Admin -> Discord. lfg is #free-agents; rosters/standings/schedule/subs/potw
  * are the live boards (#team-rosters, #standings, #match-schedule, #sub-board, #player-of-the-week).
+ * eights is the 8s text channel (#lf-8s); eights_team_a / eights_team_b are the 8s team voice channels.
  */
 export type ChannelSettings = Record<ChannelKey, string | null>
 

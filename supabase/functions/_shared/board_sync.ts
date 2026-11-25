@@ -22,6 +22,7 @@ import {
   type WeekPlayer,
 } from './boards.ts'
 import type { ChannelSettings } from './match_data.ts'
+import { queueBoards } from './eights_flow.ts'
 import { addDays, dayLabel, mondayOf, zonedDate, zonedToUtc } from './time.ts'
 
 const ACTIVE = ['signups', 'regular', 'playoffs']
@@ -279,6 +280,8 @@ export async function syncBoards(
     ['subs', channels.subs, () => subBoards(db, channels.subs!, siteUrl)],
     // Only ever adds: an old week's post is never touched again.
     ['potw', channels.potw, () => potwBoards(db, channels.potw!, siteUrl, now), { removeStale: false }],
+    // The 8s queue post in #lf-8s (also redrawn straight away on every join and leave).
+    ['eights', channels.eights, () => queueBoards(db, channels.eights!)],
   ]
   const stats: Record<string, number> = {}
   for (const [family, channelId, build, opts] of families) {

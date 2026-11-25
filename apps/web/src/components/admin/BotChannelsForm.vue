@@ -32,6 +32,14 @@ const GROUPS: { title: string; fields: { key: keyof BotChannels; label: string; 
       { key: 'potw', label: '#player-of-the-week', hint: "Monday at noon ET: last week's best average score (2+ maps), plus two mentions." },
     ],
   },
+  {
+    title: '8s pick-up games',
+    fields: [
+      { key: 'eights', label: '#lf-8s', hint: 'The queue post (Join / Leave / Leaderboard) and a post per match with the report buttons.' },
+      { key: 'eights_team_a', label: '🔊 8s Team A (voice)', hint: 'Team A gets moved here when a match starts. The bot needs Move Members.' },
+      { key: 'eights_team_b', label: '🔊 8s Team B (voice)', hint: 'Team B gets moved here.' },
+    ],
+  },
 ]
 
 async function submit() {

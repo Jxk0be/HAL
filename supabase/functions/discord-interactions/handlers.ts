@@ -9,6 +9,7 @@ import { helpCommand } from './help.ts'
 import { esubButton } from './esub.ts'
 import { inviteButton } from './invite.ts'
 import { subsButton } from './subs.ts'
+import { eightsButton, eightsCommand } from './eights.ts'
 
 /**
  * Command, component, modal and autocomplete handlers. Later steps register more here:
@@ -49,6 +50,7 @@ export const registry: Registry = {
     reschedule: rescheduleCommand,
     report: reportCommand,
     dispute: disputeCommand,
+    '8s': eightsCommand,
   },
   components: {
     checkin: checkinHandler,
@@ -57,6 +59,7 @@ export const registry: Registry = {
     esub: esubButton,
     invite: inviteButton,
     subs: subsButton,
+    eights: eightsButton,
   },
   modals: {
     lfg: lfgModalHandler,
