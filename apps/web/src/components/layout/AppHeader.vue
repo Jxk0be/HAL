@@ -33,12 +33,13 @@ function isActive(to: string) {
         <BrandLogo :size="42" decorative />
       </RouterLink>
 
-      <nav aria-label="Main" class="ml-4 hidden flex-1 lg:block">
+      <!-- The full nav needs ~1200px; below xl it goes to the menu button so it never wraps or overflows. -->
+      <nav aria-label="Main" class="ml-4 hidden flex-1 xl:block">
         <ul class="flex items-center gap-1">
           <li v-for="item in mainNav" :key="item.to">
             <RouterLink
               :to="item.to"
-              class="relative block px-3 py-2 font-heading text-sm tracking-wider transition-colors"
+              class="relative block px-3 py-2 whitespace-nowrap font-heading text-sm tracking-wider transition-colors"
               :class="isActive(item.to) ? 'text-text' : 'text-muted hover:text-text'"
               :aria-current="isActive(item.to) ? 'page' : undefined"
             >
@@ -60,7 +61,7 @@ function isActive(to: string) {
         <UserMenu />
         <button
           type="button"
-          class="-mr-1 grid size-10 place-items-center rounded-md text-text hover:bg-surface-2 lg:hidden"
+          class="-mr-1 grid size-10 place-items-center rounded-md text-text hover:bg-surface-2 xl:hidden"
           aria-label="Open menu"
           aria-haspopup="dialog"
           :aria-expanded="drawerOpen"
