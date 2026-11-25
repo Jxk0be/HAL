@@ -6,6 +6,7 @@ import InvitesCard from '@/components/profile/InvitesCard.vue'
 import EmergencySubInvitesCard from '@/components/profile/EmergencySubInvitesCard.vue'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
+import RankBadge from '@/components/players/RankBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiCard from '@/components/ui/UiCard.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
@@ -51,6 +52,10 @@ const roleLabel = computed(() => {
             <div>
               <dt class="eyebrow text-muted">Platform</dt>
               <dd class="mt-1">{{ platformLabel }}</dd>
+            </div>
+            <div v-if="auth.isPlayer">
+              <dt class="eyebrow text-muted">Rank</dt>
+              <dd class="mt-1"><RankBadge :rank="auth.profile?.cod_rank" :exception-at="auth.profile?.rank_exception_at" /><span v-if="!auth.profile?.cod_rank">Not set</span></dd>
             </div>
             <div>
               <dt class="eyebrow text-muted">Status</dt>

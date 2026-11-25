@@ -19,7 +19,7 @@ Effective: November 20, 2026
 ## 2. Eligibility
 
 > [!IMPORTANT]
-> You must be 18 or older to play in BIL, and BIL is controller only on every platform. You confirm both when you set up your profile, and you can't withdraw either confirmation.
+> You must be 18 or older to play in BIL, and BIL is controller only on every platform. You confirm both when you set up your profile, and you can't withdraw either confirmation. BIL is for Gold to Crimson players (2.8–2.9).
 
 **2.1** Players must be 18 or older.
 
@@ -29,11 +29,17 @@ Effective: November 20, 2026
 
 **2.4** Admins may ask a PC player for a live screen-share during a match.
 
-**2.5** You log in with Discord and must set up your player profile before joining or creating a team: your Activision ID, your platform, and the confirmations in 2.1 and 2.3.
+**2.5** You log in with Discord and must set up your player profile before joining or creating a team: your Activision ID, your platform, your rank (2.8), and the confirmations in 2.1 and 2.3.
 
 **2.6** Your Activision ID must be your real, current ID. Each Activision ID can be registered to only one BIL account.
 
 **2.7** Players who are banned may not play, captain or join a team until the ban ends.
+
+**2.8** BIL is for Gold to Crimson players. Your rank is the higher of your peak ranked-play rank in the previous Call of Duty and your current rank. Bronze, Silver and Top 250 players can't play in the league. 8s are open to everyone.
+
+**2.9** Iridescent players can play only in extenuating circumstances, with an exception approved by an admin. Admins decide each case; approvals are recorded in the public audit log. An exception ends if the player's rank changes.
+
+**2.10** Keep your rank up to date on your profile. Entering a lower rank than your real one to get into the league is treated as cheating under Section 11, and staff may ask for proof of rank at any time.
 
 ## 3. Teams and Rosters
 

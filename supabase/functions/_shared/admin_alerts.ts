@@ -55,3 +55,14 @@ export function unreportedAlert(m: MsgMatch, siteUrl: string): MessagePayload {
     `${siteUrl}/matches/${m.id}`,
   )
 }
+
+/** A player set their rank to Iridescent: an admin decides whether they get an exception (rule 2.9). */
+export function rankExceptionAlert(player: { name: string; id: string }, siteUrl: string): MessagePayload {
+  return alert(
+    `Iridescent player wants to play: ${player.name}`,
+    `Blackhat is for Gold to Crimson. Iridescent players can play only with an exception for extenuating circumstances ` +
+      `(rule 2.9). Approve or leave it on Roster approvals.
+[Roster approvals](${siteUrl}/admin/rosters) · [Player](${siteUrl}/players/${player.id})`,
+    `${siteUrl}/admin/rosters`,
+  )
+}

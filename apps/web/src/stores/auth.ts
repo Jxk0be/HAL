@@ -3,15 +3,15 @@ import { computed, ref } from 'vue'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import type { Database } from '@/types/database'
-import { isProfileComplete } from '@/lib/validation/profile'
+import { hasFinishedSetup, isProfileComplete, rankStatus as toRankStatus } from '@/lib/validation/profile'
 
 type StaffRole = Database['public']['Enums']['staff_role']
 type ProfileRow = Database['public']['Tables']['profiles']['Row']
 
 /** Every profile column except discord_id (hidden from the API by column privileges). */
 export const PROFILE_COLUMNS =
-  'id, discord_username, avatar_url, activision_id, platform, age_confirmed_at, controller_confirmed_at, is_free_agent, is_player, banned_until, created_at, updated_at'
-export type MyProfile = Omit<ProfileRow, 'discord_id' | 'discord_synced_at'>
+  'id, discord_username, avatar_url, activision_id, platform, age_confirmed_at, controller_confirmed_at, is_free_agent, is_player, cod_rank, rank_exception_at, banned_until, created_at, updated_at'
+export type MyProfile = Omit<ProfileRow, 'discord_id' | 'discord_synced_at' | 'rank_exception_by'>
 
 export interface MyTeam {
   id: string
@@ -65,7 +65,12 @@ export const useAuthStore = defineStore('auth', () => {
   /** False for staff-only accounts (league staff who don't play; only the owner can switch it). */
   const isPlayer = computed(() => profile.value?.is_player !== false)
   // Staff-only accounts skip the player setup (Activision ID, 18+ and controller confirmations).
-  const isOnboarded = computed(() => !isPlayer.value || isProfileComplete(profile.value))
+  // A player who has set everything up (rank included) is onboarded even if their rank can't play
+  // in the league yet; canPlay / rankStatus say whether it can (rules 2.8–2.9).
+  const isOnboarded = computed(() => !isPlayer.value || hasFinishedSetup(profile.value))
+  /** Can join or create a team: mirrors public.is_profile_complete(). */
+  const canPlay = computed(() => isPlayer.value && isProfileComplete(profile.value))
+  const rankStatus = computed(() => toRankStatus(profile.value?.cod_rank, profile.value?.rank_exception_at))
   const bannedUntil = computed(() => {
     const until = profile.value?.banned_until
     return until && new Date(until).getTime() > Date.now() ? new Date(until) : null
@@ -187,6 +192,8 @@ export const useAuthStore = defineStore('auth', () => {
     isStaff,
     isPlayer,
     isOnboarded,
+    canPlay,
+    rankStatus,
     isBanned,
     bannedUntil,
     init,

@@ -24,17 +24,68 @@ export function validateActivisionId(raw: string): string | null {
   return null
 }
 
+export type CodRank = Database['public']['Enums']['cod_rank']
+
+/** Ranked-play ranks, lowest first. */
+export const RANK_OPTIONS: readonly { value: CodRank; label: string }[] = [
+  { value: 'bronze', label: 'Bronze' },
+  { value: 'silver', label: 'Silver' },
+  { value: 'gold', label: 'Gold' },
+  { value: 'platinum', label: 'Platinum' },
+  { value: 'diamond', label: 'Diamond' },
+  { value: 'crimson', label: 'Crimson' },
+  { value: 'iridescent', label: 'Iridescent' },
+  { value: 'top250', label: 'Top 250' },
+]
+export const rankLabel = (r: CodRank | null | undefined) => RANK_OPTIONS.find((o) => o.value === r)?.label ?? 'No rank'
+
+/**
+ * Rules 2.8–2.9: Gold to Crimson play; Iridescent needs an admin-approved exception; Bronze,
+ * Silver and Top 250 can't play in the league (8s are open to everyone). Mirrors rank_block_reason().
+ */
+export type RankStatus = 'missing' | 'eligible' | 'needs_exception' | 'too_low' | 'too_high'
+export function rankStatus(rank: CodRank | null | undefined, exceptionAt: string | null | undefined): RankStatus {
+  switch (rank) {
+    case null:
+    case undefined:
+      return 'missing'
+    case 'bronze':
+    case 'silver':
+      return 'too_low'
+    case 'top250':
+      return 'too_high'
+    case 'iridescent':
+      return exceptionAt ? 'eligible' : 'needs_exception'
+    default:
+      return 'eligible'
+  }
+}
+
+export const RANK_STATUS_TEXT: Record<Exclude<RankStatus, 'eligible' | 'missing'>, string> = {
+  needs_exception:
+    'Iridescent players need an exception approved by an admin before they can join a team (rule 2.9). The admins have been told; you can still play 8s.',
+  too_low: 'Blackhat is for Gold to Crimson players, so you can’t join a team this season (rule 2.8). 8s are open to everyone.',
+  too_high: 'Top 250 players can’t play in Blackhat (rule 2.8). 8s are open to everyone.',
+}
+
 export interface OnboardingFields {
   activision_id: string | null
   platform: Platform | null
   age_confirmed_at: string | null
   controller_confirmed_at: string | null
+  cod_rank: CodRank | null
+  rank_exception_at: string | null
 }
 
-/** Mirrors public.is_profile_complete(). */
-export function isProfileComplete(p: OnboardingFields | null | undefined): boolean {
+/** Every setup field filled in (rank included, whatever it is): the onboarding step is done. */
+export function hasFinishedSetup(p: OnboardingFields | null | undefined): boolean {
   if (!p) return false
-  return Boolean(p.activision_id && p.platform && p.age_confirmed_at && p.controller_confirmed_at)
+  return Boolean(p.activision_id && p.platform && p.age_confirmed_at && p.controller_confirmed_at && p.cod_rank)
+}
+
+/** Mirrors public.is_profile_complete(): set up and with a rank that can play in the league. */
+export function isProfileComplete(p: OnboardingFields | null | undefined): boolean {
+  return hasFinishedSetup(p) && rankStatus(p?.cod_rank, p?.rank_exception_at) === 'eligible'
 }
 
 /** Turn database errors from profile saves into messages for people. */

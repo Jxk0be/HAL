@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  hasFinishedSetup,
   isProfileComplete,
+  rankStatus,
   normalizeActivisionId,
   profileErrorMessage,
   validateActivisionId,
@@ -33,6 +35,8 @@ describe('isProfileComplete', () => {
     platform: 'playstation' as const,
     age_confirmed_at: '2026-01-01T00:00:00Z',
     controller_confirmed_at: '2026-01-01T00:00:00Z',
+    cod_rank: 'gold' as const,
+    rank_exception_at: null,
   }
 
   it('needs every console field', () => {
@@ -44,6 +48,32 @@ describe('isProfileComplete', () => {
 
   it('treats PC the same as consoles (no extra pledge)', () => {
     expect(isProfileComplete({ ...base, platform: 'pc' })).toBe(true)
+  })
+
+  it('needs a rank from Gold to Crimson, or Iridescent with an approved exception (rules 2.8–2.9)', () => {
+    expect(isProfileComplete({ ...base, cod_rank: null })).toBe(false)
+    for (const r of ['gold', 'platinum', 'diamond', 'crimson'] as const) expect(isProfileComplete({ ...base, cod_rank: r })).toBe(true)
+    for (const r of ['bronze', 'silver', 'top250', 'iridescent'] as const) expect(isProfileComplete({ ...base, cod_rank: r })).toBe(false)
+    expect(isProfileComplete({ ...base, cod_rank: 'iridescent', rank_exception_at: '2026-01-02T00:00:00Z' })).toBe(true)
+  })
+
+  it('counts setup as finished with any rank, so ineligible players are not stuck on onboarding', () => {
+    expect(hasFinishedSetup({ ...base, cod_rank: 'bronze' })).toBe(true)
+    expect(hasFinishedSetup({ ...base, cod_rank: null })).toBe(false)
+  })
+})
+
+describe('rankStatus', () => {
+  it.each([
+    [null, null, 'missing'],
+    ['silver', null, 'too_low'],
+    ['gold', null, 'eligible'],
+    ['crimson', null, 'eligible'],
+    ['iridescent', null, 'needs_exception'],
+    ['iridescent', '2026-01-02T00:00:00Z', 'eligible'],
+    ['top250', '2026-01-02T00:00:00Z', 'too_high'],
+  ] as const)('%s (exception %s) is %s', (rank, at, status) => {
+    expect(rankStatus(rank, at)).toBe(status)
   })
 })
 

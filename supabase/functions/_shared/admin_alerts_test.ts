@@ -1,5 +1,5 @@
 import { assertEquals } from 'jsr:@std/assert@1'
-import { disputeAlert, mismatchAlert, teamPendingAlert, unreportedAlert, withAdminPing } from './admin_alerts.ts'
+import { disputeAlert, mismatchAlert, rankExceptionAlert, teamPendingAlert, unreportedAlert, withAdminPing } from './admin_alerts.ts'
 
 const SITE = 'https://hal.example'
 const m = {
@@ -26,4 +26,13 @@ Deno.test('each alert links to where the admin acts', () => {
   assertEquals(teamPendingAlert({ name: 'Team Vectorize', tag: 'tV', captain: 'jake', players: 4 }, SITE).embeds![0]!.url, `${SITE}/admin/season`)
   assertEquals(disputeAlert(m, 'score', SITE, '123').embeds![0]!.description!.includes('<#123>'), true)
   assertEquals(unreportedAlert(m, SITE).embeds![0]!.url, `${SITE}/matches/m1`)
+})
+
+Deno.test('rank exception alert links to roster approvals and the player', () => {
+  const p = rankExceptionAlert({ id: 'u1', name: 'Ace#1234567' }, 'https://bil.example')
+  const e = p.embeds![0]!
+  assertEquals(e.title, 'Iridescent player wants to play: Ace#1234567')
+  assertEquals(e.url, 'https://bil.example/admin/rosters')
+  assertEquals(e.description!.includes('https://bil.example/players/u1'), true)
+  assertEquals(e.description!.includes('rule 2.9'), true)
 })

@@ -22,18 +22,20 @@ import { useToast } from '@/composables/useToast'
 import { useAuthStore } from '@/stores/auth'
 import { PLATFORM_OPTIONS } from '@/lib/validation/profile'
 import { FREE_AGENT_ROLES } from '@/lib/players'
+import { RANK_STATUS_TEXT } from '@/lib/validation/profile'
 
 const auth = useAuthStore()
 const toast = useToast()
 const board = useFreeAgentBoard()
 const { search, platform, role, page, pages, rows, total, loading, error } = board
 const { season } = useActiveSeason()
+const rankNote = computed(() => (auth.rankStatus in RANK_STATUS_TEXT ? RANK_STATUS_TEXT[auth.rankStatus as keyof typeof RANK_STATUS_TEXT] : null))
 
 // Your post
 const myPost = useMyFreeAgentPost()
 const postOpen = ref(false)
 const postError = ref<string | null>(null)
-const canPost = computed(() => auth.isSignedIn && auth.isOnboarded && !auth.team && !auth.isBanned)
+const canPost = computed(() => auth.isSignedIn && auth.canPlay && !auth.team && !auth.isBanned)
 async function savePost(v: PostInput) {
   postError.value = null
   const r = await myPost.save(v, season.value?.id ?? null)
@@ -111,6 +113,9 @@ const posted = (iso: string | null) =>
       <p v-else-if="auth.isSignedIn && !auth.isOnboarded" class="rounded-md border border-accent-dim/40 bg-accent-soft px-4 py-3 text-sm">
         <RouterLink to="/onboarding" class="text-accent hover:text-accent-strong">Finish your profile</RouterLink>
         to appear on the free agent board.
+      </p>
+      <p v-else-if="auth.isSignedIn && auth.isPlayer && !auth.canPlay && rankNote" class="rounded-md border border-accent-dim/40 bg-accent-soft px-4 py-3 text-sm">
+        {{ rankNote }}
       </p>
       <p v-else-if="!auth.isSignedIn" class="text-sm text-muted">
         <RouterLink to="/login" class="text-accent hover:text-accent-strong">Log in with Discord</RouterLink>

@@ -23,6 +23,7 @@ const expires = (iso: string) => new Date(iso).toLocaleDateString(undefined, { m
 <template>
   <UiCard v-if="!loading && invites.length > 0" eyebrow="Recruiting" title="Team invites">
     <p v-if="!auth.isOnboarded" class="mb-4 text-sm text-accent">Finish your profile below before accepting an invite.</p>
+    <p v-else-if="!auth.canPlay" class="mb-4 text-sm text-accent">Your rank can’t join a team yet (rules 2.8–2.9), so you can’t accept invites for now.</p>
     <ul class="flex flex-col gap-3">
       <li v-for="i in invites" :key="i.id" class="flex flex-wrap items-center gap-3 rounded-md border border-line bg-surface-2/50 p-3">
         <TeamLogo :tag="i.team.tag" :name="i.team.name" :logo-url="i.team.logoUrl" size="md" decorative />

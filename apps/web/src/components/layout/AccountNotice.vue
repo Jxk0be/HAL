@@ -2,8 +2,9 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { RANK_STATUS_TEXT } from '@/lib/validation/profile'
 
-/** Site-wide notice for signed-in players: banned, or profile setup still needed. */
+/** Site-wide notice for signed-in players: banned, profile setup still needed, or a rank that can't play yet. */
 const auth = useAuthStore()
 const route = useRoute()
 
@@ -14,6 +15,11 @@ const bannedText = computed(() => {
   return permanent
     ? 'Your account is permanently banned from Blackhat. You can still browse the site.'
     : `Your account is banned from league play until ${until.toLocaleDateString(undefined, { dateStyle: 'long' })}. You can still browse the site.`
+})
+const rankText = computed(() => {
+  if (!auth.isSignedIn || !auth.isPlayer || !auth.isOnboarded || auth.canPlay) return null
+  const s = auth.rankStatus
+  return s in RANK_STATUS_TEXT ? RANK_STATUS_TEXT[s as keyof typeof RANK_STATUS_TEXT] : null
 })
 const showSetup = computed(
   () => auth.isSignedIn && auth.profile && !auth.isOnboarded && !auth.isBanned && route.name !== 'onboarding',
@@ -30,6 +36,12 @@ const showSetup = computed(
       <RouterLink to="/onboarding" class="font-heading tracking-wider text-accent hover:text-accent-strong">
         Set it up →
       </RouterLink>
+    </p>
+  </div>
+  <div v-else-if="rankText" role="status" class="border-b border-accent-dim/40 bg-accent-soft print:hidden">
+    <p class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2.5 text-sm sm:px-6">
+      <span>{{ rankText }}</span>
+      <RouterLink to="/profile" class="font-heading tracking-wider text-accent hover:text-accent-strong">My profile →</RouterLink>
     </p>
   </div>
 </template>

@@ -4,7 +4,7 @@ export const site = {
   shortName: 'BIL',
   /** The two lines of the logo lockup. */
   wordmark: ['Blackhat', 'Invitational League'],
-  tagline: 'Competitive Call of Duty for NA controller players.',
+  tagline: 'Competitive Call of Duty for NA controller players, Gold to Crimson.',
   discordInviteUrl: import.meta.env.VITE_DISCORD_INVITE_URL,
   leagueTimezone: 'America/New_York',
 } as const

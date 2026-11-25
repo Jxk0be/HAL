@@ -717,6 +717,32 @@ export type Database = {
           },
         ]
       }
+      eights_cancel_requests: {
+        Row: {
+          created_at: string
+          match_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          match_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          match_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eights_cancel_requests_match_id_user_id_fkey"
+            columns: ["match_id", "user_id"]
+            isOneToOne: true
+            referencedRelation: "eights_players"
+            referencedColumns: ["match_id", "user_id"]
+          },
+        ]
+      }
       eights_matches: {
         Row: {
           channel_id: string | null
@@ -1823,6 +1849,7 @@ export type Database = {
           age_confirmed_at: string | null
           avatar_url: string | null
           banned_until: string | null
+          cod_rank: Database["public"]["Enums"]["cod_rank"] | null
           controller_confirmed_at: string | null
           created_at: string
           discord_id: string | null
@@ -1832,6 +1859,8 @@ export type Database = {
           is_free_agent: boolean
           is_player: boolean
           platform: Database["public"]["Enums"]["platform"] | null
+          rank_exception_at: string | null
+          rank_exception_by: string | null
           updated_at: string
         }
         Insert: {
@@ -1839,6 +1868,7 @@ export type Database = {
           age_confirmed_at?: string | null
           avatar_url?: string | null
           banned_until?: string | null
+          cod_rank?: Database["public"]["Enums"]["cod_rank"] | null
           controller_confirmed_at?: string | null
           created_at?: string
           discord_id?: string | null
@@ -1848,6 +1878,8 @@ export type Database = {
           is_free_agent?: boolean
           is_player?: boolean
           platform?: Database["public"]["Enums"]["platform"] | null
+          rank_exception_at?: string | null
+          rank_exception_by?: string | null
           updated_at?: string
         }
         Update: {
@@ -1855,6 +1887,7 @@ export type Database = {
           age_confirmed_at?: string | null
           avatar_url?: string | null
           banned_until?: string | null
+          cod_rank?: Database["public"]["Enums"]["cod_rank"] | null
           controller_confirmed_at?: string | null
           created_at?: string
           discord_id?: string | null
@@ -1864,9 +1897,33 @@ export type Database = {
           is_free_agent?: boolean
           is_player?: boolean
           platform?: Database["public"]["Enums"]["platform"] | null
+          rank_exception_at?: string | null
+          rank_exception_by?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_rank_exception_by_fkey"
+            columns: ["rank_exception_by"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_rank_exception_by_fkey"
+            columns: ["rank_exception_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_rank_exception_by_fkey"
+            columns: ["rank_exception_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       report_drafts: {
         Row: {
@@ -3340,6 +3397,10 @@ export type Database = {
         Args: { p_match_id: string; p_user_id: string; p_winner: string }
         Returns: Json
       }
+      eights_request_cancel: {
+        Args: { p_match_id: string; p_user_id: string }
+        Returns: Json
+      }
       eights_resolve: {
         Args: { p_actor: string; p_match_id: string; p_winner: string }
         Returns: undefined
@@ -3549,6 +3610,7 @@ export type Database = {
           total_count: number
         }[]
       }
+      rank_block_reason: { Args: { p_user_id: string }; Returns: string }
       remove_player: {
         Args: { p_team_id: string; p_user_id: string }
         Returns: undefined
@@ -3653,6 +3715,10 @@ export type Database = {
         Args: { p_live: boolean; p_match_id: string; p_url?: string }
         Returns: undefined
       }
+      set_rank_exception: {
+        Args: { p_approve: boolean; p_user_id: string }
+        Returns: undefined
+      }
       sub_board: {
         Args: never
         Returns: {
@@ -3714,6 +3780,15 @@ export type Database = {
       }
     }
     Enums: {
+      cod_rank:
+        | "bronze"
+        | "silver"
+        | "gold"
+        | "platinum"
+        | "diamond"
+        | "crimson"
+        | "iridescent"
+        | "top250"
       dispute_category:
         | "score"
         | "stats"
@@ -3890,6 +3965,16 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      cod_rank: [
+        "bronze",
+        "silver",
+        "gold",
+        "platinum",
+        "diamond",
+        "crimson",
+        "iridescent",
+        "top250",
+      ],
       dispute_category: [
         "score",
         "stats",

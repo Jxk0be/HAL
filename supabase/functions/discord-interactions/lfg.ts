@@ -50,7 +50,19 @@ async function openPostForm(userId: string, siteUrl: string): Promise<Reply> {
     db.from('free_agent_posts').select('preferred_role, availability, note').eq('user_id', userId).eq('active', true).maybeSingle(),
   ])
   if (complete !== true) {
-    return ephemeral(`Finish your profile first (Activision ID, platform and age): [set it up on the site](${siteUrl}/onboarding).`, 'error')
+    // Not complete: either setup is missing, or the rank can't play in the league (rules 2.8–2.9).
+    const { data: reason } = await db.rpc('rank_block_reason', { p_user_id: userId })
+    const setupDone = await db
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .not('activision_id', 'is', null)
+      .not('platform', 'is', null)
+      .not('age_confirmed_at', 'is', null)
+      .not('controller_confirmed_at', 'is', null)
+      .maybeSingle()
+    if (setupDone.data && typeof reason === 'string') return ephemeral(`${reason} [My profile](${siteUrl}/profile)`, 'error')
+    return ephemeral(`Finish your profile first (Activision ID, platform, rank and age): [set it up on the site](${siteUrl}/onboarding).`, 'error')
   }
   if (onTeam?.length) {
     return ephemeral(`You’re on a team, so you can’t post as a free agent. [My team](${siteUrl}/my-team)`, 'error')

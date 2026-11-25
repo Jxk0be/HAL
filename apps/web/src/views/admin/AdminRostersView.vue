@@ -8,6 +8,7 @@ import UiButton from '@/components/ui/UiButton.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
+import RankExceptionsPanel from '@/components/admin/RankExceptionsPanel.vue'
 import { useRecusal, useRosterRequests, type RosterRequestRow } from '@/composables/useAdmin'
 import { useToast } from '@/composables/useToast'
 
@@ -30,7 +31,7 @@ async function review(q: RosterRequestRow, approve: boolean) {
 
 <template>
   <div>
-    <PageHeader eyebrow="Admin" title="Roster approvals" description="Pending emergency subs and roster fixes. The free agent accepts first, then you approve; an approved emergency sub plays that one match only." />
+    <PageHeader eyebrow="Admin" title="Roster approvals" description="Pending emergency subs, roster fixes and Iridescent rank exceptions. The free agent accepts first, then you approve; an approved emergency sub plays that one match only." />
     <div class="px-4 py-8 sm:px-6">
       <UiSkeleton v-if="loading" :lines="5" />
       <UiEmptyState v-else-if="!rows.length" title="No pending requests" description="Captains request emergency subs from the match page." />
@@ -77,6 +78,7 @@ async function review(q: RosterRequestRow, approve: boolean) {
           </div>
         </li>
       </ul>
+      <div class="mt-10 border-t border-line pt-8"><RankExceptionsPanel /></div>
     </div>
   </div>
 </template>

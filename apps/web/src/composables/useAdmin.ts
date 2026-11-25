@@ -756,3 +756,45 @@ export function useAdminHealth() {
   void load()
   return { health, loading, reload: load }
 }
+
+export interface RankExceptionRow {
+  id: string
+  name: string
+  discordUsername: string | null
+  approvedAt: string | null
+}
+
+/** Iridescent players and their exceptions (rule 2.9): pending ones first. Admins approve or revoke. */
+export function useRankExceptions() {
+  const rows = ref<RankExceptionRow[]>([])
+  const loading = ref(true)
+  const busy = ref(false)
+
+  async function load() {
+    loading.value = true
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, activision_id, discord_username, rank_exception_at')
+      .eq('cod_rank', 'iridescent')
+      .eq('is_player', true)
+      .order('rank_exception_at', { ascending: true, nullsFirst: true })
+    rows.value = (data ?? []).map((p) => ({
+      id: p.id,
+      name: p.activision_id ?? playerName({ discordUsername: p.discord_username }),
+      discordUsername: p.discord_username,
+      approvedAt: p.rank_exception_at,
+    }))
+    loading.value = false
+  }
+
+  async function setException(userId: string, approve: boolean): Promise<Result<void>> {
+    busy.value = true
+    const r = await rpcResult<void>(supabase.rpc('set_rank_exception', { p_user_id: userId, p_approve: approve }))
+    busy.value = false
+    if (r.ok) await load()
+    return r
+  }
+
+  void load()
+  return { rows, loading, busy, setException, reload: load }
+}

@@ -202,11 +202,11 @@ Then the restrictions:
 
 ```
 # Welcome to the Blackhat Invitational League 🕶️
-A free-entry, NA-only Call of Duty: MW4 league on the CDL ruleset. Controller only, 18+. Best-of-5 series twice a week, with a $250 prize for the champions.
+A free-entry, NA-only Call of Duty: MW4 league on the CDL ruleset for **Gold to Crimson** players. Controller only, 18+. Best-of-5 series twice a week, with a $250 prize for the champions.
 
 ## Get set up (2 minutes)
 **1.** Log in on the site with Discord: https://YOUR-SITE/login
-**2.** Finish your profile: Activision ID, platform, and the 18+ and controller confirmations.
+**2.** Finish your profile: Activision ID, platform, your rank (the higher of your peak last CoD and your current rank), and the 18+ and controller confirmations.
 **3.** Done. Your roles here update by themselves: **Free Agent** until you join a team, then your team's role and private text + voice channels.
 
 ## Find a team
@@ -246,6 +246,7 @@ Every staff action is public on the audit log: https://YOUR-SITE/audit-log
 **Eligibility**
 • 18+, North America only, controller only on every platform. PC players may be asked to screen-share (2.1–2.4).
 • One account per Activision ID. Cheating devices = player banned permanently, team banned for the season (2.6, 11.1).
+• Gold to Crimson only: the higher of your peak rank last CoD and your current rank. Iridescent needs an admin-approved exception; Bronze, Silver and Top 250 can't play. 8s are open to everyone (2.8–2.10).
 
 **Rosters**
 • Up to 4 starters + 3 subs. One team per player per season. Teams need 4 players to be approved (3.1–3.5).

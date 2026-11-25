@@ -48,7 +48,7 @@ import { handleEsubEvent } from '../_shared/esub_flow.ts'
 import { runAutoAnnouncements } from '../_shared/announcement_flow.ts'
 import { handleInviteEvent } from '../_shared/invite_flow.ts'
 import { syncBoards } from '../_shared/board_sync.ts'
-import { disputeAlert, mismatchAlert, teamPendingAlert, unreportedAlert, withAdminPing } from '../_shared/admin_alerts.ts'
+import { disputeAlert, mismatchAlert, rankExceptionAlert, teamPendingAlert, unreportedAlert, withAdminPing } from '../_shared/admin_alerts.ts'
 
 const HANDLED = [
   'match_result',
@@ -70,6 +70,7 @@ const HANDLED = [
   'emergency_sub_declined',
   'emergency_sub_reviewed',
   'team_pending',
+  'rank_exception_needed',
   'mismatch_opened',
   'team_invite_sent',
   'team_invite_closed',
@@ -325,6 +326,21 @@ async function handleOutbox(ctx: Ctx, row: { id: number; type: string; payload: 
       const cap = (t as any).captain
       await sendMessage(ctx.channels.admin, withAdminPing(
         teamPendingAlert({ name: t.name, tag: t.tag, captain: cap?.discord_username ?? cap?.activision_id ?? 'a player', players }, ctx.siteUrl),
+        ctx.adminRole,
+      ))
+      bump(ctx, 'admin_alert')
+      return
+    }
+    case 'rank_exception_needed': {
+      if (!ctx.channels.admin) return
+      const { data: pr } = await ctx.db
+        .from('profiles')
+        .select('id, activision_id, discord_username, cod_rank, rank_exception_at')
+        .eq('id', String(p.user_id))
+        .maybeSingle()
+      if (!pr || pr.cod_rank !== 'iridescent' || pr.rank_exception_at) return // changed or approved since
+      await sendMessage(ctx.channels.admin, withAdminPing(
+        rankExceptionAlert({ id: pr.id, name: pr.activision_id ?? pr.discord_username ?? 'A player' }, ctx.siteUrl),
         ctx.adminRole,
       ))
       bump(ctx, 'admin_alert')

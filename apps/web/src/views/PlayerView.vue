@@ -8,6 +8,7 @@ import UiCard from '@/components/ui/UiCard.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import PlatformBadge from '@/components/ui/PlatformBadge.vue'
+import RankBadge from '@/components/players/RankBadge.vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import { usePlayer } from '@/composables/useDirectory'
@@ -16,7 +17,7 @@ import { site } from '@/config/site'
 
 const route = useRoute()
 const id = computed(() => (typeof route.params.id === 'string' ? route.params.id : null))
-const { player, loading } = usePlayer(id)
+const { player, rank, loading } = usePlayer(id)
 const { rows: seasons, history } = usePlayerStats(id)
 const current = computed(() => seasons.value[0] ?? null)
 
@@ -61,6 +62,7 @@ const statSlots = computed(() => {
             <h1 id="player-name" class="mt-1 truncate font-heading text-4xl sm:text-5xl">{{ player.name }}</h1>
             <p class="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted">
               <PlatformBadge :platform="player.platform" />
+              <RankBadge :rank="rank?.rank" :exception-at="rank?.exceptionAt" />
               <span v-if="player.discordUsername">{{ player.activisionId }}</span>
               <UiBadge v-if="player.banned" variant="loss">Banned</UiBadge>
               <UiBadge v-else-if="player.isFreeAgent" variant="win">Free agent</UiBadge>

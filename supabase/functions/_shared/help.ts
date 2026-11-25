@@ -71,7 +71,7 @@ function guideParts(kind: ChannelKind, siteUrl: string): { title: string; descri
             value:
               'Press **Post as free agent** below to post or edit yours (role, availability, a short note), ' +
               'and **Remove my post** when you join a team or stop looking. `/lfg post` and `/lfg remove` do the same from any channel.\n' +
-              'You need a finished Blackhat profile first: `/link`.',
+              'You need a finished Blackhat profile and a Gold to Crimson rank (Iridescent with an admin exception) first: `/link`.',
           },
           {
             name: 'Captains',

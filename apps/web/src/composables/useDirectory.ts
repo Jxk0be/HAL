@@ -1,6 +1,7 @@
 import { computed, ref, watch, type MaybeRefOrGetter, toValue } from 'vue'
 import { watchDebounced } from '@vueuse/core'
 import { supabase } from '@/lib/supabase'
+import type { CodRank } from '@/lib/validation/profile'
 import { useAuthStore } from '@/stores/auth'
 import type { MemberRole, Platform } from '@/lib/teams'
 import { PAGE_SIZE, playerName, type FreeAgentRole } from '@/lib/players'
@@ -161,21 +162,28 @@ export function usePlayerDirectory() {
 export function usePlayer(id: MaybeRefOrGetter<string | null | undefined>) {
   const auth = useAuthStore()
   const player = ref<DirectoryPlayer | null>(null)
+  /** Ranked-play rank (rules 2.8–2.9), public. */
+  const rank = ref<{ rank: CodRank | null; exceptionAt: string | null } | null>(null)
   const loading = ref(true)
 
   async function load() {
     const playerId = toValue(id)
     if (!playerId) {
       player.value = null
+      rank.value = null
       loading.value = false
       return
     }
     loading.value = true
-    const { data } = await supabase.rpc('player_directory', { p_player_id: playerId, p_limit: 1 })
+    const [{ data }, { data: r }] = await Promise.all([
+      supabase.rpc('player_directory', { p_player_id: playerId, p_limit: 1 }),
+      supabase.from('profiles').select('cod_rank, rank_exception_at').eq('id', playerId).maybeSingle(),
+    ])
     player.value = data?.[0] ? mapPlayer(data[0]) : null
+    rank.value = r ? { rank: r.cod_rank, exceptionAt: r.rank_exception_at } : null
     loading.value = false
   }
 
   watch([() => toValue(id), () => auth.isSignedIn], load, { immediate: true })
-  return { player, loading }
+  return { player, rank, loading }
 }

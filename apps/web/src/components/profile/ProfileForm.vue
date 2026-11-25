@@ -5,7 +5,15 @@ import UiSelect from '@/components/ui/UiSelect.vue'
 import UiCheckbox from '@/components/ui/UiCheckbox.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import type { MyProfile } from '@/stores/auth'
-import { PLATFORM_OPTIONS, validateActivisionId, type Platform } from '@/lib/validation/profile'
+import {
+  PLATFORM_OPTIONS,
+  RANK_OPTIONS,
+  RANK_STATUS_TEXT,
+  rankStatus,
+  validateActivisionId,
+  type CodRank,
+  type Platform,
+} from '@/lib/validation/profile'
 import { useMyProfile } from '@/composables/useMyProfile'
 
 const props = defineProps<{
@@ -21,6 +29,7 @@ const { save, saving, error } = useMyProfile()
 const form = reactive({
   activisionId: '',
   platform: '' as Platform | '',
+  rank: '' as CodRank | '',
   adult: false,
   controller: false,
   freeAgent: true,
@@ -30,6 +39,7 @@ const touched = ref(false)
 function reset(p: MyProfile) {
   form.activisionId = p.activision_id ?? ''
   form.platform = p.platform ?? ''
+  form.rank = p.cod_rank ?? ''
   form.adult = Boolean(p.age_confirmed_at)
   form.controller = Boolean(p.controller_confirmed_at)
   form.freeAgent = p.is_free_agent
@@ -39,9 +49,22 @@ watch(() => props.profile, reset, { immediate: true })
 const errors = computed(() => ({
   activisionId: validateActivisionId(form.activisionId),
   platform: form.platform ? null : 'Choose your platform.',
+  // Staff-only accounts don't play, so they don't need a rank.
+  rank: form.rank || props.profile.is_player === false ? null : 'Choose your rank.',
   adult: form.adult ? null : 'You must be 18 or older to play in Blackhat.',
   controller: form.controller ? null : 'Blackhat is controller only on every platform.',
 }))
+/** What the chosen rank means (an approved Iridescent exception carries over while the rank stays the same). */
+const rankNote = computed(() => {
+  if (!form.rank) return null
+  const keepsException = form.rank === props.profile.cod_rank ? props.profile.rank_exception_at : null
+  const status = rankStatus(form.rank, keepsException)
+  if (status === 'eligible') {
+    return { ok: true, text: form.rank === 'iridescent' ? 'Exception approved: you can play in the league.' : 'You can play in the league.' }
+  }
+  return status === 'missing' ? null : { ok: false, text: RANK_STATUS_TEXT[status] }
+})
+
 const valid = computed(() => Object.values(errors.value).every((e) => e === null))
 const show = (key: keyof typeof errors.value) => (touched.value ? (errors.value[key] ?? undefined) : undefined)
 
@@ -53,6 +76,7 @@ async function submit() {
   const ok = await save({
     activision_id: form.activisionId,
     platform: form.platform,
+    ...(form.rank ? { cod_rank: form.rank } : {}),
     is_free_agent: props.onTeam ? p.is_free_agent : form.freeAgent,
     ...(p.age_confirmed_at ? {} : { age_confirmed_at: now }),
     ...(p.controller_confirmed_at ? {} : { controller_confirmed_at: now }),
@@ -81,6 +105,19 @@ async function submit() {
         required
         :error="show('platform')"
       />
+    </div>
+
+    <div v-if="profile.is_player !== false" class="flex flex-col gap-2">
+      <UiSelect
+        v-model="form.rank"
+        label="Rank"
+        placeholder="Choose your rank"
+        :options="RANK_OPTIONS"
+        required
+        hint="The higher of your peak rank in the previous Call of Duty and your current rank. Blackhat is for Gold to Crimson; Iridescent needs an admin-approved exception (rules 2.8–2.9)."
+        :error="show('rank')"
+      />
+      <p v-if="rankNote" class="text-sm" :class="rankNote.ok ? 'text-win' : 'text-accent'" role="status">{{ rankNote.text }}</p>
     </div>
 
     <fieldset class="flex flex-col gap-4 rounded-lg border border-line bg-surface-2/50 p-4 sm:p-5">
