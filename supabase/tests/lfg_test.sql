@@ -71,21 +71,14 @@ begin
   end if;
   v_checks := v_checks + 2;
 
-  -- Remove, then a new post within 24h is refused.
+  -- Remove, then post again straight away (no daily limit).
   v_json := public.lfg_remove_as(u[1]);
   if not (v_json ->> 'removed')::boolean or v_json ->> 'message_id' <> '222' then
     raise exception 'FAIL: remove wrong: %', v_json;
   end if;
-  begin
-    perform public.lfg_upsert_as(u[1], 'AR', null, null);
-    raise exception 'FAIL: second post within 24 hours';
-  exception when sqlstate 'P0001' then
-    if sqlerrm not like '%post again%' then raise; end if;
-  end;
-  update public.free_agent_posts set created_at = now() - interval '25 hours' where user_id = u[1];
   v_json := public.lfg_upsert_as(u[1], 'AR', null, null);
   v_post := (v_json ->> 'post_id')::uuid;
-  v_checks := v_checks + 3;
+  v_checks := v_checks + 2;
 
   -- Invite from Discord: only captains; joining the team takes the post down (lfg_changed).
   perform public.lfg_set_message(v_post, '111', '333');
