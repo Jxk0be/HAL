@@ -2,6 +2,7 @@ import { ephemeral, type Registry } from '../_shared/interactions.ts'
 import { halEmbed } from '../_shared/embeds.ts'
 import { checkinHandler } from './checkin.ts'
 import { lfgButton, lfgCommand, lfgModalHandler } from './lfg.ts'
+import { recruitButton } from './recruit.ts'
 import { rescheduleAutocomplete, rescheduleButton, rescheduleCommand } from './reschedule.ts'
 import { reportAutocomplete, reportCommand, reportModal } from './report.ts'
 import { disputeAutocomplete, disputeCommand, disputeModal } from './dispute.ts'
@@ -63,6 +64,7 @@ export const registry: Registry = {
     subs: subsButton,
     eights: eightsButton,
     preseason: preseasonButton,
+    recruit: recruitButton,
   },
   modals: {
     lfg: lfgModalHandler,

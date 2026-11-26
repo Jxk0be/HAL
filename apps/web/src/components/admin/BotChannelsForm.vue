@@ -18,6 +18,7 @@ const GROUPS: { title: string; fields: { key: keyof BotChannels; label: string; 
       { key: 'announcements', label: '#announcements', hint: 'Season announcements and "Now live" posts when a caster goes live.' },
       { key: 'results', label: '#results', hint: 'Final scores, map by map, and the top performer.' },
       { key: 'lfg', label: '#free-agents', hint: 'Free agent cards with an Invite to team button. Players post with the buttons on the pinned guide.' },
+      { key: 'recruiting', label: '#teams-recruiting', hint: "Teams' recruiting posts from My team, with an I'm interested button. Removed when the spot fills." },
       { key: 'disputes', label: '#disputes', hint: 'A private thread per dispute with both captains and the non-recused admins.' },
       { key: 'admin', label: '#admin-only', hint: 'Everything waiting on an admin, with a BIL Admin ping.' },
     ],

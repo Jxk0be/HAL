@@ -3053,6 +3053,143 @@ export type Database = {
           },
         ]
       }
+      team_recruit_interest: {
+        Row: {
+          created_at: string
+          notified_at: string | null
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          notified_at?: string | null
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          notified_at?: string | null
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_recruit_interest_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "team_recruit_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_recruit_interest_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_recruit_interest_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_recruit_interest_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_recruit_posts: {
+        Row: {
+          active: boolean
+          availability: string | null
+          closed_reason: string | null
+          created_at: string
+          created_by: string | null
+          discord_channel_id: string | null
+          discord_message_id: string | null
+          id: string
+          looking_for: string
+          note: string | null
+          preferred_role: string | null
+          season_id: string
+          team_id: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          availability?: string | null
+          closed_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          discord_channel_id?: string | null
+          discord_message_id?: string | null
+          id?: string
+          looking_for: string
+          note?: string | null
+          preferred_role?: string | null
+          season_id: string
+          team_id: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          availability?: string | null
+          closed_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          discord_channel_id?: string | null
+          discord_message_id?: string | null
+          id?: string
+          looking_for?: string
+          note?: string | null
+          preferred_role?: string | null
+          season_id?: string
+          team_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_recruit_posts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_recruit_posts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_recruit_posts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_recruit_posts_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_recruit_posts_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       teams: {
         Row: {
           captain_id: string
@@ -3908,6 +4045,50 @@ export type Database = {
         Returns: undefined
       }
       rank_block_reason: { Args: { p_user_id: string }; Returns: string }
+      recruit_block_reason: {
+        Args: { p_looking_for: string; p_team_id: string }
+        Returns: string
+      }
+      recruit_board: {
+        Args: never
+        Returns: {
+          availability: string
+          logo_url: string
+          looking_for: string
+          note: string
+          open: number
+          post_id: string
+          preferred_role: string
+          starters_open: number
+          subs_open: number
+          team_id: string
+          team_name: string
+          team_status: Database["public"]["Enums"]["team_status"]
+          team_tag: string
+          updated_at: string
+        }[]
+      }
+      recruit_close: {
+        Args: { p_reason: string; p_team_id: string }
+        Returns: undefined
+      }
+      recruit_close_stale: { Args: never; Returns: number }
+      recruit_interest: { Args: { p_post_id: string }; Returns: string }
+      recruit_interest_as: {
+        Args: { p_actor: string; p_post_id: string }
+        Returns: string
+      }
+      recruit_remove: { Args: { p_post_id: string }; Returns: undefined }
+      recruit_save: {
+        Args: {
+          p_availability: string
+          p_looking_for: string
+          p_note: string
+          p_role: string
+          p_team_id: string
+        }
+        Returns: string
+      }
       remove_player: {
         Args: { p_team_id: string; p_user_id: string }
         Returns: undefined

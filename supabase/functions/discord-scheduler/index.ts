@@ -6,7 +6,7 @@
  *    warning (plus #admin-only) if a team hasn't checked in at the start time.
  * 2. Drains notifications_outbox for the types it handles: results to #results, "Now live" to
  *    #announcements, reschedule notices to both team channels, check-in confirmations, and new
- *    disputes to #admin-only, and preseason invites, shared channels and proposals
+ *    disputes to #admin-only, #teams-recruiting cards and "I'm interested" notices, and preseason invites, shared channels and proposals
  *    (preseason_flow.ts). Other types stay queued for later features.
  *
  * 3. Live boards (board_sync.ts): #team-rosters, #standings, #match-schedule, #sub-board and the
@@ -43,6 +43,7 @@ import {
 } from '../_shared/match_messages.ts'
 import { dueKinds, scanWindow, type Kind } from './plan.ts'
 import { deleteLfgMessage, publishLfg } from '../_shared/lfg_sync.ts'
+import { deleteRecruitMessage, notifyInterest, publishRecruit } from '../_shared/recruit_sync.ts'
 import { refreshDiscordProfiles } from '../_shared/discord_profile.ts'
 import { finishRescheduleRequest, postRescheduleRequest } from '../_shared/reschedule_flow.ts'
 import { closeDisputeThread, ensureDisputeThread, postDisputeComment, reopenDisputeThread } from '../_shared/dispute_flow.ts'
@@ -68,6 +69,9 @@ const HANDLED = [
   'dispute_reopened',
   'lfg_changed',
   'lfg_deleted',
+  'recruit_changed',
+  'recruit_deleted',
+  'recruit_interest',
   'emergency_sub_requested',
   'emergency_sub_accepted',
   'emergency_sub_declined',
@@ -297,6 +301,19 @@ async function handleOutbox(ctx: Ctx, row: { id: number; type: string; payload: 
       await handleEsubEvent(ctx.db, row.type, String(p.request_id), ctx.siteUrl)
       bump(ctx, 'esub')
       return
+    case 'recruit_changed':
+      // Team recruiting post saved, removed or closed (roster full, team removed, rosters locked).
+      await publishRecruit(ctx.db, String(p.post_id), ctx.channels.recruiting, ctx.siteUrl)
+      bump(ctx, 'recruit')
+      return
+    case 'recruit_deleted':
+      await deleteRecruitMessage(p.channel_id as string | null, p.message_id as string | null)
+      bump(ctx, 'recruit')
+      return
+    case 'recruit_interest':
+      await notifyInterest(ctx.db, String(p.post_id), String(p.user_id), ctx.siteUrl)
+      bump(ctx, 'recruit_interest')
+      return
     case 'lfg_deleted':
       await deleteLfgMessage(p.channel_id as string | null, p.message_id as string | null)
       bump(ctx, 'lfg')
@@ -455,6 +472,12 @@ Deno.serve(async (req) => {
     await unreportedAlerts(ctx, Date.now())
   } catch (err) {
     await logError(ctx, 'unreported_admin', {}, err)
+  }
+  try {
+    // Recruiting posts whose season locked rosters or ended: queue their removal before draining.
+    await ctx.db.rpc('recruit_close_stale')
+  } catch (err) {
+    await logError(ctx, 'recruit_close_stale', {}, err)
   }
   try {
     await drainOutbox(ctx)

@@ -13,6 +13,7 @@ import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import UiPagination from '@/components/ui/UiPagination.vue'
 import PlatformBadge from '@/components/ui/PlatformBadge.vue'
 import FreeAgentPostForm from '@/components/players/FreeAgentPostForm.vue'
+import RecruitingTabs from '@/components/players/RecruitingTabs.vue'
 import { useFreeAgentBoard, type FreeAgentCard } from '@/composables/useDirectory'
 import { useFreeAgentModeration, useMyFreeAgentPost, useOpenSpots, type PostInput } from '@/composables/useFreeAgentPost'
 import { useTeamInvites } from '@/composables/useInvites'
@@ -103,6 +104,8 @@ const posted = (iso: string | null) =>
     </PageHeader>
 
     <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 sm:px-6">
+      <RecruitingTabs />
+
       <!-- Your post -->
       <UiCard v-if="canPost && myPost.post.value" eyebrow="Your post" title="You're on the board">
         <p class="text-sm text-muted">

@@ -144,6 +144,11 @@ The step-by-step build plan is `hal-build-guide.html` (kept outside the repo); e
   - Both are SECURITY DEFINER functions with filtering and paging (30 per page, max 60): `free_agent_board(search, platform, role, limit, offset)` and `player_directory(search, player_id, limit, offset)`, each with `total_count` on every row.
   - Both return `discord_username` only to signed-in callers, and only signed-in callers can search by it. Search input goes through `like_pattern()`, so wildcards are escaped.
   - The board lists free agents with a complete profile who aren't banned, posts first. Use `useFreeAgentBoard`, `usePlayerDirectory` and `usePlayer` in `useDirectory.ts`.
+- Team recruiting posts (the reverse of free agent posts):
+  - `team_recruit_posts` (one active per team; `looking_for` starter|sub|any, `preferred_role` AR|SMG|Flex or null, availability, note) and `team_recruit_interest` (post, player; once each). No direct writes: `recruit_save` / `recruit_remove` (captain or co-captain; admins can remove) and `recruit_interest` (site) / `recruit_interest_as` (bot). `recruit_block_reason` mirrors the open-spot rules; `lookingForOptions` in `src/lib/recruiting.ts` mirrors it for the form.
+  - Posts close by themselves (`recruit_close`): the advertised spot fills (trigger on `team_members`), the team is removed, or rosters lock / the season ends (`recruit_close_stale`, called by the scheduler each run).
+  - The public page `/teams-recruiting` reads `recruit_board()` (SECURITY DEFINER, active posts plus open-spot counts). My team shows `RecruitPostCard` (form, interested players with Invite). `RecruitingTabs` links it with Free Agents.
+  - Discord via the outbox: `recruit_changed` (post/edit/delete the card in #teams-recruiting, channel key `recruiting`), `recruit_deleted`, `recruit_interest` (pings the captains in the team channel, once per player and post via `notified_at`). Code: `_shared/recruit_messages.ts` (pure, tested), `_shared/recruit_sync.ts`, `discord-interactions/recruit.ts` (`recruit:interest:<postId>`).
 - Free agent posts:
   - `preferred_role` is one of `AR`, `SMG`, `Flex`. Posting needs a complete profile and no team, and lists you as a free agent (`free_agent_posts_guard`).
   - Joining a team deactivates your post. Staff can take down or delete any post (audited).

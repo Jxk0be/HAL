@@ -82,6 +82,7 @@ export function useDiscordSync() {
 
 export const BOT_CHANNEL_KEYS = [
   'lfg',
+  'recruiting',
   'disputes',
   'results',
   'announcements',

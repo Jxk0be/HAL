@@ -161,7 +161,9 @@ Then the restrictions:
   the card always lands here.
 - **8s voice channels:** a user limit of 8 on Team A/B is fine (the bot can move people into a full
   channel only if it has Move Members there, which the category ✓ above gives it).
-- **#teams-recruiting:** optional slow mode of 6 hours, so each captain's post stays visible.
+- **#teams-recruiting:** read-only like #free-agents (@everyone → **Send Messages ✗**; the bot needs
+  **Send Messages ✓** and **Embed Links ✓**). Captains post from **My team → Looking for players** on the
+  site and the bot posts the card here. Set the channel ID in Admin → Discord → Bot channels.
 - **STAFF category and 🔊 Admin:** @everyone → **View Channel ✗**; BIL Admin → **View Channel ✓**.
   Sync the channels inside to the category.
 - **🔊 Casting Stage:** a Stage channel; add BIL Caster (and BIL Admin) as **Stage Moderators**.
@@ -211,7 +213,8 @@ A free-entry, NA-only Call of Duty: MW4 league on the CDL ruleset for **Gold to 
 
 ## Find a team
 • Free agents: press **Post as free agent** on the pinned message in #free-agents. It also shows on https://YOUR-SITE/free-agents
-• Captains: post what you need in #teams-recruiting, invite from the site, or press **Invite to team** on a #free-agents card.
+• Captains: post what you need from **My team → Looking for players** (it shows in #teams-recruiting), invite from the site, or press **Invite to team** on a #free-agents card.
+• Players: press **I'm interested** on a #teams-recruiting card and the captains get a ping.
 • Starting a team? Create it on the site while signups are open. It's approved once you have 4 players.
 
 ## Around the server
@@ -297,16 +300,12 @@ Breaking a GA costs your team the map unless the rulebook lists another penalty 
 
 ```
 # Teams recruiting
-Captains: post what you're looking for. One post per team, refresh it instead of spamming.
+Teams looking for a starter or a sub. The bot posts them here.
 
-**Template**
-Team: [TAG] Name
-Looking for: AR / SMG / Flex · starter or sub
-Platform / region: PS5 · East
-Times: Tue & Thu 9 PM ET + scrims Sun
-DM the captain or reply here.
+**Players:** press **I'm interested** on a card. The team's captains get a ping in their team channel, and if they want you the invite comes to your DMs and your profile with Accept / Decline.
+**Captains:** post from **My team → Looking for players** on the site: https://YOUR-SITE/my-team. One post per team; edit it there. It comes down by itself once the spot is filled.
 
-Players: you can also press **Post as free agent** in #free-agents so captains find you, and invites come to your DMs with Accept / Decline.
+All posts are also on https://YOUR-SITE/teams-recruiting. Not seeing a fit? Press **Post as free agent** in #free-agents so captains can find you.
 ```
 
 ### #sub-board (pin this)
@@ -362,7 +361,7 @@ Full season stats: https://YOUR-SITE/leaderboard
 | #results            | Confirmed results, posted by the bot. Wrong? Captains /dispute in your team channel.                                                   |
 | #player-of-the-week | Monday noon ET: last week's top performer.                                                                                             |
 | #free-agents        | Free agents: press Post as free agent on the pinned message (or /lfg post from any channel) · Captains: press Invite to team on a card |
-| #teams-recruiting   | Captains: who you need, one post per team.                                                                                             |
+| #teams-recruiting   | Teams looking for players (posted from My team on the site) · Players: press I'm interested                                            |
 | #sub-board          | Teams short for a match. Not on a team? Press I'm available.                                                                           |
 | #clips              | Your best plays. Links or uploads.                                                                                                     |
 | #suggestions        | One idea per message. 👍 / 👎 to vote.                                                                                                 |

@@ -14,6 +14,7 @@ import InvitePanel from '@/components/team/InvitePanel.vue'
 import TeamRequestsPanel from '@/components/team/TeamRequestsPanel.vue'
 import TeamIdentityForm from '@/components/team/TeamIdentityForm.vue'
 import PreseasonCard from '@/components/team/PreseasonCard.vue'
+import RecruitPostCard from '@/components/team/RecruitPostCard.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useActiveSeason } from '@/composables/useActiveSeason'
 import { useTeam } from '@/composables/useTeams'
@@ -258,6 +259,7 @@ const lockDate = computed(() =>
             <UiCard v-if="canManage" eyebrow="Matches" title="Requests">
               <TeamRequestsPanel :team-id="team.id" />
             </UiCard>
+            <RecruitPostCard v-if="canManage" :team-id="team.id" :locked="locked" />
             <UiCard v-if="canManage" eyebrow="Recruit" title="Invite players">
               <InvitePanel :team-id="team.id" :open-spots="openSpots" :locked="locked" />
             </UiCard>

@@ -64,6 +64,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Free Agents', eyebrow: 'Recruiting', description: 'Players looking for a team. Captains can invite them while they have an open spot.', buildStep: 7 },
   },
   {
+    path: '/teams-recruiting',
+    name: 'teams-recruiting',
+    component: () => import('@/views/TeamsRecruitingView.vue'),
+    meta: { title: 'Teams recruiting', eyebrow: 'Recruiting', description: 'Teams looking for a starter or a sub.' },
+  },
+  {
     path: '/rules',
     name: 'rules',
     component: () => import('@/views/RulesView.vue'),
