@@ -54,7 +54,7 @@ export function inviteClosedDm(i: InviteInfo, status: InviteStatus, siteUrl: str
     pending: { title: `${i.team.name} invited you`, body: 'Waiting for your answer.' },
     accepted: { title: `You joined ${i.team.name}`, body: `You're on the roster. Your team channel and roles are set up within a minute.`, color: HAL_WIN },
     declined: { title: 'Invite declined', body: `You declined ${i.team.name}'s invite. Their captain has been told.`, color: HAL_LOSS },
-    cancelled: { title: 'Invite closed', body: `This invite from ${i.team.name} was cancelled (withdrawn, or you joined another team).` },
+    cancelled: { title: 'Invite closed', body: `This invite from ${i.team.name} was canceled (withdrawn, or you joined another team).` },
     expired: { title: 'Invite expired', body: `This invite from ${i.team.name} expired.` },
   }
   const t = text[status]

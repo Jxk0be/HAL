@@ -18,7 +18,7 @@ describe('profile extras', () => {
     expect(handleProblem('tiktok', '')).toBeNull()
   })
 
-  it('maps colours to theme tokens', () => {
+  it('maps colors to theme tokens', () => {
     expect(profileColorVar('blue')).toBe('var(--color-profile-blue)')
     expect(profileColorVar(null)).toBe('var(--color-profile-red)')
     expect(profileColorVar('pink')).toBe('var(--color-profile-red)')

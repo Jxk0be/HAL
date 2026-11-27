@@ -166,6 +166,8 @@ export function usePlayer(id: MaybeRefOrGetter<string | null | undefined>) {
   const rank = ref<{ rank: CodRank | null; exceptionAt: string | null } | null>(null)
   /** What the player chose to show (My profile → Customize). */
   const extras = ref<PlayerExtras | null>(null)
+  /** Their active free agent post (role, availability, note), if any. */
+  const freeAgentPost = ref<PlayerFreeAgentPost | null>(null)
   const loading = ref(true)
 
   async function load() {
@@ -173,25 +175,34 @@ export function usePlayer(id: MaybeRefOrGetter<string | null | undefined>) {
     if (!playerId) {
       player.value = null
       rank.value = null
+      freeAgentPost.value = null
       loading.value = false
       return
     }
     loading.value = true
-    const [{ data }, { data: r }] = await Promise.all([
+    const [{ data }, { data: r }, { data: fa }] = await Promise.all([
       supabase.rpc('player_directory', { p_player_id: playerId, p_limit: 1 }),
       supabase
         .from('profiles')
-        .select('cod_rank, rank_exception_at, bio, main_role, favorite_weapon, profile_color, twitch_handle, youtube_handle, x_handle, tiktok_handle')
+        .select('cod_rank, rank_exception_at, bio, main_role, profile_color, twitch_handle, youtube_handle, x_handle, tiktok_handle')
         .eq('id', playerId)
         .maybeSingle(),
+      supabase
+        .from('free_agent_posts')
+        .select('preferred_role, availability, note, updated_at')
+        .eq('user_id', playerId)
+        .eq('active', true)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ])
+    freeAgentPost.value = fa ? { role: fa.preferred_role, availability: fa.availability, note: fa.note, updatedAt: fa.updated_at } : null
     player.value = data?.[0] ? mapPlayer(data[0]) : null
     rank.value = r ? { rank: r.cod_rank, exceptionAt: r.rank_exception_at } : null
     extras.value = r
       ? {
           bio: r.bio,
           mainRole: r.main_role,
-          favoriteWeapon: r.favorite_weapon,
           color: r.profile_color,
           socials: { twitch: r.twitch_handle, youtube: r.youtube_handle, x: r.x_handle, tiktok: r.tiktok_handle },
         }
@@ -200,13 +211,19 @@ export function usePlayer(id: MaybeRefOrGetter<string | null | undefined>) {
   }
 
   watch([() => toValue(id), () => auth.isSignedIn], load, { immediate: true })
-  return { player, rank, extras, loading }
+  return { player, rank, extras, freeAgentPost, loading }
+}
+
+export interface PlayerFreeAgentPost {
+  role: string | null
+  availability: string | null
+  note: string | null
+  updatedAt: string
 }
 
 export interface PlayerExtras {
   bio: string | null
   mainRole: string | null
-  favoriteWeapon: string | null
   color: string | null
   socials: Record<'twitch' | 'youtube' | 'x' | 'tiktok', string | null>
 }

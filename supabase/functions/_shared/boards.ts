@@ -131,7 +131,7 @@ function matchLine(m: ScheduleMatch, siteUrl: string): string {
     case 'forfeit':
       return `🏳️ ${vs} · forfeit · ${link}`
     case 'cancelled':
-      return `~~${vs}~~ · cancelled`
+      return `~~${vs}~~ · canceled`
     case 'live':
       return `🔴 ${vs} · live now · ${link}`
     case 'awaiting_reports':
@@ -251,7 +251,7 @@ export function potwPost(d: { weekLabel: string; players: WeekPlayer[] }, siteUr
         url: `${siteUrl}/leaderboard`,
         description: `${d.weekLabel}\n${statLine(winner)}`,
         fields: rest.length
-          ? [{ name: 'Honourable mentions', value: rest.map((p, i) => `${i + 2}. ${tag(p)}**${p.name}** · ${statLine(p)}`).join('\n') }]
+          ? [{ name: 'Honorable mentions', value: rest.map((p, i) => `${i + 2}. ${tag(p)}**${p.name}** · ${statLine(p)}`).join('\n') }]
           : undefined,
       }),
     ],

@@ -43,7 +43,7 @@ async function run(r: TeamRequest, p: Promise<{ ok: boolean; message?: string }>
             <UiButton size="sm" :loading="busy === r.id" @click="run(r, rescheduleActions.respond(r.id, true), 'Accepted. The match time is updated.')">Accept</UiButton>
             <UiButton size="sm" variant="secondary" :disabled="busy === r.id" @click="run(r, rescheduleActions.respond(r.id, false), 'Declined.')">Decline</UiButton>
           </template>
-          <UiButton v-else size="sm" variant="ghost" :disabled="busy === r.id" @click="run(r, rescheduleActions.cancel(r.id), 'Request cancelled.')">Cancel request</UiButton>
+          <UiButton v-else size="sm" variant="ghost" :disabled="busy === r.id" @click="run(r, rescheduleActions.cancel(r.id), 'Request canceled.')">Cancel request</UiButton>
         </div>
       </li>
     </ul>

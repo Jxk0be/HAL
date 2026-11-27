@@ -70,14 +70,14 @@ async function submit() {
 }
 const respond = (r: RescheduleRequest, accept: boolean) =>
   run(rescheduleActions.respond(r.id, accept), accept ? 'Accepted. The match time is updated.' : 'Declined. The match stays at its time.')
-const cancel = (r: RescheduleRequest) => run(rescheduleActions.cancel(r.id), 'Request cancelled.')
+const cancel = (r: RescheduleRequest) => run(rescheduleActions.cancel(r.id), 'Request canceled.')
 
 const STATUS: Record<RescheduleRequest['status'], { label: string; variant: 'win' | 'loss' | 'neutral' | 'accent' }> = {
   pending: { label: 'Pending', variant: 'accent' },
   accepted: { label: 'Accepted', variant: 'win' },
   declined: { label: 'Declined', variant: 'loss' },
   expired: { label: 'Expired', variant: 'neutral' },
-  cancelled: { label: 'Cancelled', variant: 'neutral' },
+  cancelled: { label: 'Canceled', variant: 'neutral' },
 }
 </script>
 

@@ -51,7 +51,7 @@ const cancelTarget = ref<PreseasonPairing | null>(null)
 async function cancelPairing() {
   const p = cancelTarget.value
   if (!p) return
-  if (await done(await ps.cancelPairing(p.id), `${p.home.tag} vs ${p.away.tag} cancelled. Both teams are told in Discord.`)) cancelTarget.value = null
+  if (await done(await ps.cancelPairing(p.id), `${p.home.tag} vs ${p.away.tag} canceled. Both teams are told in Discord.`)) cancelTarget.value = null
 }
 
 const ANSWER = {
@@ -147,7 +147,7 @@ const answerOf = (t: (typeof teams.value)[number]) => (!t.invited ? ANSWER.none 
                     {{ p.home.name }} vs {{ p.away.name }}<template v-if="!p.hasChannel && p.status !== 'cancelled'"> · Discord channel coming</template>
                   </span>
                 </span>
-                <UiBadge v-if="p.status === 'cancelled'" variant="loss">Cancelled</UiBadge>
+                <UiBadge v-if="p.status === 'cancelled'" variant="loss">Canceled</UiBadge>
                 <RouterLink v-else-if="p.match" :to="`/matches/${p.match.id}`" class="hover:text-accent">
                   <LeagueTime :iso="p.match.scheduledAt" />
                 </RouterLink>
@@ -180,7 +180,7 @@ const answerOf = (t: (typeof teams.value)[number]) => (!t.invited ? ANSWER.none 
     </UiModal>
 
     <UiModal :model-value="!!cancelTarget" :title="cancelTarget ? `Cancel ${cancelTarget.home.tag} vs ${cancelTarget.away.tag}?` : 'Cancel'" size="sm" @update:model-value="(v: boolean) => !v && (cancelTarget = null)">
-      <p class="text-sm text-muted">The match is cancelled (if it had a time) and both teams are told in Discord. The shared channel stays for the record.</p>
+      <p class="text-sm text-muted">The match is canceled (if it had a time) and both teams are told in Discord. The shared channel stays for the record.</p>
       <template #footer>
         <UiButton variant="ghost" @click="cancelTarget = null">Keep it</UiButton>
         <UiButton variant="danger" :loading="busy" @click="cancelPairing">Cancel match</UiButton>

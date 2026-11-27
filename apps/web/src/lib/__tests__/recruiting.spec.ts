@@ -16,7 +16,7 @@ describe('recruiting', () => {
     expect(spotsSummary(full)).toBe('Roster full')
   })
 
-  it('summarises open spots', () => {
+  it('summarizes open spots', () => {
     expect(spotsSummary({ open: 3, startersOpen: 1, subsOpen: 2 })).toBe('1 starter, 2 sub spots open')
     expect(spotsSummary({ open: 1, startersOpen: 0, subsOpen: 1 })).toBe('1 sub spot open')
   })

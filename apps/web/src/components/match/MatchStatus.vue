@@ -12,7 +12,7 @@ const labels: Record<MatchCardData['status'], string> = {
   disputed: 'Disputed',
   confirmed: 'Final',
   forfeit: 'Forfeit',
-  cancelled: 'Cancelled',
+  cancelled: 'Canceled',
 }
 </script>
 

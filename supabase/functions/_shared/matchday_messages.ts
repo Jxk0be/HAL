@@ -117,7 +117,7 @@ export function matchdayIntro(
 }
 
 export function archivedNotice(status: string): MessagePayload {
-  const why = status === 'cancelled' ? 'The match was cancelled' : status === 'forfeit' ? 'The match ended in a forfeit' : 'The result is confirmed'
+  const why = status === 'cancelled' ? 'The match was canceled' : status === 'forfeit' ? 'The match ended in a forfeit' : 'The result is confirmed'
   return {
     allowed_mentions: { parse: [] },
     embeds: [halEmbed({ description: `${why}, so this channel is now archived. The teams no longer see it; admins can still read the history.` })],

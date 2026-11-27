@@ -53,7 +53,7 @@ History, Mention @everyone (only for announcements you opt into), Connect, Speak
 Activity, Move Members. The voice permissions let it give each team access to its private voice channel;
 Move Members lets it put 8s players into their team's voice channel.)
 
-**Bot already in the server?** Opening the link again and authorising updates its role's permissions.
+**Bot already in the server?** Opening the link again and authorizing updates its role's permissions.
 Or tick **Move Members** on the Blackhat Bot role (Server Settings → Roles) yourself.
 
 ### Step 5: Register the slash commands
@@ -329,7 +329,7 @@ Posts disappear once the team is covered or the match starts.
 ```
 # Clips
 Post your best plays from league matches and scrims: Medal, YouTube, Twitch or Streamable links, or upload directly.
-Tag your team and the match if you can. Staff pick favourites for #announcements and socials.
+Tag your team and the match if you can. Staff pick favorites for #announcements and socials.
 Keep it to clips. Banter goes in #general.
 ```
 
@@ -346,7 +346,7 @@ Bug on the site? Include the page, what you pressed, and a screenshot.
 
 ```
 # Player of the Week
-Every Monday at noon ET the bot posts last week's top performer: best average score with at least 2 maps played, plus two honourable mentions. Stats come from confirmed match reports only.
+Every Monday at noon ET the bot posts last week's top performer: best average score with at least 2 maps played, plus two honorable mentions. Stats come from confirmed match reports only.
 Full season stats: https://YOUR-SITE/leaderboard
 ```
 

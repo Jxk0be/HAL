@@ -24,7 +24,7 @@ describe('Activision ID validation', () => {
     expect(validateActivisionId(id)).toContain(message)
   })
 
-  it('normalises spaces around the #', () => {
+  it('normalizes spaces around the #', () => {
     expect(normalizeActivisionId('  Lumen # 1234567 ')).toBe('Lumen#1234567')
   })
 })

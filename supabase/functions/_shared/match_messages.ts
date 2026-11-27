@@ -223,7 +223,7 @@ export function rescheduleMessage(m: MsgMatch, event: RescheduleEvent, requestin
     requested: `**${asker.name}** requested a reschedule to ${when}. ${other.name} captain, respond on the site.`,
     accepted: `**${other.name}** accepted. The match is now ${when}.`,
     declined: `**${other.name}** declined the move to ${when}. The match stays at ${discordTime(m.scheduledAt)}.`,
-    cancelled: `**${asker.name}** cancelled their request to move the match to ${when}.`,
+    cancelled: `**${asker.name}** canceled their request to move the match to ${when}.`,
     expired: `The request to move the match to ${when} expired. The match stays at ${discordTime(m.scheduledAt)}.`,
   }
   return {
@@ -302,7 +302,7 @@ export function rescheduleOutcomeMessage(
     requested: 'Pending.',
     accepted: `✅ Accepted${by}. The match is now ${discordTime(r.proposedAt)}.`,
     declined: `❌ Declined${by}. The match stays at ${discordTime(m.scheduledAt)}.`,
-    cancelled: `Cancelled by ${asker.name}.`,
+    cancelled: `Canceled by ${asker.name}.`,
     expired: `Expired: it wasn't answered 24 hours before the default time. The match stays at ${discordTime(m.scheduledAt)}.`,
   }
   return {

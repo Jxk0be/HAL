@@ -41,7 +41,7 @@ Deno.test('standings table: aligned columns and a playoff line', () => {
   assert(lines[3]!.startsWith('─')) // line after the 2nd team
 })
 
-Deno.test('schedule: result, upcoming and cancelled lines', () => {
+Deno.test('schedule: result, upcoming and canceled lines', () => {
   const m = (id: string, status: string, at: string): ScheduleMatch => ({
     id,
     scheduledAt: at,

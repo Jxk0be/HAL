@@ -75,7 +75,7 @@ const swatches = [
       </section>
 
       <section aria-labelledby="sg-type">
-        <h2 id="sg-type" class="eyebrow mb-4 text-accent">Colour & type</h2>
+        <h2 id="sg-type" class="eyebrow mb-4 text-accent">Color & type</h2>
         <div class="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:grid-cols-9">
           <div v-for="[name, cls] in swatches" :key="name" class="overflow-hidden rounded-md border border-line">
             <div class="h-14" :class="cls" />

@@ -36,7 +36,7 @@ const parts = (text: string) => highlightParts(text, props.term ?? '')
           </template>
         </p>
       </template>
-      <!-- eslint-disable-next-line vue/no-v-html -- sanitised inline fragment (lib/rulebook.ts) -->
+      <!-- eslint-disable-next-line vue/no-v-html -- sanitized inline fragment (lib/rulebook.ts) -->
       <p v-else class="rule-prose" v-html="rule.html" />
 
       <component
@@ -52,7 +52,7 @@ const parts = (text: string) => highlightParts(text, props.term ?? '')
               <template v-else>{{ p.text }}</template>
             </template>
           </template>
-          <!-- eslint-disable-next-line vue/no-v-html -- sanitised inline fragment -->
+          <!-- eslint-disable-next-line vue/no-v-html -- sanitized inline fragment -->
           <span v-else class="rule-prose" v-html="item.html" />
         </li>
       </component>

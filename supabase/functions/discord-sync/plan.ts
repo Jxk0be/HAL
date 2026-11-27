@@ -180,7 +180,7 @@ export function teamRolePlacement(roles: RolePosition[], roleId: string, playerI
     .filter((r) => r.position !== roles.find((o) => o.id === r.id)?.position)
 }
 
-/** Fixed role names and colours (created on first full_resync if missing). */
+/** Fixed role names and colors (created on first full_resync if missing). */
 export const FIXED_ROLE_SPECS: Record<keyof FixedRoles, { name: string; color: number }> = {
   admin: { name: 'BIL Admin', color: 0xd91f2b },
   caster: { name: 'BIL Caster', color: 0x8fb8ff },

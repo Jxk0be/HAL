@@ -26,7 +26,7 @@ defineProps<{ variant: 'important' | 'note'; html: string }>()
       <p class="eyebrow mb-0.5" :class="variant === 'important' ? 'text-accent' : 'text-muted'">
         {{ variant === 'important' ? 'Important' : 'Note' }}
       </p>
-      <!-- eslint-disable-next-line vue/no-v-html -- sanitised inline fragment (lib/rulebook.ts) -->
+      <!-- eslint-disable-next-line vue/no-v-html -- sanitized inline fragment (lib/rulebook.ts) -->
       <p class="rule-prose text-text" v-html="html" />
     </div>
   </aside>

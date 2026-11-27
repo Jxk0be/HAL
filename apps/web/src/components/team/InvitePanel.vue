@@ -34,7 +34,7 @@ async function invite(id: string, name: string) {
 async function cancel(id: string, name: string) {
   const result = await actions.cancelInvite(id)
   if (!result.ok) return toast.error(result.message)
-  toast.show(`Invite to ${name} cancelled.`)
+  toast.show(`Invite to ${name} canceled.`)
   await reload()
 }
 

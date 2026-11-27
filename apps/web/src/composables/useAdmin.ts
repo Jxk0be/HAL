@@ -15,7 +15,7 @@ async function rpcResult<T>(p: PromiseLike<{ data: unknown; error: { code?: stri
 
 /**
  * Recusal in the UI mirrors can_staff_match(): staff on either team can't act. The database is the
- * real check; this only greys things out.
+ * real check; this only grays things out.
  */
 export function useRecusal() {
   const auth = useAuthStore()

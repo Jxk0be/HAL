@@ -96,7 +96,7 @@ function requestCancel(userId: string, matchId: string): Reply {
     await refreshMatchPost(db, matchId).catch((err) => console.error('8s match post failed', err))
     switch (r.status) {
       case 'cancelled':
-        return notice(`Cancelled: ${r.needed} players asked. It doesn't count for anything. Press **Queue again** to play another.`, 'success')
+        return notice(`Canceled: ${r.needed} players asked. It doesn't count for anything. Press **Queue again** to play another.`, 'success')
       case 'withdrawn':
         return notice(`You took back your cancel request (${r.count}/${r.needed}).`)
       default:

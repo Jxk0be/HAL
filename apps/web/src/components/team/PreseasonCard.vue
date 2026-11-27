@@ -117,7 +117,7 @@ const cancel = async (proposalId: string) => done(await ps.cancelProposal(propos
               <RouterLink :to="`/teams/${opponent(p).id}`" class="min-w-0 flex-1 truncate font-medium hover:text-accent">
                 vs {{ opponent(p).name }}
               </RouterLink>
-              <UiBadge v-if="p.status === 'cancelled'" variant="loss">Cancelled</UiBadge>
+              <UiBadge v-if="p.status === 'cancelled'" variant="loss">Canceled</UiBadge>
               <UiBadge v-else-if="p.match" variant="win">Scheduled</UiBadge>
               <UiBadge v-else variant="accent">No time yet</UiBadge>
             </div>

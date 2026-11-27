@@ -56,7 +56,7 @@ describe('parseRulebook', () => {
     ])
   })
 
-  it('sanitises rule HTML and opens external links in a new tab', () => {
+  it('sanitizes rule HTML and opens external links in a new tab', () => {
     const rule = book.sections[0]!.blocks[1]
     expect(rule?.kind).toBe('rule')
     if (rule?.kind !== 'rule') return

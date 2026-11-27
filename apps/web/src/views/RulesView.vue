@@ -133,7 +133,7 @@ function mobileJump(number: string) {
           </span>
         </div>
         <div v-for="(p, i) in book.intro" :key="i" class="mt-5 max-w-3xl text-muted">
-          <!-- eslint-disable-next-line vue/no-v-html -- sanitised inline fragment -->
+          <!-- eslint-disable-next-line vue/no-v-html -- sanitized inline fragment -->
           <p v-html="p.html" />
         </div>
       </div>
@@ -231,7 +231,7 @@ function mobileJump(number: string) {
             <template v-for="(b, i) in s.blocks" :key="i">
               <RuleRow v-if="b.kind === 'rule'" :rule="b" :highlighted="highlighted === b.number" @copy="copyLink" />
               <RuleCallout v-else-if="b.kind === 'callout'" :variant="b.variant" :html="b.html" />
-              <!-- eslint-disable-next-line vue/no-v-html -- sanitised inline fragment -->
+              <!-- eslint-disable-next-line vue/no-v-html -- sanitized inline fragment -->
               <p v-else class="rule-prose px-2 py-2 text-muted" v-html="b.html" />
             </template>
           </section>

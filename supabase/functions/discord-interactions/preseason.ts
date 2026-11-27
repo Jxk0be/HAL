@@ -23,7 +23,7 @@ interface OpenPairing {
   scheduledAt: string | null
 }
 
-/** The actor's preseason matches that can still get a time (not cancelled, not started). */
+/** The actor's preseason matches that can still get a time (not canceled, not started). */
 async function openPairings(profileId: string): Promise<OpenPairing[]> {
   const db = adminClient()
   const { data: teams } = await db.from('teams').select('id').or(`captain_id.eq.${profileId},co_captain_id.eq.${profileId}`).neq('status', 'removed')

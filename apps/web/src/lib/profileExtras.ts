@@ -1,9 +1,8 @@
 /**
- * Profile customization: bio, main role, favourite weapon, colour and socials. The rules mirror the
+ * Profile customization: bio, main role, color and socials. The rules mirror the
  * check constraints on public.profiles (site_features migration); keep them in step.
  */
 export const BIO_MAX = 300
-export const WEAPON_MAX = 40
 
 export const PROFILE_COLORS = ['red', 'blue', 'green', 'gold', 'purple', 'teal'] as const
 export type ProfileColor = (typeof PROFILE_COLORS)[number]
@@ -15,7 +14,7 @@ export const PROFILE_COLOR_LABEL: Record<ProfileColor, string> = {
   purple: 'Purple',
   teal: 'Teal',
 }
-/** The theme token for a colour (falls back to the league red). */
+/** The CSS variable for a color (falls back to the league red). */
 export const profileColorVar = (c: string | null | undefined) =>
   `var(--color-profile-${PROFILE_COLORS.includes(c as ProfileColor) ? c : 'red'})`
 

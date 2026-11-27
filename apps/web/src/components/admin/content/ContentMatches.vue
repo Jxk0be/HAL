@@ -37,7 +37,7 @@ const STATUS_OPTIONS = [
   { value: 'disputed', label: 'Disputed' },
   { value: 'confirmed', label: 'Final' },
   { value: 'forfeit', label: 'Forfeit' },
-  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'cancelled', label: 'Canceled' },
 ]
 const team = (id: string) => props.teams.find((t) => t.id === id) ?? { id, name: '?', tag: '?' }
 
@@ -96,7 +96,7 @@ async function forfeit(m: AdminMatch, teamId: string) {
 async function cancel(m: AdminMatch) {
   if (!window.confirm('Cancel this match? It no longer counts in the standings.')) return
   const r = await sm.updateMatch(m.id, { status: 'cancelled' })
-  if (r.ok) toast.success('Match cancelled.')
+  if (r.ok) toast.success('Match canceled.')
   else toast.error(r.message)
 }
 </script>

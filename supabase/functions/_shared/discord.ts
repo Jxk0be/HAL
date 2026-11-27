@@ -25,7 +25,7 @@ export interface RequestOptions {
   body?: unknown
   /** Shown in the server's audit log. */
   reason?: string
-  /** Interaction webhooks are authorised by their token in the URL, not the bot token. */
+  /** Interaction webhooks are authorized by their token in the URL, not the bot token. */
   auth?: boolean
 }
 
@@ -123,7 +123,7 @@ export const pinMessage = (channelId: string, messageId: string, reason?: string
 export const createDmChannel = (userId: string) =>
   discordRequest<{ id: string }>('POST', '/users/@me/channels', { body: { recipient_id: userId } })
 
-// ---- Interaction responses (no bot token: authorised by the interaction token) ----
+// ---- Interaction responses (no bot token: authorized by the interaction token) ----
 export const editOriginalResponse = (appId: string, token: string, payload: MessagePayload) =>
   discordRequest('PATCH', `/webhooks/${appId}/${token}/messages/@original`, { body: payload, auth: false })
 

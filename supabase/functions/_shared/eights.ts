@@ -40,7 +40,7 @@ export interface EightsMatch {
   vote?: { endsAt: string; options: VoteOption[] }
   /** How many players pressed Request cancel. */
   cancelRequests?: number
-  /** Cancelled by the players' vote (true) or by an admin (false). */
+  /** Canceled by the players' vote (true) or by an admin (false). */
   cancelledByVote?: boolean
 }
 
@@ -129,8 +129,8 @@ function mainStatus(m: EightsMatch): string {
       return "The reports don't match. An admin has been pinged and will decide the result."
     case 'cancelled':
       return m.cancelledByVote
-        ? `Cancelled: ${CANCEL_VOTES} players asked to cancel. It's as if it never happened. Press **Queue again** to play another.`
-        : 'Cancelled by an admin. No result counts.'
+        ? `Canceled: ${CANCEL_VOTES} players asked to cancel. It's as if it never happened. Press **Queue again** to play another.`
+        : 'Canceled by an admin. No result counts.'
   }
 }
 
@@ -212,7 +212,7 @@ export function disputeAlert(m: EightsMatch): MessagePayload {
 
 /** The admin alert after it's settled (buttons removed). */
 export function resolvedAlert(m: EightsMatch, adminName: string): MessagePayload {
-  const outcome = m.status === 'cancelled' ? 'cancelled the match' : `decided **${teamLabel(m.winner!)} won**`
+  const outcome = m.status === 'cancelled' ? 'canceled the match' : `decided **${teamLabel(m.winner!)} won**`
   return {
     embeds: [
       halEmbed({

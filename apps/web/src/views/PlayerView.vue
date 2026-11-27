@@ -20,7 +20,9 @@ import { profileColorVar, SOCIALS } from '@/lib/profileExtras'
 
 const route = useRoute()
 const id = computed(() => (typeof route.params.id === 'string' ? route.params.id : null))
-const { player, rank, extras, loading } = usePlayer(id)
+const { player, rank, extras, freeAgentPost, loading } = usePlayer(id)
+// The role they set under Customize, else the one on their free agent post.
+const mainRole = computed(() => extras.value?.mainRole ?? freeAgentPost.value?.role ?? null)
 const { rows: seasons, history } = usePlayerStats(id)
 const current = computed(() => seasons.value[0] ?? null)
 // Career totals, modes and maps across every season; the trend is this season's weeks.
@@ -88,14 +90,11 @@ const statSlots = computed(() => {
               <PlatformBadge :platform="player.platform" />
               <RankBadge :rank="rank?.rank" :exception-at="rank?.exceptionAt" />
               <span v-if="player.discordUsername">{{ player.activisionId }}</span>
-              <UiBadge v-if="extras?.mainRole" variant="outline">{{ extras.mainRole }}</UiBadge>
+              <UiBadge v-if="mainRole" variant="outline">{{ mainRole }}</UiBadge>
               <UiBadge v-if="player.banned" variant="loss">Banned</UiBadge>
               <UiBadge v-else-if="player.isFreeAgent" variant="win">Free agent</UiBadge>
             </p>
             <p v-if="extras?.bio" class="mt-4 max-w-2xl text-sm whitespace-pre-line text-text">{{ extras.bio }}</p>
-            <p v-if="extras?.favoriteWeapon" class="mt-2 text-xs text-muted">
-              Favourite weapon: <span class="text-text">{{ extras.favoriteWeapon }}</span>
-            </p>
             <ul v-if="socials.length" class="mt-4 flex flex-wrap gap-2" aria-label="Socials">
               <li v-for="s in socials" :key="s.key">
                 <a
@@ -128,6 +127,23 @@ const statSlots = computed(() => {
             {{ player.isFreeAgent ? 'Free agent, looking for a team.' : 'Not on a team.' }}
             <RouterLink v-if="player.isFreeAgent" to="/free-agents" class="text-accent hover:text-accent-strong">See free agents</RouterLink>
           </p>
+        </UiCard>
+        <UiCard v-if="freeAgentPost" eyebrow="Free agent" title="Looking for a team">
+          <dl class="flex flex-col gap-3 text-sm">
+            <div v-if="freeAgentPost.role">
+              <dt class="eyebrow text-muted">Role</dt>
+              <dd class="mt-0.5">{{ freeAgentPost.role }}</dd>
+            </div>
+            <div v-if="freeAgentPost.availability">
+              <dt class="eyebrow text-muted">Availability</dt>
+              <dd class="mt-0.5 whitespace-pre-line">{{ freeAgentPost.availability }}</dd>
+            </div>
+            <div v-if="freeAgentPost.note">
+              <dt class="eyebrow text-muted">About</dt>
+              <dd class="mt-0.5 whitespace-pre-line">{{ freeAgentPost.note }}</dd>
+            </div>
+          </dl>
+          <p class="mt-3 text-xs text-muted">Posted <LeagueTime :iso="freeAgentPost.updatedAt" /></p>
         </UiCard>
         <UiCard eyebrow="All seasons" title="Career">
           <p v-if="!record.matches" class="text-sm text-muted">No league matches yet.</p>

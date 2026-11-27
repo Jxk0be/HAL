@@ -256,9 +256,9 @@ export function pairingCancelledNotice(d: { home: PsTeam; away: PsTeam }): Messa
     allowed_mentions: NO_PINGS,
     embeds: [
       halEmbed({
-        title: 'Preseason match cancelled',
+        title: 'Preseason match canceled',
         color: HAL_LOSS,
-        description: `League staff cancelled the preseason match **${d.home.name}** vs **${d.away.name}**.`,
+        description: `League staff canceled the preseason match **${d.home.name}** vs **${d.away.name}**.`,
       }),
     ],
   }

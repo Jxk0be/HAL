@@ -16,7 +16,7 @@ onMounted(async () => {
     failed.value = String(providerError)
     return
   }
-  // The Supabase client exchanges the ?code for a session while initialising.
+  // The Supabase client exchanges the ?code for a session while initializing.
   await auth.init()
   await auth.refresh()
   if (!auth.isSignedIn) {

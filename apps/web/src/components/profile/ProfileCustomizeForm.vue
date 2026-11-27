@@ -13,7 +13,6 @@ import {
   PROFILE_COLORS,
   profileColorVar,
   SOCIALS,
-  WEAPON_MAX,
   type SocialKey,
 } from '@/lib/profileExtras'
 import type { MyProfile } from '@/stores/auth'
@@ -29,7 +28,6 @@ const bioId = useId()
 const form = reactive({
   bio: '',
   mainRole: '' as string,
-  weapon: '',
   color: '' as string,
   socials: { twitch: '', youtube: '', x: '', tiktok: '' } as Record<SocialKey, string>,
 })
@@ -38,7 +36,6 @@ watch(
   (p) => {
     form.bio = p.bio ?? ''
     form.mainRole = p.main_role ?? ''
-    form.weapon = p.favorite_weapon ?? ''
     form.color = p.profile_color ?? ''
     form.socials = { twitch: p.twitch_handle ?? '', youtube: p.youtube_handle ?? '', x: p.x_handle ?? '', tiktok: p.tiktok_handle ?? '' }
   },
@@ -51,7 +48,7 @@ const handles = computed(() =>
 const problems = computed(() =>
   Object.fromEntries(SOCIALS.map((s) => [s.key, handleProblem(s.key, handles.value[s.key])])) as Record<SocialKey, string | null>,
 )
-const invalid = computed(() => form.bio.length > BIO_MAX || form.weapon.length > WEAPON_MAX || Object.values(problems.value).some(Boolean))
+const invalid = computed(() => form.bio.length > BIO_MAX || Object.values(problems.value).some(Boolean))
 const roleOptions = FREE_AGENT_ROLES.map((r) => ({ value: r, label: r === 'Flex' ? 'Flex (AR or SMG)' : r }))
 
 async function submit() {
@@ -60,7 +57,6 @@ async function submit() {
   const ok = await save({
     bio: form.bio.trim() || null,
     main_role: form.mainRole || null,
-    favorite_weapon: form.weapon.trim() || null,
     profile_color: form.color || null,
     twitch_handle: handles.value.twitch || null,
     youtube_handle: handles.value.youtube || null,
@@ -90,18 +86,12 @@ async function submit() {
       <p class="tnum text-right text-xs text-muted">{{ form.bio.length }}/{{ BIO_MAX }}</p>
     </div>
 
-    <div class="grid gap-4 sm:grid-cols-2">
+    <div class="sm:max-w-xs">
       <UiSelect v-model="form.mainRole" label="Main role" placeholder="Not set" :options="roleOptions" />
-      <UiInput
-        v-model="form.weapon"
-        label="Favourite weapon"
-        placeholder="e.g. your go-to SMG"
-        :error="form.weapon.length > WEAPON_MAX ? `Keep it under ${WEAPON_MAX} characters.` : undefined"
-      />
     </div>
 
     <fieldset>
-      <legend class="eyebrow mb-2 text-muted">Profile colour</legend>
+      <legend class="eyebrow mb-2 text-muted">Profile color</legend>
       <div class="flex flex-wrap gap-2">
         <label
           v-for="c in PROFILE_COLORS"

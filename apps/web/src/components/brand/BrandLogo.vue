@@ -19,7 +19,7 @@ const props = withDefaults(
     /** Height in px. */
     size?: number
     variant?: 'full' | 'lockup' | 'emblem'
-    /** Decorative when the league name is also given as text nearby (e.g. a labelled link). */
+    /** Decorative when the league name is also given as text nearby (e.g. a labeled link). */
     decorative?: boolean
   }>(),
   { size: 36, variant: 'lockup' },

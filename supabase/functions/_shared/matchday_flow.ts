@@ -4,7 +4,7 @@
  *  - open:    15 minutes before the match, a channel both teams (plus admins and casters) can use,
  *             in the "Match Day" category. The id is saved on matches.discord_match_channel_id
  *             before anything is posted, so a retry never makes a second channel.
- *  - archive: once the match is confirmed, forfeited or cancelled, the teams lose access, the
+ *  - archive: once the match is confirmed, forfeited or canceled, the teams lose access, the
  *             channel moves to a "Match Archive" category (a new one each 50 channels) and stays
  *             for audit. matches.discord_match_channel_closed_at marks it done.
  */

@@ -14,7 +14,6 @@ type ProfileUpdate = Pick<
   | 'cod_rank'
   | 'bio'
   | 'main_role'
-  | 'favorite_weapon'
   | 'profile_color'
   | 'twitch_handle'
   | 'youtube_handle'

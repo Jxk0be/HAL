@@ -82,7 +82,7 @@ Deno.test('dispute alert shows who said what and has settle buttons; resolved al
   assertEquals(buttons(a), ['eights:fix:m1:a', 'eights:fix:m1:b', 'eights:fix:m1:cancel'])
   const r = resolvedAlert({ ...m, status: 'cancelled' }, 'jake')
   assertEquals(buttons(r), [])
-  assert(r.embeds![0]!.description!.includes('cancelled'))
+  assert(r.embeds![0]!.description!.includes('canceled the match'))
 })
 
 Deno.test('leaderboard ranks with medals and handles an empty board', () => {
@@ -106,5 +106,5 @@ Deno.test('cancel requests show on the post and the button; a vote cancel says s
   const byVote = matchPost(match({ status: 'cancelled', cancelledByVote: true, cancelRequests: 5 }))
   assert(byVote.embeds![0]!.description!.includes('5 players asked to cancel'))
   assertEquals(buttons(byVote), ['eights:join'])
-  assert(matchPost(match({ status: 'cancelled' })).embeds![0]!.description!.includes('Cancelled by an admin'))
+  assert(matchPost(match({ status: 'cancelled' })).embeds![0]!.description!.includes('Canceled by an admin'))
 })
