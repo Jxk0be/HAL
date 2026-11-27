@@ -54,14 +54,12 @@ onUnmounted(() => clearInterval(timer))
       >
         <span aria-hidden="true">{{ paused ? '▶' : '❚❚' }}</span>
       </button>
-      <a
-        :href="current.url"
-        target="_blank"
-        rel="noopener noreferrer"
+      <RouterLink
+        :to="{ path: '/watch', query: { match: current.matchId } }"
         class="shrink-0 rounded-sm bg-brand px-2.5 py-0.5 font-heading text-xs tracking-wider text-on-brand hover:bg-brand-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
-        Watch<span class="sr-only"> {{ current.homeName }} vs {{ current.awayName }} (opens in a new tab)</span>
-      </a>
+        Watch<span class="sr-only"> {{ current.homeName }} vs {{ current.awayName }}</span>
+      </RouterLink>
     </div>
   </div>
 </template>

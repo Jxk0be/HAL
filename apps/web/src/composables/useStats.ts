@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { useRealtime } from './useRealtime'
 import type { Database } from '@/types/database'
 import { topBy, type LeaderboardKey, type LeaderboardRow } from '@/lib/leaderboard'
+import { EMPTY_BREAKDOWN, type Breakdown } from '@/lib/playerStats'
 
 export type { LeaderboardKey, LeaderboardRow }
 
@@ -215,4 +216,20 @@ export function useAuditLog(pageSize = 30) {
   }, { debounce: 300 })
   watch(page, load, { immediate: true })
   return { rows, page, total, table, actor, loading, pages: () => Math.max(1, Math.ceil(total.value / pageSize)) }
+}
+
+/** The player page breakdown (career, weeks, modes, maps, best match). Null season = career. */
+export function usePlayerBreakdown(userId: MaybeRefOrGetter<string | null | undefined>, seasonId: MaybeRefOrGetter<string | null | undefined> = null) {
+  const breakdown = ref<Breakdown>(EMPTY_BREAKDOWN)
+  const loading = ref(true)
+  async function load() {
+    const id = toValue(userId)
+    if (!id) return
+    loading.value = true
+    const { data } = await supabase.rpc('player_breakdown', { p_user_id: id, p_season_id: toValue(seasonId) ?? undefined })
+    breakdown.value = (data as unknown as Breakdown | null) ?? EMPTY_BREAKDOWN
+    loading.value = false
+  }
+  watch([() => toValue(userId), () => toValue(seasonId)], load, { immediate: true })
+  return { breakdown, loading, reload: load }
 }

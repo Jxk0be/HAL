@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import UiTabs from '@/components/ui/UiTabs.vue'
+import UiButton from '@/components/ui/UiButton.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import StandingsTable from '@/components/stats/StandingsTable.vue'
@@ -28,7 +29,12 @@ const anyTies = computed(() => rows.value.some((r) => r.needs_admin_decision))
 
 <template>
   <div>
-    <PageHeader :eyebrow="season?.name ?? 'Season'" title="Standings" description="Series wins first, then map differential, head-to-head and deciding-map rounds (rule 5.5)." />
+    <PageHeader :eyebrow="season?.name ?? 'Season'" title="Standings" description="Series wins first, then map differential, head-to-head and deciding-map rounds (rule 5.5)."
+    >
+      <template #actions>
+        <UiButton to="/playoffs" variant="secondary">Playoff bracket</UiButton>
+      </template>
+    </PageHeader>
     <div class="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-10 sm:px-6">
       <UiSkeleton v-if="seasonLoading" :lines="8" />
       <UiEmptyState v-else-if="!season" title="No season running" description="Standings appear once the season starts." />

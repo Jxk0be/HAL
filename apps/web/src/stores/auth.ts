@@ -10,7 +10,7 @@ type ProfileRow = Database['public']['Tables']['profiles']['Row']
 
 /** Every profile column except discord_id (hidden from the API by column privileges). */
 export const PROFILE_COLUMNS =
-  'id, discord_username, avatar_url, activision_id, platform, age_confirmed_at, controller_confirmed_at, is_free_agent, is_player, cod_rank, rank_exception_at, banned_until, created_at, updated_at'
+  'id, discord_username, avatar_url, activision_id, platform, age_confirmed_at, controller_confirmed_at, is_free_agent, is_player, cod_rank, rank_exception_at, banned_until, created_at, updated_at, bio, main_role, favorite_weapon, profile_color, twitch_handle, youtube_handle, x_handle, tiktok_handle'
 export type MyProfile = Omit<ProfileRow, 'discord_id' | 'discord_synced_at' | 'discord_profile_checked_at' | 'rank_exception_by'>
 
 export interface MyTeam {

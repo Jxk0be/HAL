@@ -32,11 +32,15 @@ export interface MatchCardData {
   forfeitTeamId: string | null
   broadcastLive: boolean
   broadcastUrl: string | null
+  /** Who claimed or cast it. */
+  broadcastBy: string | null
+  /** Replay link added after the cast. */
+  vodUrl: string | null
   confirmedAt: string | null
 }
 
 export const MATCH_SELECT =
-  'id, season_id, division_id, week, stage, playoff_round, status, scheduled_at, default_at, home_series, away_series, winner_team_id, forfeit_team_id, broadcast_live, broadcast_url, confirmed_at, home:teams!matches_home_team_id_fkey(id, name, tag, logo_url), away:teams!matches_away_team_id_fkey(id, name, tag, logo_url)'
+  'id, season_id, division_id, week, stage, playoff_round, status, scheduled_at, default_at, home_series, away_series, winner_team_id, forfeit_team_id, broadcast_live, broadcast_url, broadcast_by, vod_url, confirmed_at, home:teams!matches_home_team_id_fkey(id, name, tag, logo_url), away:teams!matches_away_team_id_fkey(id, name, tag, logo_url)'
 
 type MatchRow = {
   id: string
@@ -54,6 +58,8 @@ type MatchRow = {
   forfeit_team_id: string | null
   broadcast_live: boolean
   broadcast_url: string | null
+  broadcast_by: string | null
+  vod_url: string | null
   confirmed_at: string | null
   home: { id: string; name: string; tag: string; logo_url: string | null }
   away: { id: string; name: string; tag: string; logo_url: string | null }
@@ -79,6 +85,8 @@ export function toMatchCard(m: MatchRow): MatchCardData {
     forfeitTeamId: m.forfeit_team_id,
     broadcastLive: m.broadcast_live,
     broadcastUrl: m.broadcast_url,
+    broadcastBy: m.broadcast_by,
+    vodUrl: m.vod_url,
     confirmedAt: m.confirmed_at,
   }
 }

@@ -19,7 +19,8 @@ export interface RecruitCard {
   logoUrl: string | null
   pending: boolean
   lookingFor: LookingFor
-  role: string | null
+  /** Empty = any role. */
+  roles: string[]
   availability: string | null
   note: string | null
   updatedAt: string
@@ -48,7 +49,7 @@ export function useRecruitBoard() {
       logoUrl: r.logo_url,
       pending: r.team_status === 'pending',
       lookingFor: r.looking_for as LookingFor,
-      role: r.preferred_role,
+      roles: r.roles ?? [],
       availability: r.availability,
       note: r.note,
       updatedAt: r.updated_at,
@@ -91,7 +92,7 @@ export function useMyRecruitInterest(userId: () => string | null | undefined) {
 export interface MyRecruitPost {
   id: string
   lookingFor: LookingFor
-  role: string | null
+  roles: string[]
   availability: string | null
   note: string | null
   updatedAt: string
@@ -108,7 +109,7 @@ export interface InterestedPlayer {
 
 export interface RecruitInput {
   lookingFor: LookingFor
-  role: string | null
+  roles: string[]
   availability: string | null
   note: string | null
 }
@@ -132,7 +133,7 @@ export function useTeamRecruitPost(teamId: () => string | null | undefined) {
     const [{ data: p }, { data: s }] = await Promise.all([
       supabase
         .from('team_recruit_posts')
-        .select('id, looking_for, preferred_role, availability, note, updated_at')
+        .select('id, looking_for, roles, availability, note, updated_at')
         .eq('team_id', id)
         .eq('active', true)
         .maybeSingle(),
@@ -141,7 +142,7 @@ export function useTeamRecruitPost(teamId: () => string | null | undefined) {
     const sp = Array.isArray(s) ? s[0] : s
     spots.value = { open: sp?.open ?? 0, startersOpen: sp?.starters_open ?? 0, subsOpen: sp?.subs_open ?? 0 }
     post.value = p
-      ? { id: p.id, lookingFor: p.looking_for as LookingFor, role: p.preferred_role, availability: p.availability, note: p.note, updatedAt: p.updated_at }
+      ? { id: p.id, lookingFor: p.looking_for as LookingFor, roles: p.roles ?? [], availability: p.availability, note: p.note, updatedAt: p.updated_at }
       : null
     if (p) {
       const { data: rows } = await supabase
@@ -174,7 +175,7 @@ export function useTeamRecruitPost(teamId: () => string | null | undefined) {
     const { error } = await supabase.rpc('recruit_save', {
       p_team_id: teamIdValue,
       p_looking_for: v.lookingFor,
-      p_role: v.role ?? '',
+      p_roles: v.roles,
       p_availability: v.availability ?? '',
       p_note: v.note ?? '',
     })

@@ -164,6 +164,8 @@ export function usePlayer(id: MaybeRefOrGetter<string | null | undefined>) {
   const player = ref<DirectoryPlayer | null>(null)
   /** Ranked-play rank (rules 2.8–2.9), public. */
   const rank = ref<{ rank: CodRank | null; exceptionAt: string | null } | null>(null)
+  /** What the player chose to show (My profile → Customize). */
+  const extras = ref<PlayerExtras | null>(null)
   const loading = ref(true)
 
   async function load() {
@@ -177,13 +179,34 @@ export function usePlayer(id: MaybeRefOrGetter<string | null | undefined>) {
     loading.value = true
     const [{ data }, { data: r }] = await Promise.all([
       supabase.rpc('player_directory', { p_player_id: playerId, p_limit: 1 }),
-      supabase.from('profiles').select('cod_rank, rank_exception_at').eq('id', playerId).maybeSingle(),
+      supabase
+        .from('profiles')
+        .select('cod_rank, rank_exception_at, bio, main_role, favorite_weapon, profile_color, twitch_handle, youtube_handle, x_handle, tiktok_handle')
+        .eq('id', playerId)
+        .maybeSingle(),
     ])
     player.value = data?.[0] ? mapPlayer(data[0]) : null
     rank.value = r ? { rank: r.cod_rank, exceptionAt: r.rank_exception_at } : null
+    extras.value = r
+      ? {
+          bio: r.bio,
+          mainRole: r.main_role,
+          favoriteWeapon: r.favorite_weapon,
+          color: r.profile_color,
+          socials: { twitch: r.twitch_handle, youtube: r.youtube_handle, x: r.x_handle, tiktok: r.tiktok_handle },
+        }
+      : null
     loading.value = false
   }
 
   watch([() => toValue(id), () => auth.isSignedIn], load, { immediate: true })
-  return { player, rank, loading }
+  return { player, rank, extras, loading }
+}
+
+export interface PlayerExtras {
+  bio: string | null
+  mainRole: string | null
+  favoriteWeapon: string | null
+  color: string | null
+  socials: Record<'twitch' | 'youtube' | 'x' | 'tiktok', string | null>
 }

@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import ProfileForm from '@/components/profile/ProfileForm.vue'
+import ProfileCustomizeForm from '@/components/profile/ProfileCustomizeForm.vue'
 import InvitesCard from '@/components/profile/InvitesCard.vue'
 import EmergencySubInvitesCard from '@/components/profile/EmergencySubInvitesCard.vue'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
@@ -9,7 +10,6 @@ import UiBadge from '@/components/ui/UiBadge.vue'
 import RankBadge from '@/components/players/RankBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiCard from '@/components/ui/UiCard.vue'
-import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -107,11 +107,15 @@ const roleLabel = computed(() => {
           <UiSkeleton v-else :lines="6" />
         </UiCard>
 
-        <UiCard eyebrow="Stats" title="Match history">
-          <UiEmptyState
-            title="No matches yet"
-            description="Your confirmed matches and stats will show here once the season starts."
-          />
+        <UiCard eyebrow="Public page" title="Customize">
+          <template v-if="auth.user" #actions>
+            <UiButton :to="`/players/${auth.user.id}`" size="sm" variant="secondary">View my page</UiButton>
+          </template>
+          <p class="mb-4 text-sm text-muted">
+            These show on your public player page next to your stats: match history, K/D trend, best maps and modes.
+          </p>
+          <ProfileCustomizeForm v-if="auth.profile" :profile="auth.profile" @saved="toast.success('Profile page updated.')" />
+          <UiSkeleton v-else :lines="6" />
         </UiCard>
       </div>
     </div>

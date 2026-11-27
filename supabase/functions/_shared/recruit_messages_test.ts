@@ -8,7 +8,7 @@ const post: RecruitPost = {
   teamTag: 'NO',
   logoUrl: 'https://cdn.example/logo.png',
   lookingFor: 'sub',
-  role: 'SMG',
+  roles: ['SMG'],
   availability: 'Weeknights after 8 PM ET',
   note: 'Chill comms, want to win.',
   open: 2,
@@ -31,12 +31,17 @@ Deno.test('recruiting card names the team, never pings and has the interest butt
 })
 
 Deno.test('recruiting card without optional bits', () => {
-  const msg = recruitPostMessage({ ...post, lookingFor: 'any', role: null, availability: null, note: null, logoUrl: null, startersOpen: 1, subsOpen: 1 }, 'https://x')
+  const msg = recruitPostMessage({ ...post, lookingFor: 'any', roles: [], availability: null, note: null, logoUrl: null, startersOpen: 1, subsOpen: 1 }, 'https://x')
   assertEquals(msg.content, '**Night Owls** [NO] is looking for a starter or sub')
   assertEquals(msg.embeds![0]!.fields!.length, 3)
   assertEquals(msg.embeds![0]!.fields![1]!.value, 'Any')
   assertEquals(msg.embeds![0]!.fields![2]!.value, '1 starter, 1 sub')
   assertEquals(msg.embeds![0]!.thumbnail, undefined)
+})
+
+Deno.test('recruiting card lists several roles', () => {
+  const msg = recruitPostMessage({ ...post, roles: ['AR', 'SMG'] }, 'https://x')
+  assertEquals(msg.embeds![0]!.fields![1], { name: 'Roles', value: 'AR, SMG', inline: true })
 })
 
 Deno.test('interest notice pings only the captains', () => {

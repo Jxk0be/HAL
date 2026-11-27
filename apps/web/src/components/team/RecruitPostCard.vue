@@ -36,12 +36,12 @@ const actions = useTeamActions()
 const editing = ref(false)
 const error = ref<string | null>(null)
 const noteId = useId()
-const form = reactive({ lookingFor: 'any' as LookingFor | '', role: '' as string, availability: '', note: '' })
+const form = reactive({ lookingFor: 'any' as LookingFor | '', roles: [] as string[], availability: '', note: '' })
 
 function fillForm() {
   const p = post.value
   form.lookingFor = p?.lookingFor ?? LOOKING_FOR.find((k) => k !== 'any' && canLookFor(k, spots.value)) ?? 'any'
-  form.role = p?.role ?? ''
+  form.roles = [...(p?.roles ?? [])]
   form.availability = p?.availability ?? ''
   form.note = p?.note ?? ''
 }
@@ -50,7 +50,7 @@ watch([post, spots], () => {
 })
 
 const options = computed(() => lookingForOptions(spots.value))
-const roleOptions = FREE_AGENT_ROLES.map((r) => ({ value: r, label: r === 'Flex' ? 'Flex (AR or SMG)' : r }))
+const rolesLabel = (roles: string[]) => (roles.length ? roles.join(', ') : 'Any')
 const canPost = computed(() => !props.locked && spots.value.open > 0)
 const showForm = computed(() => editing.value || (!post.value && canPost.value))
 
@@ -62,7 +62,7 @@ async function submit() {
   }
   const r = await recruit.save(props.teamId, {
     lookingFor: form.lookingFor,
-    role: form.role || null,
+    roles: form.roles,
     availability: form.availability.trim() || null,
     note: form.note.trim() || null,
   })
@@ -125,8 +125,8 @@ defineExpose({ reload: recruit.reload })
             <dd class="mt-0.5">{{ LOOKING_FOR_LABEL[post.lookingFor] }}</dd>
           </div>
           <div>
-            <dt class="eyebrow text-muted">Role</dt>
-            <dd class="mt-0.5">{{ post.role ?? 'Any' }}</dd>
+            <dt class="eyebrow text-muted">{{ post.roles.length > 1 ? 'Roles' : 'Role' }}</dt>
+            <dd class="mt-0.5">{{ rolesLabel(post.roles) }}</dd>
           </div>
           <div v-if="post.availability" class="col-span-2">
             <dt class="eyebrow text-muted">When you play</dt>
@@ -165,7 +165,16 @@ defineExpose({ reload: recruit.reload })
       <!-- Form -->
       <form v-else-if="showForm" class="flex flex-col gap-4" @submit.prevent="submit">
         <UiSelect v-model="form.lookingFor" label="Looking for" :options="options" required :hint="spotsSummary(spots)" />
-        <UiSelect v-model="form.role" label="Role" placeholder="Any role" :options="roleOptions" />
+        <fieldset class="flex flex-col gap-1.5">
+          <legend class="eyebrow text-muted">Roles</legend>
+          <div class="flex flex-wrap gap-4 pt-1">
+            <label v-for="r in FREE_AGENT_ROLES" :key="r" class="flex cursor-pointer items-center gap-2 text-sm">
+              <input v-model="form.roles" type="checkbox" :value="r" class="size-4 accent-[var(--color-accent)]" />
+              {{ r === 'Flex' ? 'Flex (AR or SMG)' : r }}
+            </label>
+          </div>
+          <p class="text-xs text-muted">Tick every role you'd take. None ticked means any role.</p>
+        </fieldset>
         <UiInput
           v-model="form.availability"
           label="When you play"

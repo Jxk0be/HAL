@@ -164,6 +164,10 @@ Then the restrictions:
 - **#teams-recruiting:** read-only like #free-agents (@everyone → **Send Messages ✗**; the bot needs
   **Send Messages ✓** and **Embed Links ✓**). Captains post from **My team → Looking for players** on the
   site and the bot posts the card here. Set the channel ID in Admin → Discord → Bot channels.
+- **Match Day / Match Archive categories:** created by the bot (it needs **Manage Channels**, which it
+  already has for team channels). Each match gets a channel for both teams 15 minutes before; once the
+  result is confirmed the teams lose access and it moves to Match Archive (admins can still read it).
+  Delete old Match Archive categories between seasons if the server gets near Discord's 500-channel limit.
 - **STAFF category and 🔊 Admin:** @everyone → **View Channel ✗**; BIL Admin → **View Channel ✓**.
   Sync the channels inside to the category.
 - **🔊 Casting Stage:** a Stage channel; add BIL Caster (and BIL Admin) as **Stage Moderators**.

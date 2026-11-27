@@ -9,6 +9,8 @@
  *    disputes to #admin-only, #teams-recruiting cards and "I'm interested" notices, and preseason invites, shared channels and proposals
  *    (preseason_flow.ts). Other types stay queued for later features.
  *
+ * 2b. Match-day channels for both teams (matchday_flow.ts).
+ *
  * 3. Live boards (board_sync.ts): #team-rosters, #standings, #match-schedule, #sub-board and the
  *    weekly #player-of-the-week post, edited only when their content changes.
  *
@@ -44,6 +46,7 @@ import {
 import { dueKinds, scanWindow, type Kind } from './plan.ts'
 import { deleteLfgMessage, publishLfg } from '../_shared/lfg_sync.ts'
 import { deleteRecruitMessage, notifyInterest, publishRecruit } from '../_shared/recruit_sync.ts'
+import { syncMatchdayChannels } from '../_shared/matchday_flow.ts'
 import { refreshDiscordProfiles } from '../_shared/discord_profile.ts'
 import { finishRescheduleRequest, postRescheduleRequest } from '../_shared/reschedule_flow.ts'
 import { closeDisputeThread, ensureDisputeThread, postDisputeComment, reopenDisputeThread } from '../_shared/dispute_flow.ts'
@@ -461,6 +464,14 @@ Deno.serve(async (req) => {
     await matchPosts(ctx, Date.now())
   } catch (err) {
     await logError(ctx, 'match_posts', {}, err)
+  }
+  try {
+    // Shared match-day channels: open 15 minutes before, archive once settled (matchday_flow.ts).
+    const md = await syncMatchdayChannels(ctx.db, ctx.siteUrl, Date.now(), (what, matchId, err) => logError(ctx, what, { match_id: matchId }, err))
+    if (md.opened) ctx.stats.matchday_opened = md.opened
+    if (md.archived) ctx.stats.matchday_archived = md.archived
+  } catch (err) {
+    await logError(ctx, 'matchday', {}, err)
   }
   try {
     const n = await runAutoAnnouncements(ctx.db, ctx.siteUrl)

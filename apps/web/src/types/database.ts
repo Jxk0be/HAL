@@ -1358,6 +1358,8 @@ export type Database = {
           confirmed_at: string | null
           created_at: string
           default_at: string
+          discord_match_channel_closed_at: string | null
+          discord_match_channel_id: string | null
           division_id: string | null
           forfeit_team_id: string | null
           home_series: number | null
@@ -1370,6 +1372,7 @@ export type Database = {
           stage: Database["public"]["Enums"]["match_stage"]
           status: Database["public"]["Enums"]["match_status"]
           updated_at: string
+          vod_url: string | null
           week: number
           winner_team_id: string | null
         }
@@ -1383,6 +1386,8 @@ export type Database = {
           confirmed_at?: string | null
           created_at?: string
           default_at: string
+          discord_match_channel_closed_at?: string | null
+          discord_match_channel_id?: string | null
           division_id?: string | null
           forfeit_team_id?: string | null
           home_series?: number | null
@@ -1395,6 +1400,7 @@ export type Database = {
           stage?: Database["public"]["Enums"]["match_stage"]
           status?: Database["public"]["Enums"]["match_status"]
           updated_at?: string
+          vod_url?: string | null
           week: number
           winner_team_id?: string | null
         }
@@ -1408,6 +1414,8 @@ export type Database = {
           confirmed_at?: string | null
           created_at?: string
           default_at?: string
+          discord_match_channel_closed_at?: string | null
+          discord_match_channel_id?: string | null
           division_id?: string | null
           forfeit_team_id?: string | null
           home_series?: number | null
@@ -1420,6 +1428,7 @@ export type Database = {
           stage?: Database["public"]["Enums"]["match_stage"]
           status?: Database["public"]["Enums"]["match_status"]
           updated_at?: string
+          vod_url?: string | null
           week?: number
           winner_team_id?: string | null
         }
@@ -2089,6 +2098,7 @@ export type Database = {
           age_confirmed_at: string | null
           avatar_url: string | null
           banned_until: string | null
+          bio: string | null
           cod_rank: Database["public"]["Enums"]["cod_rank"] | null
           controller_confirmed_at: string | null
           created_at: string
@@ -2096,19 +2106,27 @@ export type Database = {
           discord_profile_checked_at: string | null
           discord_synced_at: string | null
           discord_username: string | null
+          favorite_weapon: string | null
           id: string
           is_free_agent: boolean
           is_player: boolean
+          main_role: string | null
           platform: Database["public"]["Enums"]["platform"] | null
+          profile_color: string | null
           rank_exception_at: string | null
           rank_exception_by: string | null
+          tiktok_handle: string | null
+          twitch_handle: string | null
           updated_at: string
+          x_handle: string | null
+          youtube_handle: string | null
         }
         Insert: {
           activision_id?: string | null
           age_confirmed_at?: string | null
           avatar_url?: string | null
           banned_until?: string | null
+          bio?: string | null
           cod_rank?: Database["public"]["Enums"]["cod_rank"] | null
           controller_confirmed_at?: string | null
           created_at?: string
@@ -2116,19 +2134,27 @@ export type Database = {
           discord_profile_checked_at?: string | null
           discord_synced_at?: string | null
           discord_username?: string | null
+          favorite_weapon?: string | null
           id: string
           is_free_agent?: boolean
           is_player?: boolean
+          main_role?: string | null
           platform?: Database["public"]["Enums"]["platform"] | null
+          profile_color?: string | null
           rank_exception_at?: string | null
           rank_exception_by?: string | null
+          tiktok_handle?: string | null
+          twitch_handle?: string | null
           updated_at?: string
+          x_handle?: string | null
+          youtube_handle?: string | null
         }
         Update: {
           activision_id?: string | null
           age_confirmed_at?: string | null
           avatar_url?: string | null
           banned_until?: string | null
+          bio?: string | null
           cod_rank?: Database["public"]["Enums"]["cod_rank"] | null
           controller_confirmed_at?: string | null
           created_at?: string
@@ -2136,13 +2162,20 @@ export type Database = {
           discord_profile_checked_at?: string | null
           discord_synced_at?: string | null
           discord_username?: string | null
+          favorite_weapon?: string | null
           id?: string
           is_free_agent?: boolean
           is_player?: boolean
+          main_role?: string | null
           platform?: Database["public"]["Enums"]["platform"] | null
+          profile_color?: string | null
           rank_exception_at?: string | null
           rank_exception_by?: string | null
+          tiktok_handle?: string | null
+          twitch_handle?: string | null
           updated_at?: string
+          x_handle?: string | null
+          youtube_handle?: string | null
         }
         Relationships: [
           {
@@ -3115,7 +3148,7 @@ export type Database = {
           id: string
           looking_for: string
           note: string | null
-          preferred_role: string | null
+          roles: string[]
           season_id: string
           team_id: string
           updated_at: string
@@ -3131,7 +3164,7 @@ export type Database = {
           id?: string
           looking_for: string
           note?: string | null
-          preferred_role?: string | null
+          roles?: string[]
           season_id: string
           team_id: string
           updated_at?: string
@@ -3147,7 +3180,7 @@ export type Database = {
           id?: string
           looking_for?: string
           note?: string | null
-          preferred_role?: string | null
+          roles?: string[]
           season_id?: string
           team_id?: string
           updated_at?: string
@@ -3973,6 +4006,10 @@ export type Database = {
         }
         Returns: string
       }
+      player_breakdown: {
+        Args: { p_season_id?: string; p_user_id: string }
+        Returns: Json
+      }
       player_directory: {
         Args: {
           p_limit?: number
@@ -4058,7 +4095,7 @@ export type Database = {
           note: string
           open: number
           post_id: string
-          preferred_role: string
+          roles: string[]
           starters_open: number
           subs_open: number
           team_id: string
@@ -4084,7 +4121,7 @@ export type Database = {
           p_availability: string
           p_looking_for: string
           p_note: string
-          p_role: string
+          p_roles: string[]
           p_team_id: string
         }
         Returns: string
@@ -4195,6 +4232,10 @@ export type Database = {
       }
       set_rank_exception: {
         Args: { p_approve: boolean; p_user_id: string }
+        Returns: undefined
+      }
+      set_vod: {
+        Args: { p_match_id: string; p_url: string }
         Returns: undefined
       }
       sub_board: {

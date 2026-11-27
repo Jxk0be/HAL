@@ -17,7 +17,7 @@ interface StoredRecruitPost extends RecruitPost {
 async function loadRecruitPost(db: SupabaseClient, postId: string): Promise<StoredRecruitPost | null> {
   const { data, error } = await db
     .from('team_recruit_posts')
-    .select('id, team_id, looking_for, preferred_role, availability, note, active, discord_channel_id, discord_message_id, team:teams(name, tag, logo_url)')
+    .select('id, team_id, looking_for, roles, availability, note, active, discord_channel_id, discord_message_id, team:teams(name, tag, logo_url)')
     .eq('id', postId)
     .maybeSingle()
   if (error) throw error
@@ -33,7 +33,7 @@ async function loadRecruitPost(db: SupabaseClient, postId: string): Promise<Stor
     teamTag: team.tag ?? '',
     logoUrl: team.logo_url ?? null,
     lookingFor: data.looking_for as LookingFor,
-    role: data.preferred_role,
+    roles: (data.roles as string[] | null) ?? [],
     availability: data.availability,
     note: data.note,
     open: s?.open ?? 0,
@@ -97,14 +97,14 @@ export async function notifyInterest(db: SupabaseClient, postId: string, userId:
     .maybeSingle()
   // deno-lint-ignore no-explicit-any
   const team = (post as any)?.team
-  const { data: player } = await db.from('profiles').select('id, discord_id, discord_username, activision_id').eq('id', userId).maybeSingle()
+  const { data: player } = await db.from('profiles').select('id, discord_id, discord_username, activision_id, main_role').eq('id', userId).maybeSingle()
   if (team?.discord_channel_id && player) {
     const { data: fa } = await db.from('free_agent_posts').select('preferred_role').eq('user_id', userId).eq('active', true).maybeSingle()
     const captains = [team.captain?.discord_id, team.co?.discord_id].filter((x: unknown): x is string => typeof x === 'string')
     await sendMessage(
       team.discord_channel_id,
       interestNotice(
-        { id: player.id, name: player.discord_username ?? player.activision_id ?? 'A player', discordId: player.discord_id, role: fa?.preferred_role ?? null },
+        { id: player.id, name: player.discord_username ?? player.activision_id ?? 'A player', discordId: player.discord_id, role: player.main_role ?? fa?.preferred_role ?? null },
         captains,
         siteUrl,
       ),

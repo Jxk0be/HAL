@@ -64,6 +64,18 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Free Agents', eyebrow: 'Recruiting', description: 'Players looking for a team. Captains can invite them while they have an open spot.', buildStep: 7 },
   },
   {
+    path: '/playoffs',
+    name: 'playoffs',
+    component: () => import('@/views/PlayoffsView.vue'),
+    meta: { title: 'Playoffs', eyebrow: 'Postseason', description: 'The playoff bracket, filled in as results are confirmed.' },
+  },
+  {
+    path: '/watch',
+    name: 'watch',
+    component: () => import('@/views/WatchView.vue'),
+    meta: { title: 'Watch', eyebrow: 'Broadcasts', description: 'League matches live from our casters, plus replays.' },
+  },
+  {
     path: '/teams-recruiting',
     name: 'teams-recruiting',
     component: () => import('@/views/TeamsRecruitingView.vue'),

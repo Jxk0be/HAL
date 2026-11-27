@@ -13,6 +13,7 @@ export const site = {
 export const mainNav = [
   { label: 'Home', to: '/' },
   { label: 'Matches', to: '/matches' },
+  { label: 'Watch', to: '/watch' },
   { label: 'Standings', to: '/standings' },
   { label: 'Leaderboard', to: '/leaderboard' },
   { label: 'Teams', to: '/teams' },

@@ -115,3 +115,63 @@ export function useCastingDesk(days: MaybeRefOrGetter<number> = 7) {
   watch(() => toValue(days), load, { immediate: true })
   return { matches, loading, reload: load }
 }
+
+export interface WatchMatch {
+  id: string
+  scheduledAt: string
+  home: { id: string; tag: string; name: string }
+  away: { id: string; tag: string; name: string }
+  homeSeries: number | null
+  awaySeries: number | null
+  caster: string | null
+  /** Replay link (vod_url), finished matches only. */
+  vodUrl: string | null
+}
+
+const WATCH_COLUMNS =
+  'id, scheduled_at, home_series, away_series, vod_url, broadcast_by, home:teams!matches_home_team_id_fkey(id, tag, name), away:teams!matches_away_team_id_fkey(id, tag, name)'
+
+/** Watch page when nobody is live: upcoming cast matches and recent replays. */
+export function useWatchSchedule() {
+  const upcoming = ref<WatchMatch[]>([])
+  const replays = ref<WatchMatch[]>([])
+  const loading = ref(true)
+
+  async function load() {
+    const now = new Date().toISOString()
+    const [{ data: next }, { data: past }] = await Promise.all([
+      supabase
+        .from('matches')
+        .select(WATCH_COLUMNS)
+        .not('broadcast_by', 'is', null)
+        .eq('broadcast_live', false)
+        .gte('scheduled_at', now)
+        .in('status', ['scheduled', 'checkin_open'])
+        .order('scheduled_at')
+        .limit(6),
+      supabase.from('matches').select(WATCH_COLUMNS).not('vod_url', 'is', null).order('scheduled_at', { ascending: false }).limit(9),
+    ])
+    const rows = [...(next ?? []), ...(past ?? [])]
+    const names = await loadCasters(rows.map((m) => m.id))
+    const map = (m: (typeof rows)[number]): WatchMatch => ({
+      id: m.id,
+      scheduledAt: m.scheduled_at,
+      home: m.home,
+      away: m.away,
+      homeSeries: m.home_series,
+      awaySeries: m.away_series,
+      caster: names[m.id] ?? null,
+      vodUrl: m.vod_url,
+    })
+    upcoming.value = (next ?? []).map(map)
+    replays.value = (past ?? []).map(map)
+    loading.value = false
+  }
+
+  void load()
+  return { upcoming, replays, loading, reload: load }
+}
+
+/** Casters and admins add (or clear) a match's replay link. */
+export const setVod = (matchId: string, url: string) =>
+  run(supabase.rpc('set_vod', { p_match_id: matchId, p_url: url.trim() }))

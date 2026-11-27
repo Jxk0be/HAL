@@ -21,6 +21,7 @@
     # Only the hosts BIL talks to. Add a host here before using it in the app, or production blocks it.
     #  - Supabase: API, Auth, Storage (logos, signed screenshot URLs), Realtime (wss)
     #  - Discord CDN: player avatars
+    #  - Stream players (Watch page, match replays): Twitch player + chat, YouTube (nocookie), Kick
     #  - Google Fonts: allowed for future use (fonts are self-hosted via Fontsource today)
     Content-Security-Policy = """
       default-src 'self';
@@ -29,7 +30,7 @@
       font-src 'self' data: https://fonts.gstatic.com;
       img-src 'self' data: blob: https://lluwzpwiybvgnsimpwey.supabase.co https://cdn.discordapp.com https://media.discordapp.net;
       connect-src 'self' https://lluwzpwiybvgnsimpwey.supabase.co wss://lluwzpwiybvgnsimpwey.supabase.co;
-      frame-src 'none';
+      frame-src https://player.twitch.tv https://www.twitch.tv https://www.youtube-nocookie.com https://player.kick.com;
       frame-ancestors 'none';
       object-src 'none';
       base-uri 'self';

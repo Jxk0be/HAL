@@ -40,6 +40,14 @@
   --color-loss-soft: rgb(242 120 92 / 0.12);
   --color-live: #ff4f5c;
 
+  /* Profile colours (a player's chosen accent on their public page; profiles.profile_color) */
+  --color-profile-red: #ff4f5c;
+  --color-profile-blue: #5b9dff;
+  --color-profile-green: #4fb07c;
+  --color-profile-gold: #e5b84b;
+  --color-profile-purple: #a98bff;
+  --color-profile-teal: #3cc3b8;
+
   /* Type */
   --font-sans: 'Inter Variable', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
     sans-serif;

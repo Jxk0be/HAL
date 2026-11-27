@@ -15,6 +15,7 @@ import DisputePanel from '@/components/match/DisputePanel.vue'
 import RescheduleCard from '@/components/match/RescheduleCard.vue'
 import CheckInCard from '@/components/match/CheckInCard.vue'
 import EmergencySubCard from '@/components/match/EmergencySubCard.vue'
+import ReplayCard from '@/components/match/ReplayCard.vue'
 import { useMatchDetail } from '@/composables/useMatches'
 import { useReportStatus } from '@/composables/useReport'
 import { useAuthStore } from '@/stores/auth'
@@ -107,8 +108,9 @@ watch(match, (m) => {
             </RouterLink>
           </div>
           <div class="mt-6 flex flex-wrap justify-center gap-2">
-            <UiButton v-if="match.broadcastLive && match.broadcastUrl" :href="match.broadcastUrl">LIVE · Watch on {{ streamPlatform(match.broadcastUrl) }}</UiButton>
-            <UiButton v-else-if="match.broadcastUrl" :href="match.broadcastUrl" variant="secondary">Watch broadcast</UiButton>
+            <UiButton v-if="match.broadcastLive && match.broadcastUrl" :to="{ path: '/watch', query: { match: match.id } }">LIVE · Watch here</UiButton>
+            <UiButton v-else-if="match.vodUrl" :to="{ hash: '#replay' }" variant="secondary">Watch the replay</UiButton>
+            <UiButton v-else-if="match.broadcastUrl" :href="match.broadcastUrl" variant="secondary">Watch on {{ streamPlatform(match.broadcastUrl) }}</UiButton>
             <UiBadge v-if="match.scheduledAt !== match.defaultAt" variant="outline">
               Rescheduled from&nbsp;<LeagueTime :iso="match.defaultAt" />
             </UiBadge>
@@ -117,6 +119,7 @@ watch(match, (m) => {
       </section>
 
       <div class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6">
+        <ReplayCard :match="match" @saved="reload" />
         <UiCard
           v-if="reportStatus && !['forfeit', 'cancelled'].includes(match.status)"
           eyebrow="Teams and staff only"

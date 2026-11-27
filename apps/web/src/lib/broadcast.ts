@@ -28,3 +28,61 @@ export function streamPlatform(raw: string | null | undefined): string {
   }
   return 'stream'
 }
+
+export interface StreamEmbed {
+  /** Player iframe src. */
+  src: string
+  /** Twitch live chat iframe src (live channels only). */
+  chatSrc: string | null
+  platform: 'Twitch' | 'YouTube' | 'Kick'
+}
+
+const YT_ID = /^[A-Za-z0-9_-]{6,20}$/
+const TWITCH_NAME = /^[A-Za-z0-9_]{3,25}$/
+const KICK_NAME = /^[A-Za-z0-9_-]{3,25}$/
+
+/**
+ * The embeddable player for a stream or replay link, or null when the link can't be embedded (a
+ * YouTube channel page, say): show a plain "Watch on …" link then. Twitch requires the site's own
+ * hostname as `parent`. Hosts here must be allowed in netlify.toml's frame-src.
+ */
+export function streamEmbed(raw: string | null | undefined, parentHost: string): StreamEmbed | null {
+  if (!raw || !isStreamUrl(raw)) return null
+  const url = new URL(raw.trim())
+  const host = url.hostname.toLowerCase().replace(/^(www|m)\./, '')
+  const parts = url.pathname.split('/').filter(Boolean)
+  const parent = encodeURIComponent(parentHost)
+
+  if (host === 'twitch.tv' || host.endsWith('.twitch.tv')) {
+    if (parts[0] === 'videos' && /^\d+$/.test(parts[1] ?? '')) {
+      return { platform: 'Twitch', src: `https://player.twitch.tv/?video=v${parts[1]}&parent=${parent}&autoplay=false`, chatSrc: null }
+    }
+    const channel = parts[0]
+    if (channel && TWITCH_NAME.test(channel) && parts.length === 1) {
+      return {
+        platform: 'Twitch',
+        src: `https://player.twitch.tv/?channel=${channel}&parent=${parent}`,
+        chatSrc: `https://www.twitch.tv/embed/${channel}/chat?parent=${parent}&darkpopout`,
+      }
+    }
+    return null
+  }
+
+  if (host === 'youtu.be') {
+    const id = parts[0]
+    return id && YT_ID.test(id) ? { platform: 'YouTube', src: `https://www.youtube-nocookie.com/embed/${id}`, chatSrc: null } : null
+  }
+  if (host === 'youtube.com' || host.endsWith('.youtube.com')) {
+    const id = url.searchParams.get('v') ?? (['live', 'embed', 'shorts'].includes(parts[0] ?? '') ? parts[1] : null)
+    return id && YT_ID.test(id) ? { platform: 'YouTube', src: `https://www.youtube-nocookie.com/embed/${id}`, chatSrc: null } : null
+  }
+
+  if (host === 'kick.com') {
+    const channel = parts[0]
+    if (channel && KICK_NAME.test(channel) && parts.length === 1) {
+      return { platform: 'Kick', src: `https://player.kick.com/${channel}`, chatSrc: null }
+    }
+    return null
+  }
+  return null
+}

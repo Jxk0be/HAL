@@ -91,8 +91,8 @@ async function takeDown(p: RecruitCard) {
           <dl class="mt-4 flex flex-col gap-2 text-sm">
             <div class="flex gap-6">
               <div>
-                <dt class="eyebrow text-muted">Role</dt>
-                <dd class="mt-0.5">{{ p.role ?? 'Any' }}</dd>
+                <dt class="eyebrow text-muted">{{ p.roles.length > 1 ? 'Roles' : 'Role' }}</dt>
+                <dd class="mt-0.5">{{ p.roles.length ? p.roles.join(', ') : 'Any' }}</dd>
               </div>
               <div>
                 <dt class="eyebrow text-muted">Open</dt>

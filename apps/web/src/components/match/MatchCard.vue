@@ -49,15 +49,20 @@ const label = computed(() => {
       <RouterLink :to="`/matches/${match.id}`" class="text-sm text-accent after:absolute after:inset-0 hover:text-accent-strong">
         {{ final ? 'Match details' : 'Preview' }}<span class="sr-only">: {{ match.home.name }} vs {{ match.away.name }}</span>
       </RouterLink>
-      <a
+      <RouterLink
         v-if="match.broadcastLive && match.broadcastUrl"
-        :href="match.broadcastUrl"
-        target="_blank"
-        rel="noopener noreferrer"
+        :to="{ path: '/watch', query: { match: match.id } }"
         class="relative z-10 rounded-md bg-brand px-3 py-1 font-heading text-xs tracking-wider text-on-brand hover:bg-brand-strong"
       >
-        <span class="text-loss" aria-hidden="true">●</span> LIVE · Watch<span class="sr-only"> live (opens in a new tab)</span>
-      </a>
+        <span class="text-loss" aria-hidden="true">●</span> LIVE · Watch<span class="sr-only"> {{ match.home.name }} vs {{ match.away.name }} live</span>
+      </RouterLink>
+      <RouterLink
+        v-else-if="match.vodUrl && !compact"
+        :to="{ path: `/matches/${match.id}`, hash: '#replay' }"
+        class="relative z-10 text-xs text-muted hover:text-accent"
+      >
+        Watch replay<span class="sr-only"> of {{ match.home.name }} vs {{ match.away.name }}</span>
+      </RouterLink>
       <a
         v-else-if="match.broadcastUrl && !compact"
         :href="match.broadcastUrl"

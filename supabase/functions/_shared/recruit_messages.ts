@@ -11,7 +11,8 @@ export interface RecruitPost {
   teamTag: string
   logoUrl: string | null
   lookingFor: LookingFor
-  role: string | null
+  /** Empty = any role. */
+  roles: string[]
   availability: string | null
   note: string | null
   /** Open spots right now. */
@@ -33,7 +34,7 @@ function spotsText(p: RecruitPost): string {
 export function recruitPostMessage(p: RecruitPost, siteUrl: string): MessagePayload {
   const fields = [
     { name: 'Looking for', value: p.lookingFor === 'any' ? 'Starter or sub' : p.lookingFor === 'starter' ? 'Starter' : 'Sub', inline: true },
-    { name: 'Role', value: p.role ?? 'Any', inline: true },
+    { name: p.roles.length > 1 ? 'Roles' : 'Role', value: p.roles.length ? p.roles.join(', ') : 'Any', inline: true },
     { name: 'Open spots', value: spotsText(p), inline: true },
   ]
   if (p.availability) fields.push({ name: 'When they play', value: p.availability, inline: false })

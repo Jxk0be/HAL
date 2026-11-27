@@ -98,7 +98,7 @@ const leaders = computed(() =>
               <RouterLink :to="`/matches/${b.matchId}`" class="block truncate font-heading text-lg hover:text-accent">{{ b.homeTag }} vs {{ b.awayTag }}</RouterLink>
               <span class="block truncate text-xs text-muted">Cast by {{ b.caster }} on {{ streamPlatform(b.url) }}</span>
             </span>
-            <UiButton :href="b.url" size="sm">Watch<span class="sr-only"> {{ b.homeName }} vs {{ b.awayName }}</span></UiButton>
+            <UiButton :to="{ path: '/watch', query: { match: b.matchId } }" size="sm">Watch<span class="sr-only"> {{ b.homeName }} vs {{ b.awayName }}</span></UiButton>
           </li>
         </ul>
       </section>
