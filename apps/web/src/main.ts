@@ -13,8 +13,10 @@ import '@fontsource/barlow/700.css'
 import App from './App.vue'
 import { router } from './router'
 import { installErrorReporter } from './lib/errorReporter'
+import { vReveal } from './directives/reveal'
 import './assets/main.css'
 
 const app = createApp(App).use(createPinia()).use(router)
+app.directive('reveal', vReveal)
 installErrorReporter(app, router)
 app.mount('#app')

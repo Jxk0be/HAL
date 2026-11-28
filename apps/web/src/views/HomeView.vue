@@ -18,6 +18,7 @@ import { formatLeagueTime, toZoned } from '@/lib/time'
 import { ArrowRight } from 'lucide-vue-next'
 import DiscordGlyph from '@/components/brand/DiscordGlyph.vue'
 import ResultsTicker from '@/components/layout/ResultsTicker.vue'
+import HeroBackdrop from '@/components/home/HeroBackdrop.vue'
 import { navIcons } from '@/components/layout/navIcons'
 import { useSiteCounts } from '@/composables/useStats'
 import { useRecentResults } from '@/composables/useRecentResults'
@@ -111,20 +112,18 @@ const leaders = computed(() =>
     <!-- Logged out: landing hero -->
     <template v-if="!auth.isSignedIn">
       <div v-if="recentResults.length" class="h-11 border-b border-line bg-rail print:hidden"><div class="mx-auto flex h-full max-w-7xl px-2"><ResultsTicker /></div></div>
-      <section class="landing-hero relative overflow-hidden border-b border-line" aria-labelledby="home-title">
-        <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div class="absolute top-0 left-1/2 size-[640px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-accent/10 blur-3xl" />
-        </div>
+      <section class="relative isolate overflow-hidden border-b border-line bg-bg" aria-labelledby="home-title">
+        <HeroBackdrop class="-z-10" />
         <div class="relative mx-auto flex max-w-4xl flex-col items-center px-4 pt-12 pb-16 text-center sm:px-6 sm:pt-16 sm:pb-24">
           <BrandLogo :size="220" variant="full" decorative />
-          <p class="mt-8 flex items-center gap-3 eyebrow text-faint">
+          <p class="rise mt-8 flex items-center gap-3 eyebrow text-muted" style="--rise-delay: 80ms">
             <span class="h-px w-8 bg-accent sm:w-12" aria-hidden="true" />{{ c.hero.eyebrow }}<span class="h-px w-8 bg-accent sm:w-12" aria-hidden="true" />
           </p>
-          <h1 id="home-title" class="title-xl mt-5">
-            {{ c.hero.headline[0] }}<br /><span class="text-accent">{{ c.hero.headline[1] }}</span>
+          <h1 id="home-title" class="title-xl mt-5 [text-shadow:0_4px_24px_rgb(0_0_0/0.6)]">
+            <span class="rise inline-block" style="--rise-delay: 160ms">{{ c.hero.headline[0] }}</span><br /><span class="rise inline-block text-accent" style="--rise-delay: 260ms">{{ c.hero.headline[1] }}</span>
           </h1>
-          <p class="mt-6 max-w-xl text-lg text-muted">{{ site.tagline }}</p>
-          <ul class="mt-7 flex flex-wrap justify-center gap-2" aria-label="League at a glance">
+          <p class="rise mt-6 max-w-xl text-lg text-muted" style="--rise-delay: 380ms">{{ site.tagline }}</p>
+          <ul class="rise mt-7 flex flex-wrap justify-center gap-2" style="--rise-delay: 480ms" aria-label="League at a glance">
             <template v-if="counts">
               <li class="tnum rounded-full border border-line bg-chip px-4 py-1.5 text-sm"><b class="font-heading text-text">{{ counts.players }}</b> <span class="text-muted">{{ plural(counts.players, 'player', 'players') }}</span></li>
               <li class="tnum rounded-full border border-line bg-chip px-4 py-1.5 text-sm"><b class="font-heading text-text">{{ counts.teams }}</b> <span class="text-muted">{{ plural(counts.teams, 'team', 'teams') }}</span></li>
@@ -136,7 +135,7 @@ const leaders = computed(() =>
               </a>
             </li>
           </ul>
-          <div class="mt-8 flex flex-wrap justify-center gap-3">
+          <div class="rise mt-8 flex flex-wrap justify-center gap-3" style="--rise-delay: 580ms">
             <UiButton to="/login" size="lg">Join the league</UiButton>
             <UiButton to="/watch" variant="secondary" size="lg">Watch matches</UiButton>
           </div>
@@ -146,15 +145,13 @@ const leaders = computed(() =>
 
     <!-- Signed in -->
     <template v-else>
-      <section class="relative overflow-hidden border-b border-line" aria-labelledby="home-title">
-        <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-          <div class="absolute top-1/2 right-[8%] hidden size-[520px] -translate-y-1/2 rounded-full bg-accent/10 blur-3xl lg:block" />
-        </div>
+      <section class="relative isolate overflow-hidden border-b border-line bg-bg" aria-labelledby="home-title">
+        <HeroBackdrop class="-z-10" focus="right" />
         <div class="relative mx-auto grid max-w-7xl gap-10 px-4 pt-10 pb-14 sm:px-6 sm:pt-14 lg:grid-cols-[1.2fr_1fr] lg:items-center">
           <div>
             <RouterLink
               to="/dashboard"
-              class="card-accent texture-stripes mb-8 flex items-center justify-between gap-4 rounded-xl border border-line bg-surface p-4 hover:border-line-strong"
+              class="rise card-accent texture-stripes mb-8 flex items-center justify-between gap-4 rounded-xl border border-line bg-surface p-4 hover:border-line-strong"
             >
               <span>
                 <span class="eyebrow block text-faint">Your dashboard</span>
@@ -162,15 +159,15 @@ const leaders = computed(() =>
               </span>
               <ArrowRight class="size-5 shrink-0 text-accent" aria-hidden="true" />
             </RouterLink>
-            <UiBadge variant="accent">
+            <span class="rise inline-block" style="--rise-delay: 100ms"><UiBadge variant="accent">
               <template v-if="season && inSeason && week">{{ season.name }} · Week {{ week }}</template>
               <template v-else-if="season">{{ season.name }} · {{ season.status === 'signups' ? 'Signups open' : season.status }}</template>
               <template v-else>{{ c.status }}</template>
-            </UiBadge>
-            <p class="eyebrow-line mt-6 text-faint">{{ c.eyebrow }}</p>
-            <h1 id="home-title" class="title-xl mt-3">{{ c.headline }}</h1>
-            <p class="mt-6 max-w-xl text-lg text-muted">{{ c.intro }}</p>
-            <div class="mt-8 flex flex-wrap gap-3">
+            </UiBadge></span>
+            <p class="rise eyebrow-line mt-6 text-muted" style="--rise-delay: 160ms">{{ c.eyebrow }}</p>
+            <h1 id="home-title" class="rise title-xl mt-3 [text-shadow:0_4px_24px_rgb(0_0_0/0.6)]" style="--rise-delay: 240ms">{{ c.headline }}</h1>
+            <p class="rise mt-6 max-w-xl text-lg text-muted" style="--rise-delay: 340ms">{{ c.intro }}</p>
+            <div class="rise mt-8 flex flex-wrap gap-3" style="--rise-delay: 440ms">
               <UiButton :to="inSeason ? '/matches' : '/season'" size="lg">{{ inSeason ? 'See the schedule' : 'Season hub' }}</UiButton>
               <UiButton :href="site.discordInviteUrl" variant="secondary" size="lg">Discord</UiButton>
             </div>
@@ -182,7 +179,7 @@ const leaders = computed(() =>
 
     <div class="mx-auto flex max-w-7xl flex-col gap-14 px-4 py-14 sm:px-6">
       <!-- Live now -->
-      <section v-if="live.length" aria-labelledby="live-title">
+      <section v-if="live.length" v-reveal aria-labelledby="live-title">
         <h2 id="live-title" class="mb-4 flex items-center gap-2 font-heading text-2xl">
           <span class="size-2.5 animate-pulse rounded-full bg-live motion-reduce:animate-none" aria-hidden="true" />
           Live now
@@ -199,7 +196,7 @@ const leaders = computed(() =>
       </section>
 
       <!-- Next match night -->
-      <section v-if="nextNight" aria-labelledby="next-title">
+      <section v-if="nextNight" v-reveal aria-labelledby="next-title">
         <template v-if="nextNight">
           <div class="mb-4 flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -209,12 +206,12 @@ const leaders = computed(() =>
             <UiCountdown :to="nextNight.startsAt" ended-label="Matches are on" />
           </div>
           <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <li v-for="m in nextNight.matches" :key="m.id"><MatchCard :match="m" /></li>
+            <li v-for="(m, i) in nextNight.matches" :key="m.id" v-reveal="i * 70"><MatchCard :match="m" /></li>
           </ul>
         </template>
       </section>
 
-      <div v-if="latest.length || standings.length" class="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
+      <div v-if="latest.length || standings.length" v-reveal class="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
         <!-- Latest results -->
         <section v-if="latest.length" aria-labelledby="results-title">
           <div class="mb-4 flex items-end justify-between">
@@ -252,10 +249,12 @@ const leaders = computed(() =>
 
       <!-- How the league works (visitors) -->
       <section v-if="!auth.isSignedIn" aria-labelledby="how-title">
-        <p class="eyebrow-line text-faint">The league</p>
-        <h2 id="how-title" class="mt-3 font-heading text-3xl sm:text-4xl">How the league works</h2>
+        <div v-reveal>
+          <p class="eyebrow-line text-faint">The league</p>
+          <h2 id="how-title" class="mt-3 font-heading text-3xl sm:text-4xl">How the league works</h2>
+        </div>
         <ul class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <li v-for="(f, i) in c.features" :key="f.title">
+          <li v-for="(f, i) in c.features" :key="f.title" v-reveal="(i % 3) * 90">
             <component
               :is="'discord' in f ? 'a' : 'RouterLink'"
               v-bind="'discord' in f ? { href: site.discordInviteUrl, target: '_blank', rel: 'noopener noreferrer' } : { to: f.to }"
@@ -277,7 +276,7 @@ const leaders = computed(() =>
       </section>
 
       <!-- League pillars (signed in, before the season has results) -->
-      <section v-else-if="!latest.length" aria-labelledby="pillars-title">
+      <section v-else-if="!latest.length" v-reveal aria-labelledby="pillars-title">
         <p class="eyebrow-line text-faint">The league</p>
         <h2 id="pillars-title" class="mt-3 font-heading text-3xl sm:text-4xl">Built like a pro circuit</h2>
         <div class="mt-8 grid gap-px overflow-hidden rounded-xl border border-line bg-line md:grid-cols-3">
@@ -292,6 +291,7 @@ const leaders = computed(() =>
       <!-- CTA band -->
       <section
         v-if="!auth.isSignedIn"
+        v-reveal
         aria-labelledby="cta-title"
         class="texture-stripes-brand flex flex-col gap-6 rounded-2xl bg-brand p-8 text-on-brand sm:flex-row sm:items-center sm:justify-between sm:p-10"
       >
@@ -306,7 +306,7 @@ const leaders = computed(() =>
           Join the league
         </RouterLink>
       </section>
-      <section v-else aria-labelledby="cta-title" class="flex flex-col gap-6 rounded-xl border border-line bg-surface p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+      <section v-else v-reveal aria-labelledby="cta-title" class="flex flex-col gap-6 rounded-xl border border-line bg-surface p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>
           <h2 id="cta-title" class="font-heading text-2xl">Looking for players?</h2>
           <p class="mt-1 max-w-lg text-sm text-muted">Free agents post on the board and in Discord. Captains can invite them while they have an open spot.</p>
@@ -319,12 +319,3 @@ const leaders = computed(() =>
     </div>
   </UiLoadGate>
 </template>
-
-<style scoped>
-.landing-hero {
-  background-color: var(--color-bg);
-  background-image:
-    linear-gradient(to bottom, rgb(10 10 11 / 0.2), var(--color-bg)),
-    repeating-linear-gradient(135deg, transparent 0 14px, rgb(255 255 255 / 0.025) 14px 28px);
-}
-</style>

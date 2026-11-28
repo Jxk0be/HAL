@@ -29,3 +29,8 @@ export function mapArt(map: { name: string; imageUrl?: string | null }): MapArt 
   const b = bundled.get(mapSlug(map.name))
   return b ? { ...b, custom: false } : null
 }
+
+/** Every bundled map image (full size), in name order: the home page backdrop cycles through them. */
+export function bundledMapArt(): string[] {
+  return [...bundled.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([, v]) => v.src)
+}

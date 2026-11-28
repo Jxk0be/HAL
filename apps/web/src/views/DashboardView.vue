@@ -230,10 +230,10 @@ const adminTiles = computed(() => {
           </ul>
           <div class="mt-4 grid grid-cols-2 gap-3">
             <UiStatTile label="Roster changes" :value="changesLeft" accent="neutral" />
-            <div class="card-accent rounded-xl border border-line bg-surface p-4 sm:p-5" style="--card-accent: var(--color-line-strong)">
+            <div class="card-accent min-w-0 rounded-xl border border-line bg-surface p-4 sm:p-5" style="--card-accent: var(--color-line-strong)">
               <p class="eyebrow text-faint">Roster lock</p>
               <p class="tnum mt-2 font-heading text-2xl">
-                <UiCountdown v-if="d.season.value?.roster_lock_at" :to="d.season.value.roster_lock_at" ended-label="Locked" />
+                <UiCountdown v-if="d.season.value?.roster_lock_at" :to="d.season.value.roster_lock_at" ended-label="Locked" size="md" precision="minutes" />
                 <span v-else>Not set</span>
               </p>
             </div>
