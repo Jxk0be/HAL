@@ -41,6 +41,7 @@ const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyl
 <template>
   <div>
     <PageHeader
+      compact
       eyebrow="Owner"
       title="Discord sync"
       description="Team roles, private team channels and the Captain, Player, Free Agent, BIL Admin and BIL Caster roles follow the database automatically."

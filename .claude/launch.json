@@ -1,6 +1,12 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "hal-web", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "web", "dev"], "port": 5174 }
+    { "name": "hal-web", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "web", "dev"], "port": 5174 },
+    {
+      "name": "hal-web-npx",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "export PATH=\"$HOME/.nvm/versions/node/v22.23.5/bin:$PATH\"; npx -y pnpm@11.22.0 --filter web dev"],
+      "port": 5174
+    }
   ]
 }

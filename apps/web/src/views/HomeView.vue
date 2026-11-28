@@ -14,6 +14,20 @@ import { useLeaderboards, useStandings } from '@/composables/useStats'
 import { useLiveBroadcasts } from '@/composables/useBroadcasts'
 import { streamPlatform } from '@/lib/broadcast'
 import { formatLeagueTime, toZoned } from '@/lib/time'
+import { ArrowRight } from 'lucide-vue-next'
+import DiscordGlyph from '@/components/brand/DiscordGlyph.vue'
+import ResultsTicker from '@/components/layout/ResultsTicker.vue'
+import { navIcons } from '@/components/layout/navIcons'
+import { useSiteCounts } from '@/composables/useStats'
+import { useRecentResults } from '@/composables/useRecentResults'
+import { useAuthStore } from '@/stores/auth'
+import type { NavIcon } from '@/config/site'
+
+const auth = useAuthStore()
+const { counts } = useSiteCounts()
+const { results: recentResults } = useRecentResults()
+const plural = (n: number, one: string, many: string) => (n === 1 ? one : many)
+const featureIcon = (icon: string) => (icon === 'discord' ? DiscordGlyph : navIcons[icon as NavIcon])
 
 const { season, matches, loading } = useSeasonSchedule()
 const seasonId = computed(() => season.value?.id)
@@ -59,31 +73,77 @@ const leaders = computed(() =>
 
 <template>
   <div>
-    <!-- Hero -->
-    <section class="relative overflow-hidden border-b border-line" aria-labelledby="home-title">
-      <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-        <!-- Soft red glow behind the emblem -->
-        <div class="absolute top-1/2 right-[8%] hidden size-[520px] -translate-y-1/2 rounded-full bg-accent/10 blur-3xl lg:block" />
-      </div>
-      <div class="relative mx-auto grid max-w-7xl gap-12 px-4 pt-16 pb-20 sm:px-6 sm:pt-24 lg:grid-cols-[1.2fr_1fr] lg:items-center">
-        <div>
-          <div class="mb-8 flex justify-center lg:hidden"><BrandLogo :size="200" variant="full" decorative /></div>
-          <UiBadge variant="accent">
-            <template v-if="season && inSeason && week">{{ season.name }} · Week {{ week }}</template>
-            <template v-else-if="season">{{ season.name }} · {{ season.status === 'signups' ? 'Signups open' : season.status }}</template>
-            <template v-else>{{ c.status }}</template>
-          </UiBadge>
-          <p class="eyebrow mt-6 text-muted">{{ c.eyebrow }}</p>
-          <h1 id="home-title" class="mt-3 font-heading text-5xl leading-[0.95] sm:text-7xl">{{ c.headline }}</h1>
-          <p class="mt-6 max-w-xl text-lg text-muted">{{ c.intro }}</p>
-          <div class="mt-8 flex flex-wrap gap-3">
-            <UiButton :href="site.discordInviteUrl" size="lg">Join the Discord</UiButton>
-            <UiButton :to="inSeason ? '/matches' : '/rules'" variant="secondary" size="lg">{{ inSeason ? 'See the schedule' : 'Read the rules' }}</UiButton>
+    <!-- Logged out: landing hero -->
+    <template v-if="!auth.isSignedIn">
+      <div v-if="recentResults.length" class="h-11 border-b border-line bg-rail print:hidden"><div class="mx-auto flex h-full max-w-7xl px-2"><ResultsTicker /></div></div>
+      <section class="landing-hero relative overflow-hidden border-b border-line" aria-labelledby="home-title">
+        <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+          <div class="absolute top-0 left-1/2 size-[640px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-accent/10 blur-3xl" />
+        </div>
+        <div class="relative mx-auto flex max-w-4xl flex-col items-center px-4 pt-12 pb-16 text-center sm:px-6 sm:pt-16 sm:pb-24">
+          <BrandLogo :size="220" variant="full" decorative />
+          <p class="mt-8 flex items-center gap-3 eyebrow text-faint">
+            <span class="h-px w-8 bg-accent sm:w-12" aria-hidden="true" />{{ c.hero.eyebrow }}<span class="h-px w-8 bg-accent sm:w-12" aria-hidden="true" />
+          </p>
+          <h1 id="home-title" class="title-xl mt-5">
+            {{ c.hero.headline[0] }}<br /><span class="text-accent">{{ c.hero.headline[1] }}</span>
+          </h1>
+          <p class="mt-6 max-w-xl text-lg text-muted">{{ site.tagline }}</p>
+          <ul class="mt-7 flex flex-wrap justify-center gap-2" aria-label="League at a glance">
+            <template v-if="counts">
+              <li class="tnum rounded-full border border-line bg-chip px-4 py-1.5 text-sm"><b class="font-heading text-text">{{ counts.players }}</b> <span class="text-muted">{{ plural(counts.players, 'player', 'players') }}</span></li>
+              <li class="tnum rounded-full border border-line bg-chip px-4 py-1.5 text-sm"><b class="font-heading text-text">{{ counts.teams }}</b> <span class="text-muted">{{ plural(counts.teams, 'team', 'teams') }}</span></li>
+              <li class="tnum rounded-full border border-line bg-chip px-4 py-1.5 text-sm"><b class="font-heading text-text">{{ counts.matches }}</b> <span class="text-muted">{{ plural(counts.matches, 'match played', 'matches played') }}</span></li>
+            </template>
+            <li>
+              <a :href="site.discordInviteUrl" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 rounded-full bg-discord px-4 py-1.5 text-sm font-semibold text-white hover:brightness-110">
+                <DiscordGlyph class="size-4" />Discord<span class="sr-only"> (opens in a new tab)</span>
+              </a>
+            </li>
+          </ul>
+          <div class="mt-8 flex flex-wrap justify-center gap-3">
+            <UiButton to="/login" size="lg">Join the league</UiButton>
+            <UiButton to="/watch" variant="secondary" size="lg">Watch matches</UiButton>
           </div>
         </div>
-        <div class="relative hidden justify-center lg:flex"><BrandLogo :size="400" variant="full" decorative /></div>
-      </div>
-    </section>
+      </section>
+    </template>
+
+    <!-- Signed in -->
+    <template v-else>
+      <section class="relative overflow-hidden border-b border-line" aria-labelledby="home-title">
+        <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+          <div class="absolute top-1/2 right-[8%] hidden size-[520px] -translate-y-1/2 rounded-full bg-accent/10 blur-3xl lg:block" />
+        </div>
+        <div class="relative mx-auto grid max-w-7xl gap-10 px-4 pt-10 pb-14 sm:px-6 sm:pt-14 lg:grid-cols-[1.2fr_1fr] lg:items-center">
+          <div>
+            <RouterLink
+              to="/dashboard"
+              class="card-accent texture-stripes mb-8 flex items-center justify-between gap-4 rounded-xl border border-line bg-surface p-4 hover:border-line-strong"
+            >
+              <span>
+                <span class="eyebrow block text-faint">Your dashboard</span>
+                <span class="font-heading text-xl">Next match, to-dos and your team</span>
+              </span>
+              <ArrowRight class="size-5 shrink-0 text-accent" aria-hidden="true" />
+            </RouterLink>
+            <UiBadge variant="accent">
+              <template v-if="season && inSeason && week">{{ season.name }} · Week {{ week }}</template>
+              <template v-else-if="season">{{ season.name }} · {{ season.status === 'signups' ? 'Signups open' : season.status }}</template>
+              <template v-else>{{ c.status }}</template>
+            </UiBadge>
+            <p class="eyebrow-line mt-6 text-faint">{{ c.eyebrow }}</p>
+            <h1 id="home-title" class="title-xl mt-3">{{ c.headline }}</h1>
+            <p class="mt-6 max-w-xl text-lg text-muted">{{ c.intro }}</p>
+            <div class="mt-8 flex flex-wrap gap-3">
+              <UiButton :to="inSeason ? '/matches' : '/season'" size="lg">{{ inSeason ? 'See the schedule' : 'Season hub' }}</UiButton>
+              <UiButton :href="site.discordInviteUrl" variant="secondary" size="lg">Discord</UiButton>
+            </div>
+          </div>
+          <div class="relative hidden justify-center lg:flex"><BrandLogo :size="360" variant="full" decorative /></div>
+        </div>
+      </section>
+    </template>
 
     <div class="mx-auto flex max-w-7xl flex-col gap-14 px-4 py-14 sm:px-6">
       <!-- Live now -->
@@ -156,11 +216,37 @@ const leaders = computed(() =>
         </div>
       </div>
 
-      <!-- League pillars (before the season has results) -->
-      <section v-if="!latest.length" aria-labelledby="pillars-title">
-        <p class="eyebrow text-accent">The league</p>
-        <h2 id="pillars-title" class="mt-2 font-heading text-3xl sm:text-4xl">Built like a pro circuit</h2>
-        <div class="mt-8 grid gap-px overflow-hidden rounded-lg border border-line bg-line md:grid-cols-3">
+      <!-- How the league works (visitors) -->
+      <section v-if="!auth.isSignedIn" aria-labelledby="how-title">
+        <p class="eyebrow-line text-faint">The league</p>
+        <h2 id="how-title" class="mt-3 font-heading text-3xl sm:text-4xl">How the league works</h2>
+        <ul class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <li v-for="(f, i) in c.features" :key="f.title">
+            <component
+              :is="'discord' in f ? 'a' : 'RouterLink'"
+              v-bind="'discord' in f ? { href: site.discordInviteUrl, target: '_blank', rel: 'noopener noreferrer' } : { to: f.to }"
+              class="card-accent group flex h-full flex-col rounded-xl border border-line bg-surface p-6 transition-colors hover:border-line-strong"
+              :style="i === 0 ? undefined : { '--card-accent': 'var(--color-line-strong)' }"
+            >
+              <span class="grid size-11 place-items-center rounded-lg bg-accent-soft text-accent">
+                <component :is="featureIcon(f.icon)" class="size-5" aria-hidden="true" />
+              </span>
+              <h3 class="mt-4 font-heading text-xl">{{ f.title }}</h3>
+              <p class="mt-2 flex-1 text-sm leading-relaxed text-muted">{{ f.body }}</p>
+              <span class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent">
+                {{ 'discord' in f ? 'Join the Discord' : 'Learn more' }}
+                <ArrowRight class="size-4 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" aria-hidden="true" />
+              </span>
+            </component>
+          </li>
+        </ul>
+      </section>
+
+      <!-- League pillars (signed in, before the season has results) -->
+      <section v-else-if="!latest.length" aria-labelledby="pillars-title">
+        <p class="eyebrow-line text-faint">The league</p>
+        <h2 id="pillars-title" class="mt-3 font-heading text-3xl sm:text-4xl">Built like a pro circuit</h2>
+        <div class="mt-8 grid gap-px overflow-hidden rounded-xl border border-line bg-line md:grid-cols-3">
           <article v-for="(p, i) in c.pillars" :key="p.title" class="bg-surface p-6 sm:p-8">
             <p class="tnum font-heading text-sm text-accent" aria-hidden="true">0{{ i + 1 }}</p>
             <h3 class="mt-3 font-heading text-xl">{{ p.title }}</h3>
@@ -169,19 +255,42 @@ const leaders = computed(() =>
         </div>
       </section>
 
-      <!-- Discord CTA -->
-      <section aria-labelledby="cta-title" class="flex flex-col gap-6 rounded-lg border border-line bg-surface p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+      <!-- CTA band -->
+      <section
+        v-if="!auth.isSignedIn"
+        aria-labelledby="cta-title"
+        class="texture-stripes-brand flex flex-col gap-6 rounded-2xl bg-brand p-8 text-on-brand sm:flex-row sm:items-center sm:justify-between sm:p-10"
+      >
         <div>
-          <h2 id="cta-title" class="font-heading text-2xl">Want in?</h2>
-          <p class="mt-1 max-w-lg text-sm text-muted">
-            Join the Discord for announcements, match nights and free agents. Log in to land on the free agent list or build a team.
-          </p>
+          <h2 id="cta-title" class="font-heading text-3xl sm:text-4xl">{{ c.cta.title }}</h2>
+          <p class="mt-2 max-w-lg text-on-brand/85">{{ c.cta.body }}</p>
+        </div>
+        <RouterLink
+          to="/login"
+          class="inline-flex h-12 shrink-0 items-center justify-center rounded-md bg-bg px-6 font-heading tracking-wide text-text uppercase hover:bg-surface-2"
+        >
+          Join the league
+        </RouterLink>
+      </section>
+      <section v-else aria-labelledby="cta-title" class="flex flex-col gap-6 rounded-xl border border-line bg-surface p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+        <div>
+          <h2 id="cta-title" class="font-heading text-2xl">Looking for players?</h2>
+          <p class="mt-1 max-w-lg text-sm text-muted">Free agents post on the board and in Discord. Captains can invite them while they have an open spot.</p>
         </div>
         <div class="flex flex-wrap gap-3">
-          <UiButton :href="site.discordInviteUrl">Join the Discord</UiButton>
-          <UiButton to="/free-agents" variant="secondary">Free agents</UiButton>
+          <UiButton to="/free-agents">Free agents</UiButton>
+          <UiButton :href="site.discordInviteUrl" variant="secondary">Join the Discord</UiButton>
         </div>
       </section>
     </div>
   </div>
 </template>
+
+<style scoped>
+.landing-hero {
+  background-color: var(--color-bg);
+  background-image:
+    linear-gradient(to bottom, rgb(10 10 11 / 0.2), var(--color-bg)),
+    repeating-linear-gradient(135deg, transparent 0 14px, rgb(255 255 255 / 0.025) 14px 28px);
+}
+</style>

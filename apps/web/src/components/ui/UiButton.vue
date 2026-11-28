@@ -23,18 +23,18 @@ const props = withDefaults(
 
 const variants: Record<Variant, string> = {
   primary: 'bg-brand text-on-brand hover:bg-brand-strong border border-brand hover:border-brand-strong',
-  secondary: 'bg-surface-2 text-text border border-line-strong hover:border-accent-dim hover:bg-surface-3',
+  secondary: 'bg-chip text-text border border-line hover:border-line-strong hover:bg-surface-3',
   ghost: 'bg-transparent text-text border border-transparent hover:bg-surface-2',
   danger: 'bg-transparent text-loss border border-loss/50 hover:bg-loss-soft hover:border-loss',
 }
 const sizes: Record<Size, string> = {
   sm: 'h-8 px-3 text-xs',
-  md: 'h-10 px-4 text-sm',
+  md: 'h-11 px-4 text-sm',
   lg: 'h-12 px-6 text-base',
 }
 
 const classes = computed(() => [
-  'inline-flex items-center justify-center gap-2 rounded-md font-heading tracking-wider whitespace-nowrap',
+  'inline-flex items-center justify-center gap-2 rounded-md font-heading uppercase tracking-wide whitespace-nowrap',
   'transition-colors duration-150 select-none',
   'disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50',
   variants[props.variant],

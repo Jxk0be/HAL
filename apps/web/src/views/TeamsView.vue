@@ -1,53 +1,72 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
-import UiBadge from '@/components/ui/UiBadge.vue'
+import UiTabs from '@/components/ui/UiTabs.vue'
+import UiInput from '@/components/ui/UiInput.vue'
 import UiButton from '@/components/ui/UiButton.vue'
-import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
+import TeamGrid from '@/components/season/TeamGrid.vue'
 import { useTeamList } from '@/composables/useTeams'
-import { site } from '@/config/site'
+import { useActiveSeason } from '@/composables/useActiveSeason'
+import { useRecruitBoard } from '@/composables/useRecruiting'
+import { useAuthStore } from '@/stores/auth'
 
+const auth = useAuthStore()
+const { season } = useActiveSeason()
 const { teams, loading, error } = useTeamList()
+const { posts } = useRecruitBoard()
+
+const search = ref('')
+const filter = ref<string>('all')
+const recruiting = computed(() => new Set(posts.value.map((p) => p.teamId)))
+
+const divisions = computed(() => {
+  const seen = new Map<string, string>()
+  for (const t of teams.value) if (t.divisionId && t.division) seen.set(t.divisionId, t.division)
+  return [...seen].map(([value, label]) => ({ value, label }))
+})
+const tabs = computed(() => [
+  { value: 'all', label: 'All', count: teams.value.length },
+  { value: 'recruiting', label: 'Recruiting', count: recruiting.value.size },
+  ...divisions.value,
+])
+
+const shown = computed(() => {
+  const q = search.value.trim().toLowerCase()
+  return teams.value.filter(
+    (t) =>
+      (filter.value === 'all' ||
+        (filter.value === 'recruiting' ? recruiting.value.has(t.id) : t.divisionId === filter.value)) &&
+      (!q || t.name.toLowerCase().includes(q) || t.tag.toLowerCase().includes(q)),
+  )
+})
 </script>
 
 <template>
   <div>
-    <PageHeader eyebrow="League" title="Teams" description="Every team registered this season." />
-    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <div v-if="loading" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div v-for="n in 6" :key="n" class="rounded-lg border border-line bg-surface p-5"><UiSkeleton :lines="3" /></div>
-      </div>
-      <p v-else-if="error" role="alert" class="text-loss">{{ error }}</p>
-      <UiEmptyState
-        v-else-if="teams.length === 0"
-        title="No teams yet"
-        description="Teams appear here as captains register them during signups."
+    <PageHeader eyebrow="Teams" title="Find your squad" :description="`Every team registered for ${season?.name ?? 'this season'}.`">
+      <template #actions>
+        <div class="w-full sm:w-72">
+          <UiInput v-model="search" label="Search teams" type="search" placeholder="Name or tag" autocomplete="off" />
+        </div>
+      </template>
+    </PageHeader>
+    <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:px-6">
+      <div
+        v-if="auth.team"
+        class="card-accent texture-stripes flex items-center gap-4 rounded-xl border border-line bg-surface p-4 sm:p-5"
       >
-        <UiButton to="/my-team">Create a team</UiButton>
-        <UiButton :href="site.discordInviteUrl" variant="secondary">Join the Discord</UiButton>
-      </UiEmptyState>
-      <ul v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <li v-for="t in teams" :key="t.id">
-          <RouterLink
-            :to="`/teams/${t.id}`"
-            class="group flex h-full items-center gap-4 rounded-lg border border-line bg-surface p-5 transition-colors hover:border-accent-dim"
-          >
-            <TeamLogo :tag="t.tag" :name="t.name" :logo-url="t.logoUrl" size="lg" decorative />
-            <div class="min-w-0 flex-1">
-              <p class="truncate font-heading text-xl group-hover:text-accent">{{ t.name }}</p>
-              <p class="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted">
-                <UiBadge variant="outline">{{ t.tag }}</UiBadge>
-                <UiBadge v-if="t.division">{{ t.division }}</UiBadge>
-                <UiBadge v-if="t.status === 'pending'" variant="accent">Pending</UiBadge>
-              </p>
-              <p class="mt-2 text-xs text-muted">
-                <span class="tnum">{{ t.rosterSize }}</span> players · Record <span class="tnum">0–0</span>
-              </p>
-            </div>
-          </RouterLink>
-        </li>
-      </ul>
+        <TeamLogo :tag="auth.team.tag" :logo-url="auth.team.logo_url" size="lg" decorative />
+        <div class="min-w-0 flex-1">
+          <p class="eyebrow text-faint">My team</p>
+          <RouterLink :to="`/teams/${auth.team.id}`" class="block truncate font-heading text-2xl hover:text-accent">{{ auth.team.name }}</RouterLink>
+        </div>
+        <UiButton to="/my-team" variant="secondary" size="sm">Manage</UiButton>
+      </div>
+
+      <UiTabs v-model="filter" :tabs="tabs" label="Filter teams" variant="pill">
+        <TeamGrid :teams="shown" :loading="loading" :error="error" :season-id="season?.id" />
+      </UiTabs>
     </div>
   </div>
 </template>

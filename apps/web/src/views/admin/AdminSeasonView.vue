@@ -37,6 +37,7 @@ async function result(p: Promise<{ ok: boolean; message?: string }>, success: st
   else toast.success(success)
 }
 const saveSeason = (patch: SeasonPatch) => result(admin.saveSeason(patch), 'Season saved.')
+const uploadBanner = (file: File) => result(admin.uploadBanner(file), 'Banner updated.')
 
 // New season: the owner names it; it starts as a draft with default settings to edit on the Season tab.
 const newSeasonName = ref('')
@@ -58,7 +59,7 @@ const review = (teamId: string, approve: boolean, note: string | null) =>
 
 <template>
   <div>
-    <PageHeader eyebrow="Admin" title="Season & schedule">
+    <PageHeader compact eyebrow="Admin" title="Season & schedule">
       <template v-if="season" #actions>
         <UiBadge variant="accent">{{ season.name }} · {{ season.status }}</UiBadge>
       </template>
@@ -93,7 +94,7 @@ const review = (teamId: string, approve: boolean, note: string | null) =>
 
       <UiTabs v-if="!loading && season" v-model="tab" label="Season admin sections" :tabs="tabs">
         <template #default="{ active }">
-          <SeasonSettingsForm v-if="active === 'season'" :season="season" :readonly="!auth.isOwner" :busy="busy" @save="saveSeason" />
+          <SeasonSettingsForm v-if="active === 'season'" :season="season" :readonly="!auth.isOwner" :busy="busy" @save="saveSeason" @banner="uploadBanner" />
           <TeamApprovalQueue v-else-if="active === 'teams'" :pending="pending" :busy="busy" @review="review" />
           <DivisionsPanel
             v-else-if="active === 'divisions'"

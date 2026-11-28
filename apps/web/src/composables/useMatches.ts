@@ -101,17 +101,24 @@ export function currentWeek(matches: MatchCardData[], now = Date.now()): number 
 }
 
 /** Every match of the active season, live-updated. Small enough (≈130 rows) to filter client-side. */
-export function useSeasonSchedule() {
+/** Every match of a season (the active one by default), live-updated. */
+export function useSeasonSchedule(seasonId?: MaybeRefOrGetter<string | null | undefined>) {
   const season = ref<{ id: string; name: string; status: string; regular_weeks: number; starts_on: string | null; timezone: string } | null>(null)
   const matches = ref<MatchCardData[]>([])
   const loading = ref(true)
 
   async function load() {
-    const { data: s } = await supabase
-      .from('seasons')
-      .select('id, name, status, regular_weeks, starts_on, timezone')
-      .in('status', ['signups', 'regular', 'playoffs'])
-      .maybeSingle()
+    const wanted = seasonId === undefined ? undefined : toValue(seasonId)
+    if (seasonId !== undefined && !wanted) {
+      season.value = null
+      matches.value = []
+      loading.value = false
+      return
+    }
+    const base = supabase.from('seasons').select('id, name, status, regular_weeks, starts_on, timezone')
+    const { data: s } = wanted
+      ? await base.eq('id', wanted).maybeSingle()
+      : await base.in('status', ['signups', 'regular', 'playoffs']).maybeSingle()
     season.value = s
     if (s) {
       const { data } = await supabase.from('matches').select(MATCH_SELECT).eq('season_id', s.id).order('scheduled_at')
@@ -123,7 +130,8 @@ export function useSeasonSchedule() {
   }
 
   useRealtime('schedule', [{ table: 'matches' }], load)
-  void load()
+  if (seasonId === undefined) void load()
+  else watch(() => toValue(seasonId), load, { immediate: true })
   return { season, matches, loading, reload: load }
 }
 

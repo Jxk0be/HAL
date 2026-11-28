@@ -2612,6 +2612,7 @@ export type Database = {
       }
       seasons: {
         Row: {
+          banner_url: string | null
           created_at: string
           id: string
           match_nights: string[]
@@ -2635,6 +2636,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          banner_url?: string | null
           created_at?: string
           id?: string
           match_nights?: string[]
@@ -2658,6 +2660,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          banner_url?: string | null
           created_at?: string
           id?: string
           match_nights?: string[]
@@ -3225,6 +3228,7 @@ export type Database = {
       }
       teams: {
         Row: {
+          banner_url: string | null
           captain_id: string
           co_captain_id: string | null
           created_at: string
@@ -3245,6 +3249,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          banner_url?: string | null
           captain_id: string
           co_captain_id?: string | null
           created_at?: string
@@ -3265,6 +3270,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          banner_url?: string | null
           captain_id?: string
           co_captain_id?: string | null
           created_at?: string
@@ -3884,6 +3890,29 @@ export type Database = {
           p_user_id: string
         }
         Returns: boolean
+      }
+      eights_public_state: { Args: never; Returns: Json }
+      hall_of_champions: {
+        Args: never
+        Returns: {
+          champion_series: number
+          division_name: string
+          final_at: string
+          logo_url: string
+          opponent_name: string
+          opponent_series: number
+          opponent_tag: string
+          season_id: string
+          season_name: string
+          starters: string[]
+          team_id: string
+          team_name: string
+          team_tag: string
+        }[]
+      }
+      site_counts: {
+        Args: never
+        Returns: { matches: number; players: number; teams: number }[]
       }
       invitable_players: {
         Args: { p_limit?: number; p_search: string }

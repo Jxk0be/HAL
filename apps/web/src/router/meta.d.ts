@@ -17,5 +17,9 @@ declare module 'vue-router' {
     player?: boolean
     /** Staff access: any staff role, owner/admin, or owner only. */
     staff?: 'any' | 'admin' | 'owner'
+    /** Page chrome: the app shell (rail + top bar, default) or the slim public header. */
+    layout?: 'app' | 'public'
+    /** Tabs are kept in the URL hash: don't scroll on hash-only changes. */
+    tabHash?: boolean
   }
 }

@@ -16,6 +16,9 @@ import UiAvatar from '@/components/ui/UiAvatar.vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import ScoreChip from '@/components/ui/ScoreChip.vue'
 import UiCountdown from '@/components/ui/UiCountdown.vue'
+import UiStepper from '@/components/ui/UiStepper.vue'
+import UiStatTile from '@/components/ui/UiStatTile.vue'
+import UiPodium from '@/components/ui/UiPodium.vue'
 import type { TableSort } from '@/components/ui/types'
 import { useToast } from '@/composables/useToast'
 
@@ -26,6 +29,20 @@ function sendInvite() {
   toast.success('Invite sent.')
 }
 const tab = ref<'standings' | 'kd' | 'score'>('standings')
+const pill = ref<'all' | 'recruiting' | 'premier'>('all')
+const steps = [
+  { key: 'signups', label: 'Signups' },
+  { key: 'pre', label: 'Preseason' },
+  { key: 'w1', label: 'Week 1' },
+  { key: 'w2', label: 'Week 2' },
+  { key: 'w3', label: 'Week 3' },
+  { key: 'playoffs', label: 'Playoffs' },
+]
+const podium = [
+  { key: 'a', name: 'Viper#1234567', meta: 'SRPH · 1.42 K/D' },
+  { key: 'b', name: 'Nyx#7654321', meta: 'HALO · 1.31 K/D' },
+  { key: 'c', name: 'Grit#1111111', meta: 'GATE · 1.27 K/D' },
+]
 const platform = ref<'playstation' | 'xbox' | 'pc' | ''>('')
 const search = ref('')
 const activision = ref('')
@@ -86,9 +103,73 @@ const swatches = [
           <p class="font-heading text-5xl">Display heading</p>
           <p class="font-heading text-2xl">Section heading</p>
           <p class="eyebrow text-accent">Eyebrow label</p>
-          <p>Body text in Inter. The quick brown fox jumps over the lazy dog.</p>
+          <p>Body text in Barlow. The quick brown fox jumps over the lazy dog.</p>
           <p class="text-muted">Muted supporting text.</p>
           <p class="tnum font-heading text-3xl">250 – 187 · 1.42 K/D · +38</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="sg-textures">
+        <h2 id="sg-textures" class="eyebrow mb-4 text-accent">Tokens & textures</h2>
+        <div class="grid gap-4 md:grid-cols-3">
+          <div class="rounded-xl border border-line bg-surface p-5">
+            <p class="eyebrow-line text-faint">eyebrow-line</p>
+            <p class="title-xl mt-3">Title XL</p>
+          </div>
+          <div class="texture-stripes card-accent rounded-xl border border-line bg-surface p-5">
+            <p class="eyebrow text-faint">texture-stripes + card-accent</p>
+            <p class="mt-2 font-heading text-2xl">Red top border</p>
+          </div>
+          <div class="texture-stripes card-accent rounded-xl border border-line bg-surface p-5" style="--card-accent: var(--color-line-strong)">
+            <p class="eyebrow text-faint">neutral card-accent</p>
+            <p class="mt-2 font-heading text-2xl">Neutral top border</p>
+          </div>
+          <div class="texture-stripes-brand rounded-xl bg-brand p-5 text-on-brand md:col-span-2">
+            <p class="eyebrow">texture-stripes-brand</p>
+            <p class="mt-2 font-heading text-2xl">Gold to Crimson. Prove it.</p>
+          </div>
+          <div class="flex flex-col gap-2 rounded-xl border border-line bg-rail p-5">
+            <p class="eyebrow text-faint">rail · chip · track</p>
+            <span class="w-fit rounded-full bg-chip px-3 py-1 text-sm text-muted">Chip</span>
+            <div class="h-2 rounded-full bg-track"><div class="h-full w-2/3 rounded-full bg-accent" /></div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="sg-kit">
+        <h2 id="sg-kit" class="eyebrow mb-4 text-accent">Cards, tabs, stepper, tiles, podium</h2>
+        <div class="grid gap-4 md:grid-cols-3">
+          <UiCard accent="red" title="Accent red">Needs your action.</UiCard>
+          <UiCard accent="neutral" striped title="Neutral + striped">Information only.</UiCard>
+          <UiCard accent="neutral" interactive title="Interactive">Lifts on hover.</UiCard>
+        </div>
+        <div class="mt-6">
+          <UiTabs
+            v-model="pill"
+            variant="pill"
+            label="Pill tabs"
+            :tabs="[
+              { value: 'all', label: 'All', count: 12 },
+              { value: 'recruiting', label: 'Recruiting', count: 3 },
+              { value: 'premier', label: 'Premier' },
+            ]"
+          >
+            <p class="text-sm text-muted">Pill tab: {{ pill }}</p>
+          </UiTabs>
+        </div>
+        <div class="mt-6 rounded-xl border border-line bg-surface p-5">
+          <UiStepper :steps="steps" current-key="w2" label="Season progress" />
+        </div>
+        <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <UiStatTile label="Record" value="6–1" hint="Series W–L" />
+          <UiStatTile label="Map diff" value="+11" accent="neutral" />
+          <UiStatTile label="Standing" value="#1" accent="neutral" />
+          <UiStatTile label="Forfeits" value="0" accent="neutral" />
+        </div>
+        <div class="mt-8">
+          <UiPodium :entries="podium" label="Top K/D">
+            <template #media="{ entry }"><UiAvatar :name="entry.name" decorative /></template>
+          </UiPodium>
         </div>
       </section>
 

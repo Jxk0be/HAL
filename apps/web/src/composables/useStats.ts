@@ -233,3 +233,46 @@ export function usePlayerBreakdown(userId: MaybeRefOrGetter<string | null | unde
   watch([() => toValue(userId), () => toValue(seasonId)], load, { immediate: true })
   return { breakdown, loading, reload: load }
 }
+
+export type Champion = Database['public']['Functions']['hall_of_champions']['Returns'][number]
+
+/** Every completed season's champion (newest first). Public. */
+export function useHallOfChampions() {
+  const champions = ref<Champion[]>([])
+  const loading = ref(true)
+  async function load() {
+    const { data } = await supabase.rpc('hall_of_champions')
+    champions.value = data ?? []
+    loading.value = false
+  }
+  void load()
+  return { champions, loading }
+}
+
+/** CoD ranks for a few players (the podium). cod_rank is public. */
+export function usePlayerRanks(userIds: MaybeRefOrGetter<string[]>) {
+  const ranks = ref<Record<string, { rank: Database['public']['Enums']['cod_rank'] | null; exceptionAt: string | null }>>({})
+  async function load() {
+    const ids = toValue(userIds)
+    if (!ids.length) {
+      ranks.value = {}
+      return
+    }
+    const { data } = await supabase.from('profiles').select('id, cod_rank, rank_exception_at').in('id', ids)
+    ranks.value = Object.fromEntries((data ?? []).map((p) => [p.id, { rank: p.cod_rank, exceptionAt: p.rank_exception_at }]))
+  }
+  watch(() => toValue(userIds).join(','), load, { immediate: true })
+  return { ranks }
+}
+
+/** Public landing-page counts (players, approved teams, matches played). */
+export function useSiteCounts() {
+  const counts = ref<{ players: number; teams: number; matches: number } | null>(null)
+  async function load() {
+    const { data } = await supabase.rpc('site_counts')
+    const row = data?.[0]
+    counts.value = row ? { players: Number(row.players), teams: Number(row.teams), matches: Number(row.matches) } : null
+  }
+  void load()
+  return { counts }
+}

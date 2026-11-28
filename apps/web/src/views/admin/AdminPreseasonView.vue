@@ -66,6 +66,7 @@ const answerOf = (t: (typeof teams.value)[number]) => (!t.invited ? ANSWER.none 
 <template>
   <div>
     <PageHeader
+      compact
       eyebrow="Admin"
       title="Preseason"
       description="Optional preseason matches for casting: invite teams, pair the ones that say yes, and let them pick their times."

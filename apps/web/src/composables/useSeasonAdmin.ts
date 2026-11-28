@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { dbErrorMessage } from '@/lib/errors'
+import { compressImage } from '@/lib/image'
 import type { Database } from '@/types/database'
 
 type SeasonRow = Database['public']['Tables']['seasons']['Row']
@@ -20,6 +21,7 @@ export type SeasonPatch = Partial<
     | 'roster_lock_at'
     | 'playoff_teams'
     | 'prize_text'
+    | 'banner_url'
   >
 >
 
@@ -120,6 +122,30 @@ export function useSeasonAdmin() {
     return r
   }
 
+  /** Owner only: compress (WebP, 1920px max) and upload a banner to season-media, then save its URL. */
+  async function uploadBanner(file: File): Promise<Result> {
+    if (!season.value) return { ok: false, message: 'No season.' }
+    const id = season.value.id
+    busy.value = true
+    let blob: Blob
+    let ext: string
+    try {
+      ;({ blob, ext } = await compressImage(file, 1920))
+    } catch {
+      busy.value = false
+      return { ok: false, message: 'Could not read that image. Use a PNG, JPG or WebP.' }
+    }
+    const path = `${id}/banner-${Date.now()}.${ext}`
+    const { error } = await supabase.storage.from('season-media').upload(path, blob, {
+      contentType: blob.type || `image/${ext}`,
+      upsert: false,
+    })
+    busy.value = false
+    if (error) return { ok: false, message: 'Could not upload the banner. Only the owner can, and it must be under 3 MB.' }
+    const { data } = supabase.storage.from('season-media').getPublicUrl(path)
+    return saveSeason({ banner_url: data.publicUrl })
+  }
+
   async function addDivision(name: string): Promise<Result> {
     if (!season.value) return { ok: false, message: 'No season.' }
     const tier = (divisions.value.at(-1)?.tier ?? 0) + 1
@@ -177,6 +203,7 @@ export function useSeasonAdmin() {
     busy,
     reload: load,
     saveSeason,
+    uploadBanner,
     createSeason,
     addDivision,
     renameDivision,

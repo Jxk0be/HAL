@@ -31,7 +31,7 @@ const { teams } = useSeasonTeamNames(seasonId)
 
 <template>
   <div>
-    <PageHeader eyebrow="Admin" title="Content" description="Edit any match, result, team, free agent post or player. Every change is publicly logged." />
+    <PageHeader compact eyebrow="Admin" title="Content" description="Edit any match, result, team, free agent post or player. Every change is publicly logged." />
     <div class="px-4 py-8 sm:px-6">
       <UiTabs v-model="tab" label="Content sections" :tabs="tabs">
         <template v-if="tab === 'matches' || tab === 'teams'">

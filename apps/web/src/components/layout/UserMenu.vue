@@ -76,6 +76,9 @@ async function logout() {
         <p class="truncate border-b border-line px-4 py-2.5 text-xs text-muted">
           Signed in as <span class="text-text">{{ auth.displayName }}</span>
         </p>
+        <RouterLink class="block px-4 py-2 text-sm hover:bg-surface-3" to="/dashboard" @click="open = false">
+          Dashboard
+        </RouterLink>
         <RouterLink class="block px-4 py-2 text-sm hover:bg-surface-3" to="/profile" @click="open = false">
           My Profile
         </RouterLink>

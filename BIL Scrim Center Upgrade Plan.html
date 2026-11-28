@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BIL Scrim Center Upgrade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a builder's field guide, direct
+   IDEA: the page wears the target look (Scrim Center shell, Blackhat colors)
+   PICTURE: a live mini-mock of the upgraded BIL app shell
+   COLOUR and TYPE: Blackhat near-black + one red; Chakra Petch titles, Barlow body
+   LAYOUT: sticky section links, gap map first, then phases with copyable prompts */
+:root{color-scheme:dark;--bg:#0a0a0b;--card:#111113;--card2:#17171a;--card3:#1f1f23;--line:#27272c;--line2:#35353c;--ink:#ededf0;--soft:#a1a1aa;--sec:#74747d;--red:#ff4f5c;--brand:#d91f2b;--redsoft:rgb(255 79 92/.1);--win:#4fb07c;--blue:#5b9dff}
+:root[data-theme=light],:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Barlow,Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Chakra Petch",Barlow,sans-serif;text-transform:uppercase;line-height:1.05;margin:0;text-wrap:balance}
+h1{font-size:clamp(34px,5.2vw,52px)}h2{font-size:clamp(26px,3.4vw,34px)}h3{font-size:19px}
+p{margin:.5em 0;color:var(--soft);max-width:70ch}
+a{color:var(--red)}
+code{font:13.5px/1.5 "JetBrains Mono",monospace;overflow-wrap:anywhere;color:#ffb3b9}
+.band{padding:clamp(28px,4vw,56px) max(5vw,16px);max-width:1240px;margin:0 auto}
+.lede{font-size:17px;color:var(--soft)}
+.top{background:#070708;border-bottom:1px solid var(--line)}
+.top .band{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:40px;align-items:center}
+.note{font-size:14px;color:var(--sec);margin-top:14px}
+.mock{border:1px solid var(--line2);border-radius:14px;overflow:hidden;background:var(--bg);display:grid;grid-template-columns:58px 1fr;min-height:340px;box-shadow:0 30px 60px -30px #000}
+.rail{background:#0d0d0f;border-right:1px solid var(--line);padding:10px 6px;display:flex;flex-direction:column;gap:6px}
+.rail i{display:grid;place-items:center;height:40px;border-radius:9px;font:600 9px Barlow;color:var(--sec);font-style:normal;text-align:center}
+.rail i b{display:block;width:14px;height:14px;border:2px solid currentColor;border-radius:4px;margin:0 auto 3px}
+.rail i.on{background:var(--redsoft);color:var(--red)}
+.mtop{height:38px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 12px;overflow:hidden;white-space:nowrap;font:600 11px Barlow;color:var(--sec)}
+.mtop span b{color:#fff}.mtop span em{color:var(--red);font-style:normal}
+.tick{display:flex;gap:22px;animation:tick 22s linear infinite}
+@keyframes tick{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.tick{animation:none}html{scroll-behavior:auto!important}}
+.mbody{padding:14px}
+.eb{display:flex;align-items:center;gap:8px;font:600 10px Barlow;color:var(--sec);text-transform:uppercase;letter-spacing:.12em}
+.eb:before{content:"";width:18px;height:2px;background:var(--red)}
+.mbody h4{font:700 24px/1 "Chakra Petch";text-transform:uppercase;margin:6px 0 10px}
+.steps{display:flex;gap:4px;margin:8px 0 12px}.steps s{flex:1;height:4px;border-radius:3px;background:var(--line2);text-decoration:none}.steps s.d{background:var(--red)}
+.mcards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.mc{background:var(--card);border:1px solid var(--line);border-top:2px solid var(--c);border-radius:10px;padding:10px;font-size:11px;color:var(--sec)}
+.mc b{display:block;font:700 18px "Chakra Petch";color:var(--ink)}
+.stripe{background:repeating-linear-gradient(135deg,transparent 0 10px,#ffffff05 10px 20px),var(--card)}
+.jump{position:sticky;top:0;z-index:5;background:#0a0a0bee;backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.jump .scroll{display:flex;gap:6px;padding:10px max(5vw,16px);max-width:1240px;margin:0 auto}
+.jump a{flex:none;padding:8px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--soft);text-decoration:none;font:600 14px Barlow}
+.jump a:hover,.jump a:focus-visible{color:#fff;border-color:var(--red);outline:none}
+.scroll{overflow-x:auto}
+html{scroll-padding-top:72px;scroll-behavior:smooth}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card h3{margin-bottom:8px}
+.card ul{margin:6px 0 0;padding-left:18px;color:var(--soft)}.card li{margin:4px 0}
+.big{font:700 40px/1 "Chakra Petch";color:var(--ink)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{text-align:left;font:600 12px Barlow;text-transform:uppercase;letter-spacing:.06em;color:var(--sec);padding:10px 12px;border-bottom:1px solid var(--line2)}
+td{padding:10px 12px;border-bottom:1px solid var(--line);color:var(--soft);vertical-align:top}
+td:first-child{color:#fff;font-weight:600}
+.tag{display:inline-block;font:600 12px Barlow;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.have{background:rgb(79 176 124/.14);color:var(--win)}.restyle{background:var(--redsoft);color:var(--red)}.new{background:#16223a;color:var(--blue)}.skip{background:var(--card3);color:var(--sec)}
+.phase{background:var(--card);border:1px solid var(--line);border-radius:16px;margin:18px 0;overflow:hidden}
+.ph{display:flex;gap:14px;align-items:flex-start;padding:20px 20px 0}
+.ph label{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--card2);border:1px solid var(--line2);cursor:pointer}
+.ph input{width:22px;height:22px;accent-color:var(--brand);cursor:pointer}
+.ph .t{flex:1}.ph .meta{font-size:14px;color:var(--sec);margin-top:4px}
+.phase.done{opacity:.55}.phase.done h3{text-decoration:line-through}
+.pbody{padding:6px 20px 20px 78px}
+.pbody ul{margin:6px 0;padding-left:18px;color:var(--soft)}
+.prompt{position:relative;margin-top:12px;border:1px solid var(--line2);border-radius:12px;background:#070708}
+.prompt pre{margin:0;padding:52px 16px 16px;white-space:pre-wrap;font:13.5px/1.55 "JetBrains Mono",monospace;color:#d9dbe6;max-height:360px;overflow:auto}
+.prompt .bar{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:6px 6px 6px 14px;font:600 12px Barlow;color:var(--sec);text-transform:uppercase;letter-spacing:.06em;background:#070708;border-bottom:1px solid var(--line);border-radius:12px 12px 0 0}
+button{font:700 13px Barlow;text-transform:uppercase;letter-spacing:.04em;border:0;border-radius:9px;padding:0 16px;min-height:40px;cursor:pointer;background:var(--brand);color:#fff}
+button:focus-visible,.ph input:focus-visible{outline:2px solid #fff;outline-offset:2px}
+button.ok{background:var(--win);color:#04130a}
+.prog{display:flex;align-items:center;gap:14px;margin-top:10px}
+.prog .tr{flex:1;height:8px;border-radius:9px;background:var(--line2);overflow:hidden}.prog .tr i{display:block;height:100%;width:0;background:var(--red);transition:width .3s}
+.prog b{font:700 15px "Chakra Petch";white-space:nowrap}
+footer{border-top:1px solid var(--line);color:var(--sec);font-size:14px}
+@media(max-width:900px){.top .band{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.g2,.g3{grid-template-columns:1fr}.pbody{padding:6px 16px 18px}.ph{padding:16px 16px 0}.mcards{grid-template-columns:1fr 1fr}.mcards .mc:nth-child(3){display:none}
+table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;white-space:normal;color:var(--sec)}.stack td:empty{display:none}}
+</style>
+<script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+</head>
+<body>
+
+<header class="top"><div class="band">
+  <div>
+    <h1>Upgrading BIL with Scrim Center's look</h1>
+    <p class="lede">BIL is already deeper than Scrim Center where it counts for a league: double-entry reporting, recusal, the audit log, preseason, 8s and a full Discord bot. What Scrim Center has is the feel: an icon-rail app shell, a live results ticker, giant display titles, striped cards, a season hub, a podium leaderboard and a personal dashboard.</p>
+    <p class="lede">So this plan is mostly a reskin, plus 4 new screens. It keeps the Blackhat red and changes no league rules.</p>
+    <p class="note">Every prompt starts with “Read CLAUDE.md first” and ends by updating CLAUDE.md and the app overview, like your existing guide. Phase 0 switches headings to Chakra Petch and body text to Barlow, which is most of Scrim Center's feel. To keep Barlow Condensed and Inter, delete that part of the prompt.</p>
+    <div class="prog"><div class="tr"><i id="bar"></i></div><b id="pct">0 / 11 phases</b></div>
+  </div>
+  <div class="mock" aria-label="Sketch of the upgraded BIL app shell">
+    <div class="rail">
+      <i><b></b>Home</i><i class="on"><b></b>Season</i><i><b></b>Matches</i><i><b></b>Teams</i><i><b></b>Ranks</i><i><b></b>Watch</i>
+    </div>
+    <div>
+      <div class="mtop"><div class="tick" id="tick"></div></div>
+      <div class="mbody stripe">
+        <div class="eb">Season 1</div>
+        <h4>Eight weeks. One title.</h4>
+        <div class="steps"><s class="d"></s><s class="d"></s><s class="d"></s><s></s><s></s><s></s></div>
+        <div class="mcards">
+          <div class="mc" style="--c:var(--red)"><b>2D 04H</b>Roster lock</div>
+          <div class="mc" style="--c:var(--line2)"><b>Week 3</b>Tue · Thu 9 PM ET</div>
+          <div class="mc" style="--c:var(--line2)"><b>12 / 16</b>Teams approved</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></header>
+
+<nav class="jump" aria-label="Sections"><div class="scroll">
+  <a href="#gap">Gap map</a><a href="#decisions">Decisions</a><a href="#phases">Phases</a><a href="#skip">Not porting</a><a href="#notes">Gotchas</a>
+</div></nav>
+
+<section class="band" id="gap">
+  <h2>Scrim Center vs BIL today</h2>
+  <p>I compared Scrim Center with your <code>docs/APP_OVERVIEW.md</code>, CLAUDE.md, <code>main.css</code>, <code>site.ts</code>, <code>App.vue</code> and the router.</p>
+  <div class="g3" style="margin:16px 0">
+    <div class="card"><div class="big" id="cHave">0</div><p>features BIL already has and only needs to restyle</p></div>
+    <div class="card"><div class="big" id="cNew">0</div><p>new screens or features worth taking</p></div>
+    <div class="card"><div class="big" id="cSkip">0</div><p>Scrim Center features that don't fit an invite league</p></div>
+  </div>
+  <div class="card" style="padding:6px 8px">
+  <table class="stack"><thead><tr><th>Scrim Center</th><th>BIL today</th><th>Plan</th><th>Phase</th></tr></thead><tbody id="gapRows"></tbody></table>
+  </div>
+</section>
+
+<section class="band" id="decisions">
+  <h2>Decisions baked in</h2>
+  <div class="g2" style="margin-top:14px">
+    <div class="card"><h3>One red, not five colors</h3><p>Scrim Center tints every feature card a different color. CLAUDE.md allows one red accent, with green and coral only for results. The plan keeps that: cards get a red or neutral top border. Scrim Center gets its energy from type scale and stripes as much as from color.</p></div>
+    <div class="card"><h3>Rail on desktop, tab bar on phones</h3><p>Your header lists 10 links. The rail holds 7 primary items plus “More”. Home and Login use a slim public top bar like Scrim Center's; every other page uses the rail. Phones get a bottom tab bar, since players check schedules there.</p></div>
+    <div class="card"><h3>No XP system</h3><p>Scrim Center ranks players by XP and its own tiers. BIL has real stats and the player's actual CoD rank, which is more meaningful. The podium uses your leaderboard's existing sort, and the <code>RankBadge</code> takes the place of their tier emblems.</p></div>
+    <div class="card"><h3>Season hub collects pages</h3><p>Scrim Center puts a season on one page with tabs. The new <code>/season</code> hub reuses your Standings, Matches, Playoffs and Rules components inside tabs. The old routes stay so existing links and bot posts don't break.</p></div>
+  </div>
+</section>
+
+<section class="band" id="phases">
+  <h2>Upgrade phases</h2>
+  <p>Run them in order; each one ships on its own. Check phases off as you finish them (progress saves in this browser). Rough estimate with Claude Code: phases 0–3 take a weekend and change the whole feel. Phases 4–10 take about another weekend.</p>
+  <div id="phaseList"></div>
+</section>
+
+<section class="band" id="skip">
+  <h2>Not porting, and why</h2>
+  <div class="g3" style="margin-top:14px">
+    <div class="card"><h3>Switches, coins, store, payouts</h3><p>Real money and coin systems bring payment and legal work. BIL pays one $250 prize by PayPal or Venmo, which is fine by hand.</p></div>
+    <div class="card"><h3>Talent Hub</h3><p>Your casting desk already covers casters. A booking marketplace only makes sense if BIL gets outside talent.</p></div>
+    <div class="card"><h3>Multi-game, ELO, FACEIT tabs</h3><p>BIL is one game with one ruleset. Those tabs would sit empty.</p></div>
+  </div>
+</section>
+
+<section class="band" id="notes">
+  <h2>Gotchas</h2>
+  <div class="g2" style="margin-top:14px">
+    <div class="card"><h3>New columns need grants</h3><p><code>seasons.banner_url</code> and <code>teams.banner_url</code> follow your own rule: column grants, the audit trigger, regenerated types and a check in <code>audit_strip()</code>. A missing grant breaks the whole team load.</p></div>
+    <div class="card"><h3>Ticker stays cheap</h3><p>Use one shared realtime subscription for the ticker, the way <code>useLiveBroadcasts()</code> already works. Don't open a channel per component, and leave preseason out of the ticker like every other aggregate.</p></div>
+    <div class="card"><h3>Fonts and the CSP</h3><p>Install the new fonts through Fontsource like the current ones, so <code>netlify.toml</code>'s CSP doesn't change. If you link Google Fonts instead, both hosts have to go into the CSP.</p></div>
+    <div class="card"><h3>Bot links</h3><p>Bot embeds link to <code>/matches/:id</code>, <code>/standings</code> and <code>/my-team</code>. Keep all of those routes working; the hub only adds new ones.</p></div>
+  </div>
+</section>
+
+<footer class="band">Based on scrimcenter.com (public pages, CSS and route list, Nov 27, 2026) and the BIL repo docs and source on the same day.</footer>
+
+<script>
+{
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const games=[['tV','3–1','ALP'],['BRV','0–3','NOX'],['GHST','3–2','SYN'],['RVN','3–0','KRT'],['OMN','1–3','tV'],['ALP','3–0','DRK']];
+const t=games.map(g=>`<span>W3 <b>${g[0]}</b> <em>${g[1]}</em> <b>${g[2]}</b></span>`).join('');
+$('#tick').innerHTML=t+t;
+
+const gap=[
+['Icon rail + top bar layout','Header nav + mobile drawer','restyle','1'],
+['Scrolling results ticker','Results only on Home and #results','new','1'],
+['Giant titles, eyebrow lines, striped cards','PageHeader + eyebrow utility, smaller scale','restyle','0, 2'],
+['Personal dashboard','Spread over My Team, Profile and match pages','new','3'],
+['Season page: countdown, stepper, tabs','Separate Standings, Matches, Playoffs, Rules pages','new','4'],
+['Team cards with banners','Team list with logos','restyle','5'],
+['Leaderboard podium + tabs + Hall of Champions','Player leaderboard table','restyle','6'],
+['Marketing landing + split sign-in','Home hero + Discord login','restyle','7'],
+['Match cards and match page header','MatchCard, match detail','restyle','8'],
+['Match Hub (scrim finder)','8s queue lives only in Discord','new','9'],
+['Admin control center','Full admin panel with recusal','restyle','10'],
+['Scores, check-in, disputes','Double entry, mismatch queue, disputes, bot','have','—'],
+['Discord bot + webhooks','Serverless bot, boards, alerts, slash commands','have','—'],
+['Live streams (SC Live)','Watch page, casting desk, live banner','have','—'],
+['Switches, coins, store, payouts','—','skip','—'],
+['Talent Hub','Casting desk','skip','—'],
+];
+const lab={have:'Have',restyle:'Restyle',new:'New',skip:'Skip'};
+$('#gapRows').innerHTML=gap.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td><span class="tag ${r[2]}">${lab[r[2]]}</span></td><td>${esc(r[3])}</td></tr>`).join('');
+$('#cHave').textContent=gap.filter(r=>r[2]==='restyle'||r[2]==='have').length;
+$('#cNew').textContent=gap.filter(r=>r[2]==='new').length;
+$('#cSkip').textContent=gap.filter(r=>r[2]==='skip').length;
+
+const END=`
+
+When you're done: run pnpm typecheck && pnpm lint && pnpm test, check every changed page at 375px with no horizontal scroll, update the "Web app (as built)" section of CLAUDE.md and docs/APP_OVERVIEW.md to match, and list what I should test by hand.`;
+
+const phases=[
+{n:'Tokens + type refresh',m:'~1–2 hrs · apps/web/src/assets/main.css',d:['Chakra Petch display + Barlow body via Fontsource','New layout tokens and texture utilities','Bigger type scale for page titles'],p:`Read CLAUDE.md first.
+
+We're restyling the BIL web app toward the look of scrimcenter.com (an esports league site): an icon-rail app shell, huge uppercase display titles, striped dark cards, and a scrolling results ticker. Keep the Blackhat palette and the one-red-accent rule exactly as CLAUDE.md describes. This phase only touches tokens, fonts and utilities, not components.
+
+1. Fonts: install @fontsource/chakra-petch (500, 600, 700) and @fontsource/barlow (400, 500, 600, 700) and import them where the current fonts are imported. Set --font-display to 'Chakra Petch', then 'Barlow Condensed' as a fallback, and --font-sans to 'Barlow', then Inter. Keep the Barlow Condensed and Inter packages installed for now. Check that the headings in font-heading still fit everywhere: Chakra Petch is wider than Barlow Condensed, so look at the team tags, ScoreChip, the StandingsTable headers and BrandLogo's lockup text, and tighten letter-spacing or size where they wrap.
+
+2. Add tokens to @theme in apps/web/src/assets/main.css:
+--color-rail: #0d0d0f (rail and top bar background, a hair darker than surface)
+--color-chip: #1a1a1e; --color-track: #222227 (progress tracks)
+--spacing-rail: 72px; --spacing-topbar: 60px
+Keep every existing token name and value.
+
+3. Add utilities next to tnum, eyebrow and font-heading:
+- eyebrow-line: like eyebrow, but with a ::before of a 20px x 2px accent bar and an 8px gap, inline-flex and centered.
+- texture-stripes: background-image repeating-linear-gradient(135deg, transparent 0 12px, rgb(255 255 255 / 0.025) 12px 24px), layered on the element's own background color.
+- texture-stripes-brand: the same stripes in rgb(0 0 0 / 0.18) for use on bg-brand bands.
+- card-accent: a 2px top border in var(--card-accent, var(--color-accent)) so a card can set --card-accent to line-strong for neutral cards.
+- title-xl: font-heading at clamp(2.25rem, 5vw, 4rem) with line-height 1, plus text-wrap: balance.
+
+4. Update /dev/ui (the style guide) with a "Tokens & textures" block that shows the new utilities.${END}`},
+{n:'App shell: rail, ticker, tab bar',m:'~4–5 hrs · App.vue, components/layout',d:['AppRail (desktop) + AppTabBar (phones)','AppTopBar with ResultsTicker + UserMenu','Public layout for Home and Login'],p:`Read CLAUDE.md first.
+
+Replace the header-based layout with an app shell modeled on scrimcenter.com. Keep the skip link, LiveBanner, AccountNotice, UiToastHost and the mobile-first rules.
+
+1. Nav config in src/config/site.ts: change mainNav to items with { label, to, icon, rail: boolean }. Use lucide-vue-next icons (add the dependency; it's an icon set, not a component library). Rail items in order: Home (/), Season (/season, built in phase 4; until then point it at /standings), Matches, Teams, Leaderboard, Watch, Free Agents. Overflow items for a "More" menu: Players, Maps, Rules, Audit Log. Add a staff item (Admin, /admin) shown only when auth.isStaff. Add a Dashboard item (/dashboard, phase 3) shown only when signed in; for now it can point at /my-team.
+
+2. components/layout/AppRail.vue: fixed on the left, width var(--spacing-rail), full height, bg-rail with a right border-line. BrandLogo variant="emblem" at the top (36px). Each item stacks a 20px icon over an 11px label, centered in a 56px-tall rounded-lg button: text-faint by default, hover:bg-surface-2 hover:text-text, active (router-link-active, exact for /) bg-accent-soft text-accent. "More" opens a popover menu to the right (keyboard navigable, Escape closes it, focus returns to the trigger). Shown from lg up.
+
+3. components/layout/ResultsTicker.vue + composable useRecentResults(): the last 20 confirmed or forfeited non-preseason matches in the active season (home/away tags, series score, week label, LeagueTime short), refreshed through ONE shared realtime subscription on matches, the way useLiveBroadcasts() works. Render the list twice in a flex row and animate translateX(0 → -50%) linearly; the duration scales with item count, about 4s per item. Pause on hover and focus-within, show it static under prefers-reduced-motion, and give it an aria-label like "Recent results" with the duplicated copy aria-hidden. Each item links to /matches/:id. The winning score is text-accent. Show nothing (not an empty bar) when there are no results.
+
+4. components/layout/AppTopBar.vue: height var(--spacing-topbar), bg-rail, bottom border-line, sticky. Ticker on the left (flex-1, overflow hidden with fade masks on both edges); on the right, Sign in (ghost) + "Join the league" (bg-brand) when logged out, UserMenu when logged in. Below lg, put BrandLogo lockup at the left of the bar.
+
+5. components/layout/AppTabBar.vue (below lg): fixed to the bottom, 5 slots (Home, Season, Matches, Teams, More) with icons and labels, honoring env(safe-area-inset-bottom). "More" opens the existing mobile <dialog> drawer, repurposed to list the overflow items and the user links. Add bottom padding to <main> so content clears the bar.
+
+6. Layouts: add route meta layout: 'public' | 'app' (default 'app'). App.vue picks the shell: 'app' = rail + top bar + main offset by the rail width on lg; 'public' = the current AppHeader slimmed down (logo, Home, Rules, Join Discord, Sign in) + AppFooter. Set layout: 'public' on /login, /auth/callback and /onboarding. Leave / on 'app' for now; phase 7 decides.
+
+7. Delete AppHeader's old desktop nav only once nothing uses it, and keep UserMenu.${END}`},
+{n:'UI kit upgrade',m:'~3 hrs · components/ui, PageHeader',d:['PageHeader with giant title + eyebrow line','UiCard accent/striped, UiTabs pill/underline','New: UiStepper, UiStatTile, UiPodium'],p:`Read CLAUDE.md first.
+
+Upgrade the shared primitives to the scrimcenter.com style using the phase 0 utilities. Keep every existing prop and behavior working; the existing views should look better without any edits.
+
+1. layout/PageHeader.vue: eyebrow rendered with eyebrow-line, title with title-xl, optional subtitle (text-muted, max-w-2xl), and an #actions slot that sits to the right of the title from md up and stacks below on phones. Add a "compact" prop for admin pages that keeps the old size.
+
+2. ui/UiCard.vue: add props accent?: 'red' | 'neutral' (applies card-accent, setting --card-accent for neutral), striped?: boolean (texture-stripes), interactive?: boolean (hover:border-line-strong plus a 1px lift, off under reduced motion). Default rounded-xl, bg-surface, border-line.
+
+3. ui/UiTabs.vue: add variant 'pill' (rounded-full chips, active = bg-brand text-on-brand, inactive = bg-chip text-muted) alongside the current style, which becomes 'underline' (uppercase font-heading, active = text-text with a 2px accent underline). Support syncing to the URL hash (prop hashSync), using CSS.escape-safe ids. Scroll horizontally on overflow, never wrap.
+
+4. New ui/UiStepper.vue: horizontal segmented progress. Props steps: { key, label }[] and currentKey. Done segments are bg-accent, the current one is accent with a pulse dot, upcoming ones are bg-track. Labels go under each segment; below 640px show only the current label plus "Step n of N". Uses role="list" and aria-current.
+
+5. New ui/UiStatTile.vue: label (eyebrow), value (font-heading text-3xl tnum), optional hint and trend slot, card-accent.
+
+6. New ui/UiPodium.vue: 3 striped cards in the order #2, #1, #3. #1 is raised and gets the red accent; #2 and #3 are neutral. Each has a big rank numeral (font-heading text-5xl, accent for #1), a corner slot for a badge, avatar or logo, name, a meta line and a link. On phones it stacks #1, #2, #3.
+
+7. ui/UiButton.vue: make sure the variants are primary (bg-brand text-on-brand), secondary (bg-chip, border-line), ghost and danger, all uppercase font-heading tracking-wide at h-11. Keep 44px targets.
+
+8. Add everything to /dev/ui and add unit tests in ui/__tests__ for UiStepper's current/done logic and UiTabs' hash sync.${END}`},
+{n:'Personal dashboard',m:'~4 hrs · new /dashboard',d:['Next match hero with countdown + actions','To-do list from real state','Team snapshot, invites, season progress'],p:`Read CLAUDE.md first.
+
+Add a signed-in home base at /dashboard, like scrimcenter.com's dashboard: one screen that tells a player what to do next. meta: { requiresAuth: true, title: 'Dashboard' }. After login, /auth/callback should send onboarded users here when there's no next param. Point the rail's Dashboard item here.
+
+Data: add a composable useDashboard() that composes existing hooks and RPCs where possible (auth store, useActiveSeason, useMyInvites, the team's matches from useSeasonSchedule filtered to my team, my_match_report_status, reschedule requests). Add a SECURITY DEFINER SQL function my_dashboard() only if the client would otherwise need more than about 4 round trips: it returns my next match, my last result, the open action counts and the season phase for auth.uid(). It must set search_path = '', be signed-in only and expose nothing private. Add a SQL test in supabase/tests.
+
+Layout (PageHeader eyebrow "Dashboard", title "Welcome back, <playerName>"):
+1. Next match hero (UiCard striped, accent red): both TeamLogos large, "VS", week label, LeagueTime, a UiCountdown, the match status, and the right action for the current state: Check in (opens the CheckInCard flow) in the window, "Report result" after start, "Watch" if live. With no team, show a free agent card linking to /free-agents and the user's own FA post state.
+2. To-do list (one row each, only when non-empty): pending team invites (accept/decline inline via the existing actions), emergency sub invites, reschedule requests awaiting me as captain, matches to report, open disputes on my matches, incomplete profile or rank exception pending.
+3. Team snapshot: logo, record, division standing position, roster with starter/sub chips, roster changes used out of the max, the roster lock countdown. Link to My Team.
+4. Season progress: UiStepper (Signups, Preseason, Weeks 1–N, Playoffs, Offseason) driven by the same phase logic phase 4 uses. Put that logic in src/lib/seasonPhase.ts now as getSeasonPhase(season, now) with Vitest tests (DST-safe, using lib/time.ts).
+5. Latest results in my division (5 rows) and my season stat line (K/D, avg score, maps) from usePlayerStats.
+Staff-only accounts see a staff variant: admin queue counts from admin_overview() and a link to /admin.${END}`},
+{n:'Season hub',m:'~5 hrs · new /season',d:['Banner hero, sticky countdown bar, stepper','Tabs reuse Standings/Matches/Playoffs/Rules','seasons.banner_url + admin upload'],p:`Read CLAUDE.md first.
+
+Build a season hub at /season (the active season) and /season/:id (past seasons), modeled on a scrimcenter.com league page. Keep /standings, /matches, /playoffs and /rules working: the bot links there.
+
+1. Migration: add seasons.banner_url text (nullable), with an https check like the other URL columns. Grant select to anon and authenticated. It's owner-editable through the existing season settings path, so make sure the audit trigger covers it. Store uploads in the public team-logos bucket under seasons/{season_id}/banner-<timestamp>.webp, or add a public season-media bucket with owner-only write policies if that's cleaner, and explain which you chose. Add an image field to SeasonSettingsForm (browser-compressed with compressImage, 16:9 crop guidance). Regenerate the types and run the security advisors.
+
+2. Sticky sub-bar under the top bar: "Next up" + UiCountdown to the next milestone, from getSeasonPhase (signups close → preseason → week N match night → roster lock → playoffs → final), with a context CTA: "Create a team" during signups when the user has none, "Check in" in a check-in window, "View my match" otherwise. On the right: approved teams out of capacity (16 × divisions).
+
+3. Hero: banner image full-bleed under a dark gradient (fallback: texture-stripes on surface), breadcrumbs (Seasons / Season name), eyebrow-line "Season", the name in title-xl, chips (status, MW4, 4v4, Bo5, Top-8 playoffs, Free entry, the prize from settings), a share button (navigator.share, falling back to copying the link, with a toast).
+
+4. UiStepper across the hero bottom (Signups, Preseason if any preseason matches exist, Weeks 1–N, Playoffs, Completed).
+
+5. UiTabs variant underline with hashSync: Overview, Standings, Matches, Bracket, Teams, Rules. Reuse the existing components: StandingsTable + StatLeaderboard, the matches list from MatchesView (extract it into a component if it's view-local), PlayoffBracket, the team grid (phase 5 restyles it), and a Rules tab showing the section list linking to /rules#n.
+
+6. Overview tab: left column has "About the season" (copy from site.ts or season settings), a date row (signups open, season start, roster lock, playoffs) in LeagueTime, and "Run by" with the Discord invite button. Right column has a "Season settings" key/value card (game, team size, starters/subs, matches per week, nights and time, playoff teams, roster changes, prize). Below: the divisions list with team counts.
+
+7. /season/:id for a completed season shows the champion banner (the existing component) at the top of Overview.
+
+8. Rail and tab bar: point Season at /season. Add a season switcher (UiSelect) in the header actions when more than one season exists.${END}`},
+{n:'Teams with banners',m:'~3 hrs · /teams, /teams/:id, My Team',d:['teams.banner_url + captain upload','Discover grid with overlapping logo cards','Team page banner hero'],p:`Read CLAUDE.md first.
+
+Restyle Teams like scrimcenter.com's Team Hub.
+
+1. Migration: teams.banner_url text nullable with the same storage rules as logo_url. Path {team_id}/banner-<timestamp>.webp in the team-logos bucket; extend the storage policies so captains and co-captains can upload to their team's folder (match the logo policy exactly). Captains update it through the same path as logo_url (check that teams' column grants and the guard allow it), and the audit trigger covers staff edits. Add a "Banner" field to TeamIdentityForm (compressImage at a max width of 1600, 3:1 crop guidance, remove button). Regenerate the types and run the advisors.
+
+2. components/team/TeamCard.vue: UiCard interactive. A 3:1 banner strip (fallback: a dark gradient plus a dot-grid pattern made with radial-gradient), a 56px TeamLogo overlapping the banner's bottom-left with a 3px bg-surface ring, a status chip on the banner top-right (Approved / Pending), name + tag (tag keeps its case), the division, the record in tnum, an avatar stack of starters, and an action row: "View team" always; "Interested" when the team has an active recruit post and I'm eligible (existing recruit_interest RPC); "Invite me" never exists (BIL is invite-only, so don't copy Scrim Center's Request to join).
+
+3. /teams: PageHeader eyebrow "Teams", title "Find your squad", a search box in the actions slot, UiTabs pill filter (All, Recruiting, by division), and the TeamCard grid (1 column at 375px, 2 at md, 3 at xl). Above the grid, "My team" as a wide card when signed in.
+
+4. /teams/:id: a banner hero with a large logo, title-xl name, tag, a record strip of UiStatTiles (W-L, map diff, standing, forfeits), then UiTabs underline: Roster (existing RosterList), Matches, Stats (mode records, maps played), Recruiting (the post if active).${END}`},
+{n:'Leaderboard podium + Hall of Champions',m:'~3 hrs · /leaderboard',d:['Podium top 3 with RankBadge','Tabs: Players, Teams, Hall of Champions','champions view, no new writes'],p:`Read CLAUDE.md first.
+
+Restyle /leaderboard like scrimcenter.com's leaderboard, using BIL's real stats (no XP system).
+
+1. PageHeader eyebrow "Leaderboard", title "Rankings across players and teams", player search in the actions slot. UiTabs underline with hashSync: Players, Teams, Hall of Champions.
+
+2. Players: UiPodium for the top 3 by the page's current default sort (keep whatever useSeasonLeaderboard sorts by; let the sort control re-pick the podium). Each card has the avatar, playerName (Activision ID when logged out, per the privacy rules), team tag, the headline stat big in tnum, a small secondary stat line, and RankBadge (cod_rank) in the corner slot. Then the existing table, restyled: rank column in font-heading, the sorted column highlighted text-accent, incomplete lines keep their flag. Paginate if it isn't already.
+
+3. Teams: a table from division_standings across divisions plus team aggregates (series W-L, map W-L, map diff, win %), with a top-3 podium of team logos. If you need a new SQL function, make it SECURITY INVOKER or DEFINER per the existing pattern, exclude preseason, and add a test in supabase/tests/leaderboard_test.sql.
+
+4. Hall of Champions: a public view champions_v (or a SECURITY DEFINER function) deriving each completed season's champion from its confirmed playoff final: season name, team name/tag/logo, the starters on the roster at the final (from that match's checkins), the final score and date. No new table and no writes. Render it as large striped cards newest first, with an empty state ("Season 1's champion will be crowned here").${END}`},
+{n:'Landing page + sign-in',m:'~3–4 hrs · HomeView, LoginView',d:['Logged-out home: hero, counts, feature grid, CTA band','Signed-in home: send to /dashboard or keep','Split-screen login'],p:`Read CLAUDE.md first.
+
+Rework the public front door like scrimcenter.com's landing and sign-in pages. Copy goes in src/content/home.ts and site.ts, not in components.
+
+1. Counts: add a public SECURITY DEFINER function site_counts() returning players (complete, non-staff-only profiles), approved teams in the active season and confirmed matches. Aggregates only; anon can execute it. Add a test.
+
+2. HomeView, logged out (set the route's layout to 'public'):
+- The ResultsTicker strip under the public header.
+- Hero: full-bleed dark art (src/assets/brand hero image; use a striped gradient placeholder if none exists) behind a dark overlay, BrandLogo variant="full" centered, a centered eyebrow with lines on both sides ("Invite-only · NA · Controller"), a 2-line title-xl headline from home.ts with the second line in text-accent, the tagline, count chips (players, teams, matches played) plus a Discord chip in #5865F2 linking to the invite, then "Join the league" (primary) + "Watch matches" (secondary).
+- If a broadcast is live, the existing Live now strip.
+- "How the league works" grid of 6 UiCards (accent red on the first, neutral on the rest), each with an icon in a tinted square, an uppercase title, one sentence and an arrow link: Season format → /season, Teams & free agents → /teams, Match day → /rules#7, Double-entry stats → /leaderboard, Broadcasts → /watch, Discord bot → the invite.
+- Next matches + latest results (existing components).
+- CTA band: a full-width rounded card in bg-brand with texture-stripes-brand, the title "Gold to Crimson. Prove it." (from home.ts), one line, and a dark button.
+- Footer.
+
+3. HomeView signed in: keep the layout 'app' and show the current home content in the new style, plus a "Go to dashboard" card at the top. (Decide with me before redirecting / to /dashboard.)
+
+4. LoginView (layout 'public'): a split screen from lg up. Left: eyebrow-line "Blackhat Invitational League", a two-line title ("Your squad." / "Your stage." with the second in accent), a short blurb and an inline SVG of two layered sine waves along the bottom (accent and line-strong, slow horizontal drift, static under reduced motion). Right: a card with BrandLogo full, "Welcome back", "Continue with Discord" (#5865F2, the Discord glyph as inline SVG), and fine print about the 18+, controller and NA requirements with a link to /rules#2. On phones it's a single column with the card first.${END}`},
+{n:'Matches + match page polish',m:'~3 hrs · MatchCard, /matches, /matches/:id',d:['Compact ticker-style rows + week pills','Match page header: big score/VS','Cards grouped by state'],p:`Read CLAUDE.md first.
+
+Restyle matches to match the new look. No behavior changes.
+
+1. MatchCard: two layouts. "row" (compact, like a ticker item: week label, home tag + logo, series score or LeagueTime, away tag + logo, status chip, LIVE pill) and "card" (current info, restyled with UiCard interactive, a striped background when live, the winning side's score in accent).
+
+2. /matches: PageHeader eyebrow "Schedule", title "Every match, every week", UiTabs pill for weeks (Preseason, W1…W8, Playoffs) that scroll horizontally and default to the current week from getSeasonPhase, the team filter in the actions slot, matches grouped by night (date headers in LeagueTime), and row layout on phones.
+
+3. /matches/:id header: a full-width striped hero with both team logos (96px) and names, a center column showing a huge "VS" before the match or the series score in title-xl tnum after, with the status, week, LeagueTime and a countdown before start. Below it, a map strip: one chip per map (mode, map, score, the winner's side highlighted). Keep every existing card (check-in, reschedule, emergency sub, dispute, report, replay) and give them consistent UiCard accents: red only for the card that needs the viewer's action right now.${END}`},
+{n:'8s hub on the site',m:'~4 hrs · new /8s (optional)',d:['Read-only queue, live matches, leaderboard','Join/leave stays in Discord','Like Scrim Center Match Hub'],p:`Read CLAUDE.md first.
+
+Scrim Center has a Match Hub for scrims; BIL's equivalent is 8s, which today lives only in Discord. Add a public /8s page that shows it, without moving the queue logic.
+
+1. SQL: the 8s tables are service-role only, so add public SECURITY DEFINER read functions with search_path = '': eights_public_state() returns the current queue size (count only, plus player names only for signed-in callers, following the discord_username privacy rule: use playerName rules / Activision IDs for anon), live or voting matches (teams as player lists, mode, map, vote_ends_at) and the last 10 settled matches; and reuse eights_leaderboard() if it's safe for anon, or wrap it. Add supabase/tests/eights_public_test.sql covering the anon vs signed-in fields.
+
+2. /8s page: PageHeader eyebrow "8s", title "Pick-up 4v4s", subtitle explaining the queue, a big queue meter (n / 8 as a segmented bar), "Join in Discord" linking to the #lf-8s channel (put the channel URL in site.ts; read it from an env var VITE_DISCORD_EIGHTS_URL), live matches as striped cards with both sides and a countdown for the vote, the recent results list, and the leaderboard table (wins, win %). Poll every 15s while the tab is visible (the 8s tables aren't in the realtime publication; don't add them).
+
+3. Add 8s to the rail's More menu and the home "How the league works" grid.${END}`},
+{n:'Admin control center restyle',m:'~2–3 hrs · AdminLayout',d:['Admin inside the rail shell','Overview as stat tiles + queues','Compact PageHeaders'],p:`Read CLAUDE.md first.
+
+Bring /admin into the new shell without changing any admin behavior, recusal or audit logging.
+
+1. AdminLayout renders inside the 'app' layout: the main rail stays, and the admin section nav becomes a second, narrower column (200px, bg-surface, border-line) on lg, and the existing scrolling tabs on phones. Group the items: League (Overview, Season & Schedule, Preseason, Modes & maps, Announcements), Queues (Mismatches, Disputes, Roster approvals), Content (Content, Casting desk), System (Health, Discord, User roles). Show queue counts from admin_overview() as small badges next to Mismatches, Disputes and Roster approvals.
+
+2. Overview: PageHeader compact, eyebrow "Control center", then a row of UiStatTiles (open mismatches, open disputes, teams awaiting approval, emergency subs to approve, unreported matches, outbox backlog), each linking to its page, with card-accent red when > 0. Then "Next 24 hours": matches with their check-in state.
+
+3. Every admin page: switch to PageHeader compact and UiCard, and check RecusedNotice and PublicLogNotice still render clearly in the new styles.${END}`},
+];
+let done=[];try{done=JSON.parse(localStorage.getItem('bil-sc-plan-done')||'[]')}catch(e){}
+$('#phaseList').innerHTML=phases.map((p,i)=>`<article class="phase" id="ph${i}">
+<div class="ph"><label title="Mark phase done"><input type="checkbox" data-i="${i}" aria-label="Mark phase ${i} done"></label>
+<div class="t"><h3>Phase ${i} · ${esc(p.n)}</h3><div class="meta">${esc(p.m)}</div></div></div>
+<div class="pbody"><ul>${p.d.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+<div class="prompt"><div class="bar"><span>Claude Code prompt</span><button type="button" data-c="${i}">Copy</button></div><pre>${esc(p.p)}</pre></div></div></article>`).join('');
+
+const sync=()=>{
+  document.querySelectorAll('.ph input').forEach(c=>{const i=+c.dataset.i;c.checked=done.includes(i);c.closest('.phase').classList.toggle('done',c.checked)});
+  $('#bar').style.width=(done.length/phases.length*100)+'%';
+  $('#pct').textContent=`${done.length} / ${phases.length} phases`;
+};
+sync();
+document.addEventListener('change',e=>{
+  const c=e.target.closest('.ph input');if(!c)return;const i=+c.dataset.i;
+  done=c.checked?[...new Set([...done,i])]:done.filter(x=>x!==i);
+  try{localStorage.setItem('bil-sc-plan-done',JSON.stringify(done))}catch(err){}
+  sync();
+});
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('button[data-c]');if(!b)return;
+  try{await navigator.clipboard.writeText(phases[+b.dataset.c].p);b.textContent='Copied';b.classList.add('ok')}
+  catch(err){const r=document.createRange();r.selectNodeContents(b.closest('.prompt').querySelector('pre'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selected, press Ctrl+C'}
+  setTimeout(()=>{b.textContent='Copy';b.classList.remove('ok')},1800);
+});
+}
+</script>
+</body>
+</html>

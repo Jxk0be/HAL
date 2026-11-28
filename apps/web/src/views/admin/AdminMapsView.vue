@@ -6,6 +6,7 @@ import GameDataPanel from '@/components/admin/GameDataPanel.vue'
 <template>
   <div>
     <PageHeader
+      compact
       eyebrow="Admin"
       title="Modes & maps"
       description="The map pool for league matches and 8s. Each mode has its own maps. Changes show on the public Maps page straight away."

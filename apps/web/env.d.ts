@@ -4,6 +4,8 @@ interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL: string
   readonly VITE_SUPABASE_PUBLISHABLE_KEY: string
   readonly VITE_DISCORD_INVITE_URL: string
+  /** Link to the #lf-8s channel (https://discord.com/channels/<guild>/<channel>); falls back to the invite. */
+  readonly VITE_DISCORD_EIGHTS_URL?: string
   /** Public site URL, e.g. https://hal.netlify.app (Open Graph tags, Discord links). */
   readonly VITE_SITE_URL?: string
 }

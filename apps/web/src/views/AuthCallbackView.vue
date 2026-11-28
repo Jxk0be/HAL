@@ -23,7 +23,9 @@ onMounted(async () => {
     failed.value = 'We could not complete the Discord login.'
     return
   }
-  const next = safeNext(route.query.next, '/profile')
+  // A login started from the home page (or with no destination) lands on the dashboard.
+  const requested = safeNext(route.query.next, '/dashboard')
+  const next = requested === '/' ? '/dashboard' : requested
   if (!auth.isOnboarded) {
     await router.replace({ name: 'onboarding', query: { next } })
   } else {

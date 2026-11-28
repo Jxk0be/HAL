@@ -77,6 +77,7 @@ async function toggle(r: AnnouncementRow) {
 <template>
   <div>
     <PageHeader
+      compact
       eyebrow="Admin"
       title="Announcements"
       description="Season announcements built from the season settings. Preview them, post one to #announcements now, or let the bot post it automatically a week and a day before."
