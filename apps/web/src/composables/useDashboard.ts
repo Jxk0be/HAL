@@ -6,6 +6,7 @@ import { useMyInvites } from './useInvites'
 import { useMyEmergencySubRequests } from './useEmergencySubs'
 import { useTeamRequests } from './useMatchActions'
 import { useTeam } from './useTeams'
+import { useTeamDiscordPresence } from './useDiscordPresence'
 import { usePlayerStats, useStandings } from './useStats'
 import { useMyFreeAgentPost } from './useFreeAgentPost'
 import { getSeasonPhase, nextMilestone, seasonSteps } from '@/lib/seasonPhase'
@@ -45,6 +46,7 @@ export function useDashboard() {
   const { rows: standings, loading: standingsLoading } = useStandings(() => season.value?.id, null)
   const { rows: myStats, loading: statsLoading } = usePlayerStats(() => auth.user?.id)
   const { post: faPost, loading: faPostLoading } = useMyFreeAgentPost()
+  const { status: discordStatus, loading: discordLoading } = useTeamDiscordPresence(teamId)
 
   /** True until every hook above has finished its first load. */
   const loading = computed(
@@ -57,7 +59,8 @@ export function useDashboard() {
       teamLoading.value ||
       standingsLoading.value ||
       statsLoading.value ||
-      faPostLoading.value,
+      faPostLoading.value ||
+      discordLoading.value,
   )
 
   const myMatches = computed(() =>
@@ -135,5 +138,6 @@ export function useDashboard() {
     milestone,
     divisionResults,
     faPost,
+    discordStatus,
   }
 }

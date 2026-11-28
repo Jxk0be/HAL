@@ -10,6 +10,8 @@ type Token = ReturnType<InstanceType<typeof MarkdownIt>['parse']>[number]
  *
  * Format (see the build guide, step 8):
  *   # Title / intro paragraphs / "Effective: <date>"
+ *   Recent changes:              -> then a bullet list, newest first:
+ *   - **Nov 28, 2026** Text      -> change entries (rule numbers like 3.13 link to the rule)
  *   ## 4. Substitutes            -> section "4"
  *   **4.2** Rule text            -> rule "4.2"
  *   > [!IMPORTANT] / > [!NOTE]   -> callouts
@@ -42,10 +44,21 @@ export interface Section {
   blocks: Block[]
 }
 
+export interface ChangeEntry {
+  /** The bold date at the start of the entry, as written ("Nov 28, 2026"). */
+  date: string | null
+  html: string
+  text: string
+  /** Rule numbers the entry mentions, in order (each also becomes a link in `html`). */
+  rules: string[]
+}
+
 export interface Rulebook {
   title: string
   intro: { html: string; text: string }[]
   effective: string | null
+  /** "Recent changes" from the top of the file, newest first. */
+  changes: ChangeEntry[]
   sections: Section[]
 }
 
@@ -82,10 +95,25 @@ const RULE_RE = /^\*\*(\d+\.\d+)\*\*\s*([\s\S]*)$/
 const SECTION_RE = /^(\d+)\.\s+(.+)$/
 const CALLOUT_RE = /^\[!(IMPORTANT|NOTE)\]\s*\n?([\s\S]*)$/i
 const EFFECTIVE_RE = /^Effective:\s*(.+)$/i
+const CHANGES_HEADING_RE = /^Recent changes:?$/i
+const CHANGE_RE = /^\*\*(.+?)\*\*\s*[·:—-]?\s*([\s\S]*)$/
+/** A bare rule number like 3.13 (not part of a longer number, link or anchor). */
+const RULE_REF_RE = /(?<![\w.#/[])(\d{1,2}\.\d{1,2})(?!\w|\.\d|\])/g
+
+function changeEntry(src: string): ChangeEntry {
+  const m = CHANGE_RE.exec(src)
+  const date = m ? m[1]!.trim() : null
+  const body = (m ? m[2]! : src).trim()
+  const rules = [...body.matchAll(RULE_REF_RE)].map((r) => r[1]!)
+  const linked = body.replace(RULE_REF_RE, '[$1](/rules#$1)')
+  return { date, ...inline(linked), rules }
+}
 
 export function parseRulebook(source: string): Rulebook {
   const tokens: Token[] = md.parse(source, {})
-  const book: Rulebook = { title: '', intro: [], effective: null, sections: [] }
+  const book: Rulebook = { title: '', intro: [], effective: null, changes: [], sections: [] }
+  /** Inside the "Recent changes:" list at the top of the file. */
+  let inChanges = false
   let section: Section | null = null
   let blockquoteDepth = 0
   let list: { ordered: boolean; items: { html: string; text: string }[] } | null = null
@@ -135,7 +163,8 @@ export function parseRulebook(source: string): Rulebook {
         const content = t.content.trim()
         if (!content) break
         if (list && listItemDepth > 0) {
-          list.items.push(inline(content))
+          if (!section && inChanges) book.changes.push(changeEntry(content))
+          else list.items.push(inline(content))
           break
         }
         if (blockquoteDepth > 0) {
@@ -150,6 +179,7 @@ export function parseRulebook(source: string): Rulebook {
         if (!section) {
           const eff = EFFECTIVE_RE.exec(content)
           if (eff?.[1]) book.effective = eff[1].trim()
+          else if (CHANGES_HEADING_RE.test(content)) inChanges = true
           else book.intro.push(inline(content))
           break
         }

@@ -92,3 +92,48 @@ describe('search helpers', () => {
     expect(highlightParts('abc', '')).toEqual([{ text: 'abc', match: false }])
   })
 })
+
+describe('recent changes', () => {
+  const src = `# Rules
+
+Intro.
+
+Effective: November 20, 2026
+
+Recent changes:
+
+- **Nov 28, 2026** Added 3.13: everyone must be in the Discord. See also 4.2.
+- **Nov 21, 2026**: Reworded 1.1 (no rule change).
+- No date here, rule 2.10 changed.
+
+## 1. General
+
+**1.1** A rule.
+
+- a list after a rule stays with the rule
+`
+  const book = parseRulebook(src)
+
+  it('reads entries in order with their dates', () => {
+    expect(book.changes.map((c) => c.date)).toEqual(['Nov 28, 2026', 'Nov 21, 2026', null])
+    expect(book.changes[0]!.text).toBe('Added 3.13: everyone must be in the Discord. See also 4.2.')
+  })
+
+  it('links rule numbers and lists them', () => {
+    expect(book.changes[0]!.rules).toEqual(['3.13', '4.2'])
+    expect(book.changes[0]!.html).toContain('<a href="/rules#3.13">3.13</a>')
+    expect(book.changes[2]!.rules).toEqual(['2.10'])
+  })
+
+  it('keeps the heading out of the intro and lists inside sections untouched', () => {
+    expect(book.intro.map((p) => p.text)).toEqual(['Intro.'])
+    const rule = book.sections[0]!.blocks[0]
+    expect(rule?.kind === 'rule' && rule.list?.items[0]?.text).toBe('a list after a rule stays with the rule')
+  })
+
+  it('reads the real rulebook changes', () => {
+    const real = parseRulebook(bundled)
+    expect(real.changes.length).toBeGreaterThan(0)
+    expect(real.changes[0]!.rules).toContain('3.13')
+  })
+})

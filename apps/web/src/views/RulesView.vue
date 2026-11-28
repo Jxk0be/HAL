@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import UiInput from '@/components/ui/UiInput.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
@@ -73,6 +73,25 @@ function jump(number: string) {
   void goTo(number)
 }
 
+// ---- Recent changes -----------------------------------------------------
+const CHANGES_SHOWN = 3
+const NEW_FOR_DAYS = 14
+const showAllChanges = ref(false)
+const changes = computed(() => (showAllChanges.value ? book.value.changes : book.value.changes.slice(0, CHANGES_SHOWN)))
+/** Entries dated within the last two weeks get a "New" badge (dates that don't parse never do). */
+function isNew(date: string | null) {
+  const t = date ? Date.parse(date) : NaN
+  return Number.isFinite(t) && Date.now() - t < NEW_FOR_DAYS * 86_400_000
+}
+/** Rule links in an entry (/rules#3.13) scroll in place instead of reloading the page. */
+function onChangeClick(e: MouseEvent) {
+  const a = (e.target as HTMLElement | null)?.closest('a')
+  const hash = a?.getAttribute('href')?.match(/^\/rules#(.+)$/)?.[1]
+  if (!hash) return
+  e.preventDefault()
+  jump(decodeURIComponent(hash))
+}
+
 // ---- Active section (table of contents) -----------------------------------
 const active = ref<string | null>(null)
 let observer: IntersectionObserver | null = null
@@ -90,7 +109,7 @@ function observe() {
       }
       // First section (in document order) inside the band wins.
       const first = book.value.sections.find((s) => inBand.has(s.number))
-      if (first) active.value = first.number
+      if (first && !atBottom()) active.value = first.number
     },
     { rootMargin: '-80px 0px -60% 0px' },
   )
@@ -99,11 +118,24 @@ function observe() {
     if (el) observer.observe(el)
   }
 }
+// The last sections are too short to reach the reading band, so at the bottom of the page the
+// last section is the active one.
+function atBottom() {
+  return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8
+}
+function onScroll() {
+  if (searching.value || !atBottom()) return
+  const last = book.value.sections.at(-1)
+  if (last) active.value = last.number
+}
+onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }))
+
 watch([book, searching], async () => {
   await nextTick()
   if (!searching.value) observe()
 }, { immediate: true, flush: 'post' })
 onBeforeUnmount(() => {
+  window.removeEventListener('scroll', onScroll)
   observer?.disconnect()
   clearTimeout(highlightTimer)
 })
@@ -137,6 +169,36 @@ function mobileJump(number: string) {
           <!-- eslint-disable-next-line vue/no-v-html -- sanitized inline fragment -->
           <p v-html="p.html" />
         </div>
+
+        <!-- Recent changes (the "Recent changes:" list at the top of rules/rulebook.md) -->
+        <section
+          v-if="book.changes.length"
+          aria-labelledby="changes-title"
+          class="card-accent mt-8 max-w-3xl rounded-xl border border-line bg-surface p-4 sm:p-5 print:hidden"
+        >
+          <div class="flex items-center justify-between gap-3">
+            <h2 id="changes-title" class="eyebrow-line text-faint">Recent changes</h2>
+            <button
+              v-if="book.changes.length > CHANGES_SHOWN"
+              type="button"
+              class="text-xs font-semibold text-accent hover:text-accent-strong"
+              :aria-expanded="showAllChanges"
+              @click="showAllChanges = !showAllChanges"
+            >
+              {{ showAllChanges ? 'Show fewer' : `Show all ${book.changes.length}` }}
+            </button>
+          </div>
+          <ol class="mt-3 flex flex-col divide-y divide-line" @click="onChangeClick">
+            <li v-for="(c, i) in changes" :key="i" class="flex flex-col gap-1 py-2.5 first:pt-0 last:pb-0 sm:flex-row sm:items-baseline sm:gap-4">
+              <span class="flex shrink-0 items-center gap-2 sm:w-44">
+                <time v-if="c.date" class="tnum font-heading text-sm whitespace-nowrap text-text">{{ c.date }}</time>
+                <UiBadge v-if="isNew(c.date)" variant="accent">New</UiBadge>
+              </span>
+              <!-- eslint-disable-next-line vue/no-v-html -- sanitized inline fragment; rule numbers are links -->
+              <p class="rule-prose text-sm text-muted [&_a]:font-mono [&_a]:text-accent [&_a:hover]:text-accent-strong" v-html="c.html" />
+            </li>
+          </ol>
+        </section>
       </div>
     </header>
 
@@ -239,7 +301,7 @@ function mobileJump(number: string) {
 
           <p class="flex flex-wrap items-center gap-2 text-xs text-muted print:hidden">
             <UiBadge variant="outline">Changes</UiBadge>
-            Rule changes are announced in Discord, and the date above shows the latest one.
+            Rule changes are announced in Discord and listed under Recent changes at the top of this page.
           </p>
         </div>
       </div>

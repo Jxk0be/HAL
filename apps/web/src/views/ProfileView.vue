@@ -14,6 +14,9 @@ import UiLoadGate from '@/components/ui/UiLoadGate.vue'
 import { useReady } from '@/composables/useReady'
 import { useMyInvites } from '@/composables/useInvites'
 import { useMyEmergencySubRequests } from '@/composables/useEmergencySubs'
+import { useTeam } from '@/composables/useTeams'
+import { useTeamDiscordPresence } from '@/composables/useDiscordPresence'
+import TeamDiscordAlert from '@/components/team/TeamDiscordAlert.vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
@@ -24,7 +27,11 @@ const toast = useToast()
 const invites = useMyInvites()
 const esubs = useMyEmergencySubRequests()
 // Invite cards sit above the forms; wait for them so the forms don't jump down.
-const ready = useReady(() => invites.loading.value || esubs.loading.value)
+// Captains and co-captains get a reminder about teammates who aren't in the Discord (rule 3.13).
+const captainTeamId = computed(() => (auth.team && (auth.team.isCaptain || auth.team.isCoCaptain) ? auth.team.id : null))
+const { team: myTeam, loading: teamLoading } = useTeam(captainTeamId)
+const { status: discordStatus, loading: discordLoading } = useTeamDiscordPresence(captainTeamId)
+const ready = useReady(() => invites.loading.value || esubs.loading.value || teamLoading.value || discordLoading.value)
 
 const platformLabel = computed(
   () => PLATFORM_OPTIONS.find((o) => o.value === auth.profile?.platform)?.label ?? 'No platform yet',
@@ -102,6 +109,13 @@ const roleLabel = computed(() => {
 
       <!-- Edit -->
       <UiLoadGate :ready="ready" class="flex flex-col gap-6" variant="form" :count="5" label="Loading your profile…">
+        <TeamDiscordAlert
+          v-if="myTeam"
+          title="Reminder for your team"
+          :status="discordStatus"
+          :roster="myTeam.roster"
+          can-manage
+        />
         <InvitesCard :state="invites" />
         <EmergencySubInvitesCard :state="esubs" />
         <UiCard eyebrow="Player details" title="Edit profile">

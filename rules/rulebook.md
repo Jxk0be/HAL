@@ -4,6 +4,10 @@ These rules govern Season 1 of Blackhat Invitational League (BIL), a free-entry,
 
 Effective: November 20, 2026
 
+Recent changes:
+
+- **Nov 28, 2026** Added 3.13: every player on a roster, starters and subs, must be in the BIL Discord server.
+
 ## 1. General
 
 **1.1** BIL follows the current Call of Duty League (CDL) ruleset and Gentlemen's Agreements (GAs), except where this rulebook says otherwise. Where they conflict, this rulebook wins.

@@ -9,6 +9,7 @@ import UiStatTile from '@/components/ui/UiStatTile.vue'
 import UiCountdown from '@/components/ui/UiCountdown.vue'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
 import UiLoadGate from '@/components/ui/UiLoadGate.vue'
+import TeamDiscordAlert from '@/components/team/TeamDiscordAlert.vue'
 import { useReady } from '@/composables/useReady'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
@@ -119,6 +120,15 @@ const adminTiles = computed(() => {
       </template>
 
       <template v-else>
+        <!-- Rule 3.13: teammates who aren't in the league Discord (renders nothing when everyone is in) -->
+        <TeamDiscordAlert
+          v-if="d.team.value"
+          class="lg:col-span-3"
+          title="Your team"
+          :status="d.discordStatus.value"
+          :roster="d.team.value.roster"
+          :can-manage="d.isCaptain.value"
+        />
         <!-- Next match hero -->
         <div class="lg:col-span-2">
           <UiCard v-if="d.nextMatch.value && opponent && auth.team" accent="red" striped as="section" aria-labelledby="dash-next">

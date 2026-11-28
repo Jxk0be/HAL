@@ -15,7 +15,13 @@ import { site } from '@/config/site'
  * aren't listed; nothing shows when everyone is in.
  */
 // The page loads `status` (useTeamDiscordPresence) so it can wait for it before rendering.
-const props = defineProps<{ status: Map<string, boolean | null>; roster: RosterPlayer[]; canManage?: boolean }>()
+const props = defineProps<{
+  status: Map<string, boolean | null>
+  roster: RosterPlayer[]
+  canManage?: boolean
+  /** Header label; defaults to "Roster warning". */
+  title?: string
+}>()
 
 const auth = useAuthStore()
 const toast = useToast()
@@ -43,7 +49,7 @@ async function copyInvite() {
     <div class="flex items-center gap-2.5 border-b border-accent-dim/40 px-4 py-2.5 sm:px-5">
       <TriangleAlert class="size-4 shrink-0 text-accent" aria-hidden="true" />
       <h2 id="discord-alert-title" class="eyebrow text-accent">
-        {{ missing.length === 1 ? 'Roster warning' : `Roster warning · ${missing.length} players` }}
+        {{ missing.length === 1 ? (title ?? 'Roster warning') : `${title ?? 'Roster warning'} · ${missing.length} players` }}
       </h2>
     </div>
 
