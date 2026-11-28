@@ -131,7 +131,10 @@ export function useSeasonSchedule(seasonId?: MaybeRefOrGetter<string | null | un
 
   useRealtime('schedule', [{ table: 'matches' }], load)
   if (seasonId === undefined) void load()
-  else watch(() => toValue(seasonId), load, { immediate: true })
+  else watch(() => toValue(seasonId), () => {
+    loading.value = true
+    void load()
+  }, { immediate: true })
   return { season, matches, loading, reload: load }
 }
 

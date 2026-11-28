@@ -6,7 +6,8 @@ import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiModal from '@/components/ui/UiModal.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import RosterList from '@/components/team/RosterList.vue'
 import ManagePlayerModal from '@/components/team/ManagePlayerModal.vue'
@@ -16,6 +17,7 @@ import TeamIdentityForm from '@/components/team/TeamIdentityForm.vue'
 import TeamBannerField from '@/components/team/TeamBannerField.vue'
 import PreseasonCard from '@/components/team/PreseasonCard.vue'
 import RecruitPostCard from '@/components/team/RecruitPostCard.vue'
+import TeamDiscordAlert from '@/components/team/TeamDiscordAlert.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useActiveSeason } from '@/composables/useActiveSeason'
 import { useTeam } from '@/composables/useTeams'
@@ -44,6 +46,8 @@ async function removeBanner() {
 }
 const { season, loading: seasonLoading } = useActiveSeason()
 const { team, loading: teamLoading, reload } = useTeam(() => auth.team?.id)
+// Latched: reloading the team after an edit keeps the page instead of flashing the skeleton.
+const ready = useReady(() => seasonLoading.value || teamLoading.value)
 
 const uid = computed(() => auth.user?.id)
 const isCaptain = computed(() => team.value?.captainId === uid.value)
@@ -144,17 +148,20 @@ const lockDate = computed(() =>
   <div>
     <PageHeader
       :eyebrow="team ? team.seasonName : 'Captain'"
-      :title="team ? team.name : 'My Team'"
-      :description="team ? undefined : 'Create a team for this season, or wait for a captain to invite you.'"
+      :title="team?.name ?? auth.team?.name ?? 'My Team'"
+      :description="auth.team ? undefined : 'Create a team for this season, or wait for a captain to invite you.'"
     >
-      <template v-if="team" #actions>
+      <template v-if="ready && team" #actions>
         <UiButton :to="`/teams/${team.id}`" variant="secondary" size="sm">Public page</UiButton>
         <UiButton :href="site.discordInviteUrl" variant="secondary" size="sm">Team Discord</UiButton>
       </template>
     </PageHeader>
 
     <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <UiSkeleton v-if="seasonLoading || (auth.team && teamLoading)" :lines="8" />
+      <div v-if="!ready" role="status" aria-busy="true">
+        <span class="sr-only">Loading your team…</span>
+        <UiPageSkeleton variant="panel" />
+      </div>
 
       <!-- No team yet -->
       <template v-else-if="!team">
@@ -216,6 +223,8 @@ const lockDate = computed(() =>
         >
           <strong class="text-loss">Note from league staff:</strong> {{ team.reviewNote }}
         </p>
+
+        <TeamDiscordAlert :team-id="team.id" :roster="team.roster" :can-manage="canManage" />
 
         <dl class="grid grid-cols-2 overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-4" style="gap: 1px">
           <div class="bg-surface p-4">

@@ -7,7 +7,7 @@ withDefaults(defineProps<{ lines?: number }>(), { lines: 1 })
     <div
       v-for="n in lines"
       :key="n"
-      class="h-4 animate-pulse rounded-sm bg-surface-3"
+      class="skeleton h-4 rounded-sm"
       :class="n === lines && lines > 1 ? 'w-2/3' : 'w-full'"
     />
   </div>

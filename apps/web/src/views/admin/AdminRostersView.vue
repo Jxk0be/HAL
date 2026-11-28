@@ -7,7 +7,8 @@ import RecusedNotice from '@/components/admin/RecusedNotice.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import RankExceptionsPanel from '@/components/admin/RankExceptionsPanel.vue'
 import { useRecusal, useRosterRequests, type RosterRequestRow } from '@/composables/useAdmin'
@@ -16,6 +17,8 @@ import { useToast } from '@/composables/useToast'
 const toast = useToast()
 const r = useRosterRequests()
 const { rows, loading, busy } = r
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 const { isRecused } = useRecusal()
 const notes = reactive<Record<string, string>>({})
 
@@ -34,7 +37,7 @@ async function review(q: RosterRequestRow, approve: boolean) {
   <div>
     <PageHeader compact eyebrow="Admin" title="Roster approvals" description="Pending emergency subs, roster fixes and Iridescent rank exceptions. The free agent accepts first, then you approve; an approved emergency sub plays that one match only." />
     <div class="px-4 py-8 sm:px-6">
-      <UiSkeleton v-if="loading" :lines="5" />
+      <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="list" :count="4" /></div>
       <UiEmptyState v-else-if="!rows.length" title="No pending requests" description="Captains request emergency subs from the match page." />
       <ul v-else class="flex flex-col gap-3">
         <li v-for="q in rows" :key="q.id" class="rounded-lg border border-line bg-surface p-4" :class="recused(q) ? 'opacity-70' : ''">

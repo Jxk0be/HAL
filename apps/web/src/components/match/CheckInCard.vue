@@ -19,7 +19,7 @@ const props = defineProps<{
 const emit = defineEmits<{ changed: [] }>()
 
 const toast = useToast()
-const { players, busy, checkIn } = useCheckin(() => props.match.id, () => props.captainOf)
+const { players, busy, loaded, checkIn } = useCheckin(() => props.match.id, () => props.captainOf)
 
 const now = ref(Date.now())
 const clock = setInterval(() => (now.value = Date.now()), 30_000)
@@ -51,7 +51,7 @@ const showForm = computed(() => props.captainOf && open.value && (!mine.value ||
 </script>
 
 <template>
-  <UiCard v-if="checkins.length || captainOf" eyebrow="Teams and staff only" title="Check-in">
+  <UiCard v-if="loaded && (checkins.length || captainOf)" eyebrow="Teams and staff only" title="Check-in">
     <div class="flex flex-col gap-4 text-sm">
       <ul v-if="checkins.length" class="flex flex-col gap-2">
         <li v-for="c in checkins" :key="c.teamId">

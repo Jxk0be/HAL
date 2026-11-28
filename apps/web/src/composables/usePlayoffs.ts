@@ -86,6 +86,9 @@ export function usePlayoffMatches(seasonId: MaybeRefOrGetter<string | null | und
   }
 
   useRealtime('playoffs', [{ table: 'matches' }], () => void load(), 1500)
-  watch([() => toValue(seasonId), () => toValue(divisionId)], load, { immediate: true })
+  watch([() => toValue(seasonId), () => toValue(divisionId)], () => {
+    loading.value = true
+    void load()
+  }, { immediate: true })
   return { matches, seeds, loading, reload: load }
 }

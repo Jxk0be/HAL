@@ -15,7 +15,7 @@ const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 const { book, commit, loading } = useRulebook()
-const { season } = useActiveSeason()
+const { season, loading: seasonLoading } = useActiveSeason()
 
 // ---- Search -------------------------------------------------------------
 const term = ref('')
@@ -123,7 +123,8 @@ function mobileJump(number: string) {
     <!-- Header -->
     <header class="border-b border-line">
       <div class="mx-auto max-w-7xl px-4 pt-10 pb-8 sm:px-6 sm:pt-14">
-        <p class="eyebrow text-accent">{{ season?.name ?? site.name }}</p>
+        <div v-if="seasonLoading" class="skeleton h-4 w-32 rounded-sm" aria-hidden="true" />
+        <p v-else class="eyebrow text-accent">{{ season?.name ?? site.name }}</p>
         <h1 class="mt-2 font-heading text-4xl sm:text-6xl">Official Rulebook</h1>
         <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
           <span v-if="book.effective">Effective {{ book.effective }}</span>

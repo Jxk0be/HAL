@@ -6,6 +6,9 @@ import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiInput from '@/components/ui/UiInput.vue'
 import UiSelect from '@/components/ui/UiSelect.vue'
 import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiLoadGate from '@/components/ui/UiLoadGate.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import UiTable from '@/components/ui/UiTable.vue'
 import type { TableColumn, TableSort } from '@/components/ui/types'
 import { useActiveSeason } from '@/composables/useActiveSeason'
@@ -17,13 +20,15 @@ import RankBadge from '@/components/players/RankBadge.vue'
 import { formatLeagueTime } from '@/lib/time'
 import { boardTeams, filterRows, formatKd, formatPlusMinus, type LeaderboardRow } from '@/lib/leaderboard'
 
-const { season: active } = useActiveSeason()
+const { season: active, loading: activeLoading } = useActiveSeason()
 const { seasons, loading: seasonsLoading } = useLeaderboardSeasons()
 
 // Default to the running season, else the newest one.
 const seasonId = ref<string>('')
-watch([active, seasons], () => {
-  if (!seasonId.value) seasonId.value = active.value?.id ?? seasons.value[0]?.id ?? ''
+// Wait for both lists so the newest season can't win the race against the running one.
+watch([active, seasons, activeLoading, seasonsLoading], () => {
+  if (seasonId.value || activeLoading.value || seasonsLoading.value) return
+  seasonId.value = active.value?.id ?? seasons.value[0]?.id ?? ''
 }, { immediate: true })
 const seasonName = computed(() => seasons.value.find((s) => s.id === seasonId.value)?.name)
 
@@ -129,18 +134,29 @@ const teamPodium = computed(() =>
 
 // ---- Hall of Champions -------------------------------------------------------------
 const { champions, loading: championsLoading } = useHallOfChampions()
+
+const ready = useReady(
+  () => activeLoading.value || seasonsLoading.value || loading.value || standingsLoading.value || championsLoading.value,
+)
 </script>
 
 <template>
   <div>
-    <PageHeader eyebrow="Leaderboard" title="Rankings across players and teams" :description="`${seasonName ?? 'This season'}, from confirmed results. Click a column to sort.`">
-      <template v-if="tab === 'players'" #actions>
+    <PageHeader eyebrow="Leaderboard" title="Rankings across players and teams" :description="`${seasonName ?? 'This season'}, from confirmed results. Click a column to sort.`" :pending="!ready">
+      <template v-if="ready && tab === 'players'" #actions>
         <div class="w-full sm:w-64">
           <UiInput v-model="search" label="Search players" type="search" placeholder="Activision ID" autocomplete="off" />
         </div>
       </template>
     </PageHeader>
-    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+    <UiLoadGate :ready="ready" class="mx-auto max-w-7xl px-4 py-8 sm:px-6" label="Loading the leaderboard…">
+      <template #skeleton>
+        <div class="mb-6 flex gap-6 border-b border-line pb-3"><div v-for="n in 3" :key="n" class="skeleton h-4 w-20 rounded-sm" /></div>
+        <div class="mb-6 grid grid-cols-3 items-end gap-3 sm:gap-4">
+          <div class="skeleton h-40 rounded-xl" /><div class="skeleton h-52 rounded-xl" /><div class="skeleton h-36 rounded-xl" />
+        </div>
+        <UiPageSkeleton variant="table" :count="8" />
+      </template>
       <UiTabs v-model="tab" :tabs="tabs" label="Leaderboard sections" hash-sync>
       <template #default="{ active: section }">
       <div v-if="section === 'players'" class="flex flex-col gap-6">
@@ -280,6 +296,6 @@ const { champions, loading: championsLoading } = useHallOfChampions()
       </div>
       </template>
       </UiTabs>
-    </div>
+    </UiLoadGate>
   </div>
 </template>

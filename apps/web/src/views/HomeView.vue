@@ -4,7 +4,8 @@ import BrandLogo from '@/components/brand/BrandLogo.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiCountdown from '@/components/ui/UiCountdown.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiLoadGate from '@/components/ui/UiLoadGate.vue'
+import { useReady } from '@/composables/useReady'
 import MatchCard from '@/components/match/MatchCard.vue'
 import StandingsTable from '@/components/stats/StandingsTable.vue'
 import { site } from '@/config/site'
@@ -24,16 +25,26 @@ import { useAuthStore } from '@/stores/auth'
 import type { NavIcon } from '@/config/site'
 
 const auth = useAuthStore()
-const { counts } = useSiteCounts()
-const { results: recentResults } = useRecentResults()
+const { counts, loading: countsLoading } = useSiteCounts()
+const { results: recentResults, loaded: resultsLoaded } = useRecentResults()
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many)
 const featureIcon = (icon: string) => (icon === 'discord' ? DiscordGlyph : navIcons[icon as NavIcon])
 
 const { season, matches, loading } = useSeasonSchedule()
 const seasonId = computed(() => season.value?.id)
-const { rows: standings } = useStandings(seasonId, () => null)
-const { boards } = useLeaderboards(seasonId, 1)
-const { live } = useLiveBroadcasts()
+const { rows: standings, loading: standingsLoading } = useStandings(seasonId, () => null)
+const { boards, loading: boardsLoading } = useLeaderboards(seasonId, 1)
+const { live, loaded: liveLoaded } = useLiveBroadcasts()
+
+// Render the page only once everything on it has arrived, so sections never pop in or swap.
+const ready = useReady(
+  () =>
+    loading.value ||
+    standingsLoading.value ||
+    boardsLoading.value ||
+    !liveLoaded.value ||
+    (!auth.isSignedIn && (countsLoading.value || !resultsLoaded.value)),
+)
 
 const now = Date.now()
 const week = computed(() => (matches.value.length ? currentWeek(matches.value, now) : null))
@@ -72,7 +83,31 @@ const leaders = computed(() =>
 </script>
 
 <template>
-  <div>
+  <UiLoadGate :ready="ready" label="Loading the home page…">
+    <template #skeleton>
+      <div class="border-b border-line">
+        <div class="mx-auto flex max-w-4xl flex-col items-center gap-5 px-4 pt-14 pb-16 sm:px-6 sm:pt-20 sm:pb-24" :class="auth.isSignedIn ? 'lg:max-w-7xl lg:items-start' : ''">
+          <div v-if="!auth.isSignedIn" class="skeleton size-40 rounded-2xl" />
+          <div v-else class="skeleton h-20 w-full max-w-xl rounded-xl" />
+          <div class="skeleton h-3 w-40 rounded-sm" />
+          <div class="skeleton h-12 w-4/5 max-w-lg" />
+          <div class="skeleton h-12 w-3/5 max-w-md" />
+          <div class="skeleton h-4 w-full max-w-md rounded-sm" />
+          <div class="mt-3 flex gap-3">
+            <div class="skeleton h-12 w-40" />
+            <div class="skeleton h-12 w-40" />
+          </div>
+        </div>
+      </div>
+      <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-14 sm:px-6">
+        <div class="skeleton h-3 w-32 rounded-sm" />
+        <div class="skeleton h-8 w-72 max-w-full" />
+        <div class="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div v-for="n in 3" :key="n" class="skeleton h-36 rounded-xl" />
+        </div>
+      </div>
+    </template>
+
     <!-- Logged out: landing hero -->
     <template v-if="!auth.isSignedIn">
       <div v-if="recentResults.length" class="h-11 border-b border-line bg-rail print:hidden"><div class="mx-auto flex h-full max-w-7xl px-2"><ResultsTicker /></div></div>
@@ -164,9 +199,8 @@ const leaders = computed(() =>
       </section>
 
       <!-- Next match night -->
-      <section v-if="loading || nextNight" aria-labelledby="next-title">
-        <UiSkeleton v-if="loading" :lines="3" />
-        <template v-else-if="nextNight">
+      <section v-if="nextNight" aria-labelledby="next-title">
+        <template v-if="nextNight">
           <div class="mb-4 flex flex-wrap items-end justify-between gap-4">
             <div>
               <p class="eyebrow text-accent">{{ nextNight.isTonight ? "Tonight's matches" : 'Next match night' }}</p>
@@ -283,7 +317,7 @@ const leaders = computed(() =>
         </div>
       </section>
     </div>
-  </div>
+  </UiLoadGate>
 </template>
 
 <style scoped>

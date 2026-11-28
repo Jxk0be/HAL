@@ -4,7 +4,7 @@ import UiInput from '@/components/ui/UiInput.vue'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
 import UiPagination from '@/components/ui/UiPagination.vue'
 import PlatformBadge from '@/components/ui/PlatformBadge.vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
@@ -35,7 +35,10 @@ const { search, page, pages, players, total, loading, error } = usePlayerDirecto
         </UiInput>
       </div>
 
-      <UiSkeleton v-if="loading && players.length === 0" :lines="8" />
+      <div v-if="loading && players.length === 0" role="status" aria-busy="true">
+        <span class="sr-only">Loading players…</span>
+        <UiPageSkeleton variant="table" />
+      </div>
       <p v-else-if="error" role="alert" class="text-loss">{{ error }}</p>
       <UiEmptyState
         v-else-if="players.length === 0"

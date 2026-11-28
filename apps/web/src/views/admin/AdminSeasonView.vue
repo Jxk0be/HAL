@@ -2,7 +2,8 @@
 import { computed, ref } from 'vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import UiTabs from '@/components/ui/UiTabs.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
@@ -20,6 +21,8 @@ const auth = useAuthStore()
 const toast = useToast()
 const admin = useSeasonAdmin()
 const { season, divisions, approved, pending, loading, busy } = admin
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 
 type Tab = 'season' | 'teams' | 'divisions' | 'schedule' | 'playoffs'
 const tab = ref<Tab>('season')
@@ -66,7 +69,7 @@ const review = (teamId: string, approve: boolean, note: string | null) =>
     </PageHeader>
 
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <UiSkeleton v-if="loading" :lines="8" />
+      <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="form" :count="5" /></div>
       <UiEmptyState
         v-else-if="!season"
         title="No season yet"
@@ -83,7 +86,7 @@ const review = (teamId: string, approve: boolean, note: string | null) =>
       </UiEmptyState>
 
       <form
-        v-if="!loading && season?.status === 'complete' && auth.isOwner"
+        v-if="ready && season?.status === 'complete' && auth.isOwner"
         class="mb-6 flex flex-col gap-3 rounded-lg border border-line bg-surface p-4 sm:flex-row sm:items-end"
         @submit.prevent="createSeason"
       >
@@ -92,7 +95,7 @@ const review = (teamId: string, approve: boolean, note: string | null) =>
         <UiButton type="submit" :disabled="busy || !newSeasonName.trim()">Start next season</UiButton>
       </form>
 
-      <UiTabs v-if="!loading && season" v-model="tab" label="Season admin sections" :tabs="tabs">
+      <UiTabs v-if="ready && season" v-model="tab" label="Season admin sections" :tabs="tabs">
         <template #default="{ active }">
           <SeasonSettingsForm v-if="active === 'season'" :season="season" :readonly="!auth.isOwner" :busy="busy" @save="saveSeason" @banner="uploadBanner" />
           <TeamApprovalQueue v-else-if="active === 'teams'" :pending="pending" :busy="busy" @review="review" />

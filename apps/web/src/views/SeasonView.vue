@@ -9,7 +9,8 @@ import UiBadge from '@/components/ui/UiBadge.vue'
 import UiCard from '@/components/ui/UiCard.vue'
 import UiCountdown from '@/components/ui/UiCountdown.vue'
 import UiSelect from '@/components/ui/UiSelect.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import StandingsPanel from '@/components/season/StandingsPanel.vue'
@@ -39,6 +40,8 @@ const seasonId = computed(() => season.value?.id ?? null)
 const { matches, loading: matchesLoading } = useSeasonSchedule(seasonId)
 const { teams, loading: teamsLoading, error: teamsError } = useTeamList(seasonId)
 const { book } = useRulebook()
+// The hero (phase, call to action, stepper) needs the season and its matches.
+const ready = useReady(() => hub.loading.value || matchesLoading.value)
 
 type Tab = 'overview' | 'standings' | 'matches' | 'bracket' | 'teams' | 'rules'
 const tab = ref<Tab>('overview')
@@ -159,7 +162,10 @@ watch(
 
 <template>
   <div>
-    <div v-if="hub.loading.value && !season" class="mx-auto max-w-7xl px-4 py-16 sm:px-6"><UiSkeleton :lines="10" /></div>
+    <div v-if="!ready" role="status" aria-busy="true">
+      <span class="sr-only">Loading the season…</span>
+      <UiPageSkeleton variant="detail" />
+    </div>
     <div v-else-if="!season" class="mx-auto max-w-7xl px-4 py-16 sm:px-6">
       <UiEmptyState
         :title="hub.notFound.value ? 'Season not found' : 'No season yet'"

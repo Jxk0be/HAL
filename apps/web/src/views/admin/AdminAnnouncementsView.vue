@@ -5,7 +5,8 @@ import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiModal from '@/components/ui/UiModal.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import { useAnnouncements, type AnnouncementRow } from '@/composables/useAnnouncements'
 import { useToast } from '@/composables/useToast'
@@ -13,6 +14,8 @@ import { CUSTOM_BODY_MAX, customAnnouncementProblem, parseCustomAnnouncement, pr
 
 const toast = useToast()
 const { rows, season, channelSet, loading, error, busyKey, post, postCustom, setAuto } = useAnnouncements()
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 
 // Custom announcement: paste text; a bold first line becomes the title.
 const customId = useId()
@@ -133,7 +136,7 @@ async function toggle(r: AnnouncementRow) {
       </article>
 
       <h2 class="eyebrow mt-4 text-accent">Season announcements</h2>
-      <UiSkeleton v-if="loading" :lines="8" />
+      <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="cards" :count="4" /></div>
       <p v-else-if="error" class="text-sm text-loss" role="alert">{{ error }}</p>
       <UiEmptyState v-else-if="!season" title="No season running" description="Announcements use the season in signups, regular season or playoffs." />
       <template v-else>

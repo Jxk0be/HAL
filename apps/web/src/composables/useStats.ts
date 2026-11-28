@@ -33,21 +33,32 @@ export function useStandings(
     loading.value = false
   }
   useRealtime('standings', [{ table: 'matches' }], () => void load(), 1500)
-  watch([() => toValue(seasonId), () => toValue(divisionId)], load, { immediate: true })
+  watch([() => toValue(seasonId), () => toValue(divisionId)], () => {
+    loading.value = true
+    void load()
+  }, { immediate: true })
   return { rows, loading, reload: load }
 }
 
 /** Divisions of a season (empty = one league table). */
 export function useDivisions(seasonId: MaybeRefOrGetter<string | null | undefined>) {
   const divisions = ref<{ id: string; name: string; tier: number }[]>([])
+  const loading = ref(true)
   async function load() {
     const s = toValue(seasonId)
-    if (!s) return
+    if (!s) {
+      loading.value = false
+      return
+    }
     const { data } = await supabase.from('divisions').select('id, name, tier').eq('season_id', s).order('tier')
     divisions.value = data ?? []
+    loading.value = false
   }
-  watch(() => toValue(seasonId), load, { immediate: true })
-  return { divisions }
+  watch(() => toValue(seasonId), () => {
+    loading.value = true
+    void load()
+  }, { immediate: true })
+  return { divisions, loading }
 }
 
 /**
@@ -72,7 +83,10 @@ export function useSeasonLeaderboard(seasonId: MaybeRefOrGetter<string | null | 
     loading.value = false
   }
   useRealtime('leaderboard', [{ table: 'matches' }], () => void load(), 1500)
-  watch(() => toValue(seasonId), load, { immediate: true })
+  watch(() => toValue(seasonId), () => {
+    loading.value = true
+    void load()
+  }, { immediate: true })
   return { rows, loading, error, reload: load }
 }
 
@@ -108,9 +122,13 @@ export function useLeaderboardSeasons() {
 export function usePlayerStats(userId: MaybeRefOrGetter<string | null | undefined>) {
   const rows = ref<PlayerStatRow[]>([])
   const history = ref<{ matchId: string; scheduledAt: string; opponent: string; won: boolean | null; kills: number; deaths: number; maps: number }[]>([])
+  const loading = ref(true)
   async function load() {
     const id = toValue(userId)
-    if (!id) return
+    if (!id) {
+      loading.value = false
+      return
+    }
     const [{ data: stats }, { data: lines }] = await Promise.all([
       supabase.from('player_season_stats_v').select('*').eq('user_id', id),
       supabase
@@ -145,17 +163,25 @@ export function usePlayerStats(userId: MaybeRefOrGetter<string | null | undefine
       byMatch.set(m.id, entry)
     }
     history.value = [...byMatch.values()].sort((a, b) => b.scheduledAt.localeCompare(a.scheduledAt))
+    loading.value = false
   }
-  watch(() => toValue(userId), load, { immediate: true })
-  return { rows, history }
+  watch(() => toValue(userId), () => {
+    loading.value = true
+    void load()
+  }, { immediate: true })
+  return { rows, history, loading }
 }
 
 /** A team's regular-season series record (from match_results_v). */
 export function useTeamRecord(teamId: MaybeRefOrGetter<string | null | undefined>) {
   const record = ref({ wins: 0, losses: 0, mapsWon: 0, mapsLost: 0 })
+  const loading = ref(true)
   async function load() {
     const id = toValue(teamId)
-    if (!id) return
+    if (!id) {
+      loading.value = false
+      return
+    }
     const { data } = await supabase.from('match_results_v').select('won, maps_won, maps_lost').eq('team_id', id).eq('stage', 'regular')
     const rows = data ?? []
     record.value = {
@@ -164,23 +190,35 @@ export function useTeamRecord(teamId: MaybeRefOrGetter<string | null | undefined
       mapsWon: rows.reduce((s, r) => s + (r.maps_won ?? 0), 0),
       mapsLost: rows.reduce((s, r) => s + (r.maps_lost ?? 0), 0),
     }
+    loading.value = false
   }
   useRealtime('team-record', [{ table: 'matches' }], () => void load(), 1500)
-  watch(() => toValue(teamId), load, { immediate: true })
-  return { record }
+  watch(() => toValue(teamId), () => {
+    loading.value = true
+    void load()
+  }, { immediate: true })
+  return { record, loading }
 }
 
 /** A team's mode records for a season. */
 export function useTeamModeRecords(teamId: MaybeRefOrGetter<string | null | undefined>) {
   const records = ref<{ mode: string; wins: number; losses: number }[]>([])
+  const loading = ref(true)
   async function load() {
     const id = toValue(teamId)
-    if (!id) return
+    if (!id) {
+      loading.value = false
+      return
+    }
     const { data } = await supabase.from('team_mode_records_v').select('mode_name, wins, losses').eq('team_id', id).order('mode_name')
     records.value = (data ?? []).map((r) => ({ mode: r.mode_name ?? 'Mode', wins: r.wins ?? 0, losses: r.losses ?? 0 }))
+    loading.value = false
   }
-  watch(() => toValue(teamId), load, { immediate: true })
-  return { records }
+  watch(() => toValue(teamId), () => {
+    loading.value = true
+    void load()
+  }, { immediate: true })
+  return { records, loading }
 }
 
 // ---- Audit log --------------------------------------------------------------------
@@ -224,7 +262,10 @@ export function usePlayerBreakdown(userId: MaybeRefOrGetter<string | null | unde
   const loading = ref(true)
   async function load() {
     const id = toValue(userId)
-    if (!id) return
+    if (!id) {
+      loading.value = false
+      return
+    }
     loading.value = true
     const { data } = await supabase.rpc('player_breakdown', { p_user_id: id, p_season_id: toValue(seasonId) ?? undefined })
     breakdown.value = (data as unknown as Breakdown | null) ?? EMPTY_BREAKDOWN
@@ -268,11 +309,13 @@ export function usePlayerRanks(userIds: MaybeRefOrGetter<string[]>) {
 /** Public landing-page counts (players, approved teams, matches played). */
 export function useSiteCounts() {
   const counts = ref<{ players: number; teams: number; matches: number } | null>(null)
+  const loading = ref(true)
   async function load() {
     const { data } = await supabase.rpc('site_counts')
     const row = data?.[0]
     counts.value = row ? { players: Number(row.players), teams: Number(row.teams), matches: Number(row.matches) } : null
+    loading.value = false
   }
   void load()
-  return { counts }
+  return { counts, loading }
 }

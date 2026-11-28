@@ -10,7 +10,8 @@ import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiModal from '@/components/ui/UiModal.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import UiTabs from '@/components/ui/UiTabs.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import { adminResults, useDisputes, useRecusal, type DisputeRow } from '@/composables/useAdmin'
@@ -22,6 +23,8 @@ type PenaltyType = Database['public']['Enums']['penalty_type']
 const toast = useToast()
 const d = useDisputes()
 const { rows, loading, busy } = d
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 const { isRecused } = useRecusal()
 
 const tab = ref<'open' | 'resolved'>('open')
@@ -108,7 +111,7 @@ async function issuePenalty() {
   <div>
     <PageHeader compact eyebrow="Admin" title="Disputes" description="Open disputes first. Decisions are public on the match page; evidence stays with the teams and staff." />
     <div class="px-4 py-8 sm:px-6">
-      <UiSkeleton v-if="loading" :lines="6" />
+      <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="list" :count="4" /></div>
       <UiTabs v-else v-model="tab" label="Dispute status" :tabs="tabs">
         <UiEmptyState v-if="!shown.length" :title="tab === 'open' ? 'No open disputes' : 'No resolved disputes yet'" />
         <ul v-else class="flex flex-col gap-4">

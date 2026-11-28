@@ -50,20 +50,23 @@ export function parseReportStatus(json: unknown): ReportStatus | null {
 export function useReportStatus(matchId: MaybeRefOrGetter<string | null | undefined>) {
   const auth = useAuthStore()
   const status = ref<ReportStatus | null>(null)
+  const loading = ref(true)
 
   async function load() {
     const id = toValue(matchId)
     if (!id || !auth.isSignedIn) {
       status.value = null
+      loading.value = false
       return
     }
     const { data } = await supabase.rpc('my_match_report_status', { p_match_id: id })
     status.value = parseReportStatus(data)
+    loading.value = false
   }
 
   useRealtime('report-status', [{ table: 'matches' }, { table: 'match_maps' }], () => void load())
   watch([() => toValue(matchId), () => auth.isSignedIn], load, { immediate: true })
-  return { status, reload: load }
+  return { status, loading, reload: load }
 }
 
 const draftKey = (matchId: string, teamId: string) => `hal:report-draft:${matchId}:${teamId}`

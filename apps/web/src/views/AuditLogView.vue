@@ -2,7 +2,8 @@
 import PageHeader from '@/components/layout/PageHeader.vue'
 import UiInput from '@/components/ui/UiInput.vue'
 import UiSelect from '@/components/ui/UiSelect.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiPagination from '@/components/ui/UiPagination.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
@@ -10,6 +11,8 @@ import { useAuditLog } from '@/composables/useStats'
 
 const log = useAuditLog()
 const { rows, page, total, table, actor, loading } = log
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 
 const tableOptions = [
   { value: '', label: 'Everything' },
@@ -41,7 +44,7 @@ const when = (iso: string | null) =>
         <div class="w-full sm:w-56"><UiSelect v-model="table" label="Show" :options="tableOptions" /></div>
         <div class="w-full sm:w-56"><UiInput v-model="actor" label="By" placeholder="Staff name, or bot" autocomplete="off" /></div>
       </div>
-      <UiSkeleton v-if="loading" :lines="10" />
+      <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="list" :count="10" /></div>
       <UiEmptyState v-else-if="rows.length === 0" title="Nothing logged yet" description="Staff actions appear here as they happen." />
       <ol v-else class="flex flex-col divide-y divide-line rounded-lg border border-line bg-surface">
         <li v-for="r in rows" :key="r.id ?? 0" class="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-start sm:gap-4">

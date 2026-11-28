@@ -5,13 +5,16 @@ import UiCard from '@/components/ui/UiCard.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiCountdown from '@/components/ui/UiCountdown.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import DiscordGlyph from '@/components/brand/DiscordGlyph.vue'
 import { useEights } from '@/composables/useEights'
 import { formatLocalTime } from '@/lib/time'
 import { site } from '@/config/site'
 
 const { state, loading, error } = useEights()
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 const queued = computed(() => Math.min(state.value?.queue_count ?? 0, 8))
 </script>
 
@@ -35,7 +38,7 @@ const queued = computed(() => Math.min(state.value?.queue_count ?? 0, 8))
     </PageHeader>
 
     <div class="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6">
-      <UiSkeleton v-if="loading" :lines="8" />
+      <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="panel" /></div>
       <p v-else-if="error" role="alert" class="text-loss">{{ error }}</p>
       <template v-else-if="state">
         <!-- Queue meter -->

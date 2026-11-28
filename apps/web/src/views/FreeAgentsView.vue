@@ -9,7 +9,9 @@ import UiCard from '@/components/ui/UiCard.vue'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
 import UiModal from '@/components/ui/UiModal.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiLoadGate from '@/components/ui/UiLoadGate.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import UiPagination from '@/components/ui/UiPagination.vue'
 import PlatformBadge from '@/components/ui/PlatformBadge.vue'
 import FreeAgentPostForm from '@/components/players/FreeAgentPostForm.vue'
@@ -85,6 +87,9 @@ async function hide(p: FreeAgentCard) {
   await board.reload()
 }
 
+// Your post, the Invite buttons and the board all show together once loaded.
+const ready = useReady(() => loading.value || myPost.loading.value || spots.loading.value || sent.loading.value)
+
 const platformOptions = PLATFORM_OPTIONS.map((o) => ({ value: o.value, label: o.value === 'pc' ? 'PC' : o.label }))
 const roleOptions = FREE_AGENT_ROLES.map((r) => ({ value: r, label: r }))
 const posted = (iso: string | null) =>
@@ -98,13 +103,21 @@ const posted = (iso: string | null) =>
       title="Free Agents"
       description="Players looking for a team. Captains can invite them while they have an open spot."
     >
-      <template v-if="canPost" #actions>
+      <template v-if="ready && canPost" #actions>
         <UiButton @click="postOpen = true">{{ myPost.post.value ? 'Edit my post' : 'Post as free agent' }}</UiButton>
       </template>
     </PageHeader>
 
     <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 sm:px-6">
       <RecruitingTabs />
+
+      <UiLoadGate :ready="ready" class="flex flex-col gap-6" label="Loading free agents…">
+        <template #skeleton>
+          <div class="flex flex-col gap-6">
+            <div class="grid gap-3 sm:grid-cols-[1fr_12rem_10rem]"><div class="skeleton h-11" /><div class="skeleton h-11" /><div class="skeleton h-11" /></div>
+            <UiPageSkeleton variant="cards" />
+          </div>
+        </template>
 
       <!-- Your post -->
       <UiCard v-if="canPost && myPost.post.value" eyebrow="Your post" title="You're on the board">
@@ -146,9 +159,7 @@ const posted = (iso: string | null) =>
       </div>
 
       <!-- Board -->
-      <div v-if="loading && rows.length === 0" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div v-for="n in 6" :key="n" class="rounded-lg border border-line bg-surface p-5"><UiSkeleton :lines="4" /></div>
-      </div>
+      <UiPageSkeleton v-if="loading && rows.length === 0" variant="cards" />
       <p v-else-if="error" role="alert" class="text-loss">{{ error }}</p>
       <UiEmptyState
         v-else-if="rows.length === 0"
@@ -213,6 +224,7 @@ const posted = (iso: string | null) =>
       </ul>
 
       <UiPagination v-model="page" :pages="pages" :total="total" label="Free agent pages" />
+      </UiLoadGate>
     </div>
 
     <UiModal

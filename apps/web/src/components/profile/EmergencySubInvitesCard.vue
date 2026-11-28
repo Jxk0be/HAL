@@ -4,12 +4,14 @@ import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiCard from '@/components/ui/UiCard.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
-import { useMyEmergencySubRequests } from '@/composables/useEmergencySubs'
+import type { useMyEmergencySubRequests } from '@/composables/useEmergencySubs'
 import { useToast } from '@/composables/useToast'
 
 /** A free agent's open emergency sub requests (they can also answer from the Discord DM). */
 const toast = useToast()
-const { requests, busyId, respond } = useMyEmergencySubRequests()
+// The page owns the data (so it can wait for it before rendering) and passes it in.
+const props = defineProps<{ state: ReturnType<typeof useMyEmergencySubRequests> }>()
+const { requests, busyId, respond } = props.state
 
 async function answer(id: string, tag: string, accept: boolean) {
   const r = await respond(id, accept)

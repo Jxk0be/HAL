@@ -4,7 +4,8 @@ import PublicLogNotice from '@/components/admin/PublicLogNotice.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiCheckbox from '@/components/ui/UiCheckbox.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import { useContentPosts, type ContentPost } from '@/composables/useAdmin'
 import { useToast } from '@/composables/useToast'
@@ -12,6 +13,8 @@ import { useToast } from '@/composables/useToast'
 const toast = useToast()
 const c = useContentPosts()
 const { posts, loading, busy } = c
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 const activeOnly = ref(true)
 const shown = computed(() => (activeOnly.value ? posts.value.filter((p) => p.active) : posts.value))
 
@@ -32,7 +35,7 @@ async function remove(p: ContentPost) {
   <div class="flex flex-col gap-4">
     <UiCheckbox v-model="activeOnly" label="Active posts only" />
     <PublicLogNotice />
-    <UiSkeleton v-if="loading" :lines="6" />
+    <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="list" :count="5" /></div>
     <ul v-else class="flex flex-col divide-y divide-line rounded-lg border border-line bg-surface">
       <li v-if="!shown.length" class="px-4 py-3 text-sm text-muted">No posts.</li>
       <li v-for="p in shown" :key="p.id" class="flex flex-wrap items-start gap-x-4 gap-y-2 px-4 py-3 text-sm">

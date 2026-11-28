@@ -7,7 +7,8 @@ import ContentPlayers from '@/components/admin/content/ContentPlayers.vue'
 import ContentPosts from '@/components/admin/content/ContentPosts.vue'
 import ContentTeams from '@/components/admin/content/ContentTeams.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import UiTabs from '@/components/ui/UiTabs.vue'
 import { useActiveSeason } from '@/composables/useActiveSeason'
 import { useSeasonTeamNames } from '@/composables/useAdmin'
@@ -25,6 +26,8 @@ const tabs = [
 ]
 
 const { season, loading } = useActiveSeason()
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 const seasonId = computed(() => season.value?.id ?? null)
 const { teams } = useSeasonTeamNames(seasonId)
 </script>
@@ -35,7 +38,7 @@ const { teams } = useSeasonTeamNames(seasonId)
     <div class="px-4 py-8 sm:px-6">
       <UiTabs v-model="tab" label="Content sections" :tabs="tabs">
         <template v-if="tab === 'matches' || tab === 'teams'">
-          <UiSkeleton v-if="loading" :lines="6" />
+          <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="table" :count="6" /></div>
           <UiEmptyState v-else-if="!seasonId" title="No active season" />
           <ContentMatches v-else-if="tab === 'matches'" :season-id="seasonId" :timezone="season?.timezone ?? 'America/New_York'" :teams="teams" />
           <ContentTeams v-else :season-id="seasonId" />

@@ -8,7 +8,8 @@ import UiStepper from '@/components/ui/UiStepper.vue'
 import UiStatTile from '@/components/ui/UiStatTile.vue'
 import UiCountdown from '@/components/ui/UiCountdown.vue'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiLoadGate from '@/components/ui/UiLoadGate.vue'
+import { useReady } from '@/composables/useReady'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import MatchStatus from '@/components/match/MatchStatus.vue'
@@ -24,7 +25,8 @@ const { auth } = d
 const toast = useToast()
 
 const staffOnly = computed(() => auth.isStaff && !auth.isPlayer)
-const { overview } = useAdminOverview()
+const { overview, loading: overviewLoading } = useAdminOverview()
+const ready = useReady(() => d.loading.value || (staffOnly.value && overviewLoading.value))
 
 const name = computed(() => auth.profile?.activision_id?.split('#')[0] || auth.displayName)
 
@@ -67,12 +69,37 @@ const adminTiles = computed(() => {
 <template>
   <div>
     <PageHeader eyebrow="Dashboard" :title="`Welcome back, ${name}`">
-      <template v-if="d.season.value" #actions>
+      <template v-if="ready && d.season.value" #actions>
         <UiBadge variant="outline">{{ d.season.value.name }} · {{ d.phase.value ? phaseLabel(d.phase.value) : '' }}</UiBadge>
       </template>
     </PageHeader>
 
-    <div class="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-3">
+    <UiLoadGate :ready="ready" class="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-3" label="Loading your dashboard…">
+      <template #skeleton>
+        <div class="flex flex-col gap-5 rounded-xl border border-line bg-surface p-5 lg:col-span-2">
+          <div class="skeleton h-3 w-40 rounded-sm" />
+          <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+            <div class="flex flex-col items-center gap-2"><div class="skeleton size-20 rounded-xl" /><div class="skeleton h-4 w-24 rounded-sm" /></div>
+            <div class="skeleton h-8 w-12" />
+            <div class="flex flex-col items-center gap-2"><div class="skeleton size-20 rounded-xl" /><div class="skeleton h-4 w-24 rounded-sm" /></div>
+          </div>
+          <div class="mx-auto skeleton h-6 w-40" />
+          <div class="mx-auto flex gap-2"><div class="skeleton h-11 w-32" /><div class="skeleton h-11 w-32" /></div>
+        </div>
+        <div class="flex flex-col gap-4 rounded-xl border border-line bg-surface p-5">
+          <div class="skeleton h-3 w-16 rounded-sm" />
+          <div v-for="n in 3" :key="n" class="skeleton h-4 rounded-sm" :class="n === 3 ? 'w-1/2' : 'w-full'" />
+        </div>
+        <div class="flex flex-col gap-4 rounded-xl border border-line bg-surface p-5 lg:col-span-2">
+          <div class="skeleton h-3 w-32 rounded-sm" />
+          <div class="skeleton h-10 w-full" />
+        </div>
+        <div class="flex flex-col gap-4 rounded-xl border border-line bg-surface p-5">
+          <div class="skeleton h-3 w-24 rounded-sm" />
+          <div v-for="n in 3" :key="n" class="skeleton h-4 w-full rounded-sm" />
+        </div>
+      </template>
+
       <!-- Staff-only accounts -->
       <template v-if="staffOnly">
         <section class="lg:col-span-3" aria-labelledby="dash-admin">
@@ -94,10 +121,7 @@ const adminTiles = computed(() => {
       <template v-else>
         <!-- Next match hero -->
         <div class="lg:col-span-2">
-          <UiCard v-if="d.scheduleLoading.value" accent="red" striped>
-            <UiSkeleton class="h-32" />
-          </UiCard>
-          <UiCard v-else-if="d.nextMatch.value && opponent && auth.team" accent="red" striped as="section" aria-labelledby="dash-next">
+          <UiCard v-if="d.nextMatch.value && opponent && auth.team" accent="red" striped as="section" aria-labelledby="dash-next">
             <div class="flex flex-wrap items-center justify-between gap-2">
               <h2 id="dash-next" class="eyebrow-line text-faint">Next match · {{ weekLabel(d.nextMatch.value.week) }}</h2>
               <MatchStatus :match="d.nextMatch.value" />
@@ -257,6 +281,6 @@ const adminTiles = computed(() => {
         </ul>
         <p v-else class="mt-3 text-muted">No results yet.</p>
       </UiCard>
-    </div>
+    </UiLoadGate>
   </div>
 </template>

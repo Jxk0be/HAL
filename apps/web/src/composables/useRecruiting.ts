@@ -65,15 +65,18 @@ export function useRecruitBoard() {
 export function useMyRecruitInterest(userId: () => string | null | undefined) {
   const postIds = ref(new Set<string>())
   const busy = ref<string | null>(null)
+  const loading = ref(true)
 
   async function load() {
     const uid = userId()
     if (!uid) {
       postIds.value = new Set()
+      loading.value = false
       return
     }
     const { data } = await supabase.from('team_recruit_interest').select('post_id').eq('user_id', uid)
     postIds.value = new Set((data ?? []).map((r) => r.post_id))
+    loading.value = false
   }
 
   async function interested(postId: string): Promise<Result> {
@@ -86,7 +89,7 @@ export function useMyRecruitInterest(userId: () => string | null | undefined) {
   }
 
   watch(userId, load, { immediate: true })
-  return { postIds, busy, interested }
+  return { postIds, busy, loading, interested }
 }
 
 export interface MyRecruitPost {

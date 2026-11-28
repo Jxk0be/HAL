@@ -21,3 +21,6 @@ export interface Toast {
   kind: ToastKind
   message: string
 }
+
+/** Generic placeholders for UiPageSkeleton / UiLoadGate. */
+export type PageSkeletonVariant = 'list' | 'cards' | 'table' | 'detail' | 'form' | 'panel' | 'tiles'

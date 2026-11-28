@@ -6,7 +6,8 @@ import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiCard from '@/components/ui/UiCard.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import { useReady } from '@/composables/useReady'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
 import UiCountdown from '@/components/ui/UiCountdown.vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
@@ -28,7 +29,8 @@ const auth = useAuthStore()
 const id = computed(() => (typeof route.params.id === 'string' ? route.params.id : null))
 const { match, maps, screenshots, checkins, dispute, loading, reload } = useMatchDetail(id)
 // Only returned to the two teams and staff.
-const { status: reportStatus } = useReportStatus(id)
+const { status: reportStatus, loading: statusLoading } = useReportStatus(id)
+const ready = useReady(() => loading.value || statusLoading.value)
 
 const mySide = computed(() => {
   const m = match.value
@@ -80,7 +82,21 @@ watch(match, (m) => {
 
 <template>
   <div>
-    <div v-if="loading" class="mx-auto max-w-7xl px-4 py-14 sm:px-6"><UiSkeleton :lines="8" /></div>
+    <div v-if="!ready" role="status" aria-busy="true">
+      <span class="sr-only">Loading match…</span>
+      <div class="border-b border-line bg-surface">
+        <div class="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 py-10 sm:px-6 sm:py-14">
+          <div class="flex w-full justify-between"><div class="skeleton h-4 w-32 rounded-sm" /><div class="skeleton h-6 w-20 rounded-full" /></div>
+          <div class="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4">
+            <div class="flex flex-col items-center gap-3"><div class="skeleton size-20 rounded-xl sm:size-24" /><div class="skeleton h-5 w-28 rounded-sm" /></div>
+            <div class="skeleton h-14 w-24" />
+            <div class="flex flex-col items-center gap-3"><div class="skeleton size-20 rounded-xl sm:size-24" /><div class="skeleton h-5 w-28 rounded-sm" /></div>
+          </div>
+          <div class="flex gap-2"><div v-for="n in 5" :key="n" class="skeleton h-10 w-24" /></div>
+        </div>
+      </div>
+      <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6"><UiPageSkeleton variant="panel" /></div>
+    </div>
     <div v-else-if="!match" class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
       <UiEmptyState title="Match not found" description="This match doesn't exist or was removed.">
         <UiButton to="/matches" variant="secondary">All matches</UiButton>

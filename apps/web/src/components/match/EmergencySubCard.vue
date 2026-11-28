@@ -22,7 +22,7 @@ const props = defineProps<{
 
 const toast = useToast()
 const subs = useMatchEmergencySubs(() => props.match, () => props.captainOf)
-const { requests, roster, busy } = subs
+const { requests, roster, busy, loaded } = subs
 const open = computed(() => Boolean(props.captainOf) && ['scheduled', 'checkin_open', 'live'].includes(props.match.status))
 
 const STATE: Record<EsubState, { label: string; variant: 'neutral' | 'accent' | 'win' | 'loss' }> = {
@@ -84,7 +84,7 @@ async function backIn(userId: string, name: string) {
 </script>
 
 <template>
-  <UiCard v-if="open" eyebrow="Short a player?" title="Emergency sub">
+  <UiCard v-if="loaded && open" eyebrow="Short a player?" title="Emergency sub">
     <p class="text-sm text-muted">
       If fewer than 4 of your players can play, tick who's out and ask a free agent for this match only. They have to accept, then an
       admin approves. Up to {{ MAX_EMERGENCY_SUBS }} per match; they stay free agents and don't use a roster change (rule 4.3).

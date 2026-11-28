@@ -67,11 +67,13 @@ export function useMyInvites() {
 /** Pending invites a team has sent (visible to its captains). */
 export function useTeamInvites(teamId: MaybeRefOrGetter<string | null | undefined>) {
   const invites = ref<SentInvite[]>([])
+  const loading = ref(true)
 
   async function load() {
     const id = toValue(teamId)
     if (!id) {
       invites.value = []
+      loading.value = false
       return
     }
     const { data } = await supabase
@@ -92,8 +94,9 @@ export function useTeamInvites(teamId: MaybeRefOrGetter<string | null | undefine
         activisionId: i.player.activision_id,
       },
     }))
+    loading.value = false
   }
 
   watch(() => toValue(teamId), load, { immediate: true })
-  return { invites, reload: load }
+  return { invites, loading, reload: load }
 }

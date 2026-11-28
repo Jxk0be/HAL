@@ -64,8 +64,13 @@ export function useMatchReschedules(matchId: MaybeRefOrGetter<string | null | un
     const { data } = await supabase.from('reschedule_requests').select(REQUEST_COLUMNS).eq('match_id', id).order('created_at', { ascending: false })
     requests.value = (data ?? []).map(toRequest)
   }
-  watch(() => toValue(matchId), load, { immediate: true })
-  return { requests, reload: load }
+  /** True once the first load has finished (cards stay hidden until then instead of flashing). */
+  const loaded = ref(false)
+  watch(() => toValue(matchId), async () => {
+    await load()
+    loaded.value = true
+  }, { immediate: true })
+  return { requests, loaded, reload: load }
 }
 
 export interface TeamRequest extends RescheduleRequest {
@@ -208,8 +213,13 @@ export function useMatchDispute(matchId: MaybeRefOrGetter<string | null | undefi
     return { ok: true, value: undefined }
   }
 
-  watch([() => toValue(matchId), () => auth.isSignedIn], load, { immediate: true })
-  return { dispute, busy, open, comment, reload: load }
+  /** True once the first load has finished (cards stay hidden until then instead of flashing). */
+  const loaded = ref(false)
+  watch([() => toValue(matchId), () => auth.isSignedIn], async () => {
+    await load()
+    loaded.value = true
+  }, { immediate: true })
+  return { dispute, busy, loaded, open, comment, reload: load }
 }
 
 // ---- Check-in -------------------------------------------------------------------------
@@ -241,6 +251,11 @@ export function useCheckin(matchId: MaybeRefOrGetter<string | null | undefined>,
     busy.value = false
     return r
   }
-  watch([() => toValue(matchId), () => toValue(teamId)], load, { immediate: true })
-  return { players, busy, checkIn, reload: load }
+  /** True once the first load has finished (cards stay hidden until then instead of flashing). */
+  const loaded = ref(false)
+  watch([() => toValue(matchId), () => toValue(teamId)], async () => {
+    await load()
+    loaded.value = true
+  }, { immediate: true })
+  return { players, busy, loaded, checkIn, reload: load }
 }

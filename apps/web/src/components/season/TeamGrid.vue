@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import TeamCard from '@/components/team/TeamCard.vue'
 import { useTeamHub } from '@/composables/useTeamHub'
 import type { TeamSummary } from '@/composables/useTeams'
@@ -9,11 +10,14 @@ import { site } from '@/config/site'
 
 const props = defineProps<{ teams: TeamSummary[]; loading: boolean; error?: string | null; seasonId?: string | null }>()
 const hub = useTeamHub(() => props.seasonId)
+// Cards need their records and recruiting posts too, so wait for all of it.
+const ready = useReady(() => props.loading || hub.loading.value)
 </script>
 
 <template>
-  <div v-if="loading" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-    <div v-for="n in 6" :key="n" class="rounded-xl border border-line bg-surface p-5"><UiSkeleton :lines="5" /></div>
+  <div v-if="!ready" role="status" aria-busy="true">
+    <span class="sr-only">Loading teams…</span>
+    <UiPageSkeleton variant="cards" />
   </div>
   <p v-else-if="error" role="alert" class="text-loss">{{ error }}</p>
   <UiEmptyState v-else-if="teams.length === 0" title="No teams yet" description="Teams appear here as captains register them during signups.">

@@ -6,7 +6,8 @@ import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiCard from '@/components/ui/UiCard.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import PlatformBadge from '@/components/ui/PlatformBadge.vue'
 import RankBadge from '@/components/players/RankBadge.vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
@@ -23,11 +24,12 @@ const id = computed(() => (typeof route.params.id === 'string' ? route.params.id
 const { player, rank, extras, freeAgentPost, loading } = usePlayer(id)
 // The role they set under Customize, else the one on their free agent post.
 const mainRole = computed(() => extras.value?.mainRole ?? freeAgentPost.value?.role ?? null)
-const { rows: seasons, history } = usePlayerStats(id)
+const { rows: seasons, history, loading: statsLoading } = usePlayerStats(id)
 const current = computed(() => seasons.value[0] ?? null)
 // Career totals, modes and maps across every season; the trend is this season's weeks.
-const { breakdown: career } = usePlayerBreakdown(id)
-const { breakdown: thisSeason } = usePlayerBreakdown(id, () => current.value?.season_id ?? null)
+const { breakdown: career, loading: careerLoading } = usePlayerBreakdown(id)
+const { breakdown: thisSeason, loading: seasonLoading } = usePlayerBreakdown(id, () => current.value?.season_id ?? null)
+const ready = useReady(() => loading.value || statsLoading.value || careerLoading.value || seasonLoading.value)
 
 const accent = computed(() => profileColorVar(extras.value?.color))
 const headerStyle = computed(() => ({
@@ -72,7 +74,20 @@ const statSlots = computed(() => {
 
 <template>
   <div>
-    <div v-if="loading" class="mx-auto max-w-7xl px-4 py-14 sm:px-6"><UiSkeleton :lines="6" /></div>
+    <div v-if="!ready" role="status" aria-busy="true">
+      <span class="sr-only">Loading player…</span>
+      <div class="border-b border-line">
+        <div class="mx-auto flex max-w-7xl items-center gap-5 px-4 py-10 sm:px-6 sm:py-14">
+          <div class="skeleton size-20 shrink-0 rounded-full sm:size-24" />
+          <div class="flex flex-1 flex-col gap-3">
+            <div class="skeleton h-3 w-24 rounded-sm" />
+            <div class="skeleton h-9 w-3/5 max-w-sm" />
+            <div class="flex gap-2"><div class="skeleton h-6 w-16 rounded-full" /><div class="skeleton h-6 w-20 rounded-full" /></div>
+          </div>
+        </div>
+      </div>
+      <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6"><UiPageSkeleton variant="tiles" /></div>
+    </div>
     <div v-else-if="!player" class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
       <UiEmptyState title="Player not found" description="This player doesn't exist or hasn't set up their profile.">
         <UiButton to="/players" variant="secondary">All players</UiButton>

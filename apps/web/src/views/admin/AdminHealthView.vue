@@ -4,10 +4,13 @@ import PageHeader from '@/components/layout/PageHeader.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiCard from '@/components/ui/UiCard.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import { useAdminHealth } from '@/composables/useAdmin'
 
 const { health, loading, reload } = useAdminHealth()
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 const when = (iso: string | null) => (iso ? new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '—')
 
 const tiles = computed(() => {
@@ -29,7 +32,7 @@ const tiles = computed(() => {
       <template #actions><UiButton size="sm" variant="secondary" @click="reload">Refresh</UiButton></template>
     </PageHeader>
     <div class="flex flex-col gap-6 px-4 py-8 sm:px-6">
-      <UiSkeleton v-if="loading" :lines="6" />
+      <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="tiles" :count="4" /></div>
       <template v-else-if="health">
         <ul class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <li v-for="t in tiles" :key="t.label" class="rounded-lg border bg-surface p-5" :class="t.bad ? 'border-loss/50' : 'border-line'">

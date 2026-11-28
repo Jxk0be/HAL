@@ -6,7 +6,8 @@ import UiButton from '@/components/ui/UiButton.vue'
 import UiCard from '@/components/ui/UiCard.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiModal from '@/components/ui/UiModal.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import { usePreseasonAdmin, type PreseasonPairing } from '@/composables/usePreseason'
@@ -21,6 +22,8 @@ import { preseasonMatchCount, PRESEASON_GAP_HOURS } from '@/lib/preseason'
 const toast = useToast()
 const ps = usePreseasonAdmin()
 const { season, teams, pairings, loading, busy, error } = ps
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 
 const yes = computed(() => teams.value.filter((t) => t.interested === true))
 const no = computed(() => teams.value.filter((t) => t.interested === false))
@@ -72,7 +75,7 @@ const answerOf = (t: (typeof teams.value)[number]) => (!t.invited ? ANSWER.none 
       description="Optional preseason matches for casting: invite teams, pair the ones that say yes, and let them pick their times."
     />
     <div class="@container flex flex-col gap-6 px-4 py-8 sm:px-6">
-      <UiSkeleton v-if="loading" :lines="8" />
+      <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="panel" /></div>
       <p v-else-if="error" role="alert" class="text-loss">{{ error }}</p>
       <UiEmptyState v-else-if="!season" title="No active season" description="Create a season and open signups first (Season & schedule)." />
 

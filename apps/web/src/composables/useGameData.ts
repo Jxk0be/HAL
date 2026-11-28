@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { dbErrorMessage } from '@/lib/errors'
+import { compressImage } from '@/lib/image'
 
 export interface GameMode {
   id: string
@@ -12,6 +13,8 @@ export interface GameMap {
   id: string
   name: string
   active: boolean
+  /** Admin-uploaded artwork (else the bundled art from lib/mapArt.ts). */
+  imageUrl: string | null
 }
 
 type Result = { ok: true } | { ok: false; message: string }
@@ -30,11 +33,11 @@ export function useGameData() {
     loading.value = true
     const [m, mp, mm] = await Promise.all([
       supabase.from('game_modes').select('id, name, sort_order, active').order('sort_order').order('name'),
-      supabase.from('maps').select('id, name, active').order('name'),
+      supabase.from('maps').select('id, name, active, image_url').order('name'),
       supabase.from('map_modes').select('map_id, mode_id'),
     ])
     modes.value = (m.data ?? []).map((x) => ({ id: x.id, name: x.name, sortOrder: x.sort_order, active: x.active }))
-    maps.value = mp.data ?? []
+    maps.value = (mp.data ?? []).map((x) => ({ id: x.id, name: x.name, active: x.active, imageUrl: x.image_url }))
     legal.value = new Set((mm.data ?? []).map((x) => `${x.map_id}:${x.mode_id}`))
     loading.value = false
   }
@@ -77,11 +80,32 @@ export function useGameData() {
     }
   }
 
+  /** Admins: compress (WebP, 1920px max) and upload a map's artwork to map-media, then save its URL. */
+  async function uploadMapArt(mapId: string, file: File): Promise<Result> {
+    let blob: Blob
+    let ext: string
+    try {
+      ;({ blob, ext } = await compressImage(file, 1920))
+    } catch {
+      return { ok: false, message: 'Could not read that image. Use a PNG, JPG or WebP.' }
+    }
+    busy.value = true
+    const path = `${mapId}/art-${Date.now()}.${ext}`
+    const { error } = await supabase.storage.from('map-media').upload(path, blob, { contentType: blob.type || `image/${ext}`, upsert: false })
+    busy.value = false
+    if (error) return { ok: false, message: 'Could not upload the image. It must be under 3 MB.' }
+    const { data } = supabase.storage.from('map-media').getPublicUrl(path)
+    return run(() => supabase.from('maps').update({ image_url: data.publicUrl }).eq('id', mapId))
+  }
+
   /** Maps in a mode's pool, alphabetical. */
   const mapsInMode = (modeId: string) => maps.value.filter((m) => legal.value.has(`${m.id}:${modeId}`))
 
   return {
     addMapToMode,
+    uploadMapArt,
+    /** Back to the bundled art (or none). */
+    clearMapArt: (mapId: string) => run(() => supabase.from('maps').update({ image_url: null }).eq('id', mapId)),
     mapsInMode,
     modes,
     maps,

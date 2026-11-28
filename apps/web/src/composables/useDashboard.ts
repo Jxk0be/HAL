@@ -36,15 +36,29 @@ export function useDashboard() {
   const teamId = computed(() => auth.team?.id ?? null)
   const isCaptain = computed(() => Boolean(auth.team?.isCaptain || auth.team?.isCoCaptain))
 
-  const { season } = useActiveSeason()
+  const { season, loading: seasonLoading } = useActiveSeason()
   const { matches, loading: scheduleLoading } = useSeasonSchedule()
-  const { invites, busyId: inviteBusy, respond: respondInvite } = useMyInvites()
-  const { requests: esubRequests } = useMyEmergencySubRequests()
-  const { requests: reschedules } = useTeamRequests(teamId)
-  const { team } = useTeam(teamId)
-  const { rows: standings } = useStandings(() => season.value?.id, null)
-  const { rows: myStats } = usePlayerStats(() => auth.user?.id)
-  const { post: faPost } = useMyFreeAgentPost()
+  const { invites, loading: invitesLoading, busyId: inviteBusy, respond: respondInvite } = useMyInvites()
+  const { requests: esubRequests, loading: esubLoading } = useMyEmergencySubRequests()
+  const { requests: reschedules, loading: reschedulesLoading } = useTeamRequests(teamId)
+  const { team, loading: teamLoading } = useTeam(teamId)
+  const { rows: standings, loading: standingsLoading } = useStandings(() => season.value?.id, null)
+  const { rows: myStats, loading: statsLoading } = usePlayerStats(() => auth.user?.id)
+  const { post: faPost, loading: faPostLoading } = useMyFreeAgentPost()
+
+  /** True until every hook above has finished its first load. */
+  const loading = computed(
+    () =>
+      seasonLoading.value ||
+      scheduleLoading.value ||
+      invitesLoading.value ||
+      esubLoading.value ||
+      reschedulesLoading.value ||
+      teamLoading.value ||
+      standingsLoading.value ||
+      statsLoading.value ||
+      faPostLoading.value,
+  )
 
   const myMatches = computed(() =>
     teamId.value ? matches.value.filter((m) => m.home.id === teamId.value || m.away.id === teamId.value) : [],
@@ -101,6 +115,7 @@ export function useDashboard() {
     auth,
     season,
     scheduleLoading,
+    loading,
     isCaptain,
     team,
     nextMatch,

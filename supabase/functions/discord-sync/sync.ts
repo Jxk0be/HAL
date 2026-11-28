@@ -121,6 +121,17 @@ async function managedRoleIds(db: SupabaseClient, fixed: FixedRoles): Promise<Se
 }
 
 // ---- Users -------------------------------------------------------------------
+/**
+ * Remember whether the user is in the league server (discord_presence), so the site can warn
+ * their team. Never fails the sync: a missing row just reads as "not checked yet".
+ */
+async function recordPresence(db: SupabaseClient, userId: string, inServer: boolean) {
+  const { error } = await db
+    .from('discord_presence')
+    .upsert({ user_id: userId, in_server: inServer, checked_at: new Date().toISOString() })
+  if (error) console.error('presence save failed', error)
+}
+
 export async function syncUser(
   env: SyncEnv,
   userId: string,
@@ -168,11 +179,13 @@ export async function syncUser(
   try {
     const member = await getGuildMember(guildId, profile.discord_id)
     current = member.roles
+    await recordPresence(db, userId, true)
     // The member record carries their current Discord picture and name: keep the site in step.
     await saveDiscordProfile(db, userId, member.user).catch((err) => console.error('profile refresh failed', err))
   } catch (err) {
     if (discordErrorCode(err) === UNKNOWN_MEMBER) {
       stats.notInServer++
+      await recordPresence(db, userId, false)
       // Not in the server: still refresh their picture and name from their Discord account.
       await getUser(profile.discord_id)
         .then((u) => saveDiscordProfile(db, userId, u))

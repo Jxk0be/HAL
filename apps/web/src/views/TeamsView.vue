@@ -6,15 +6,20 @@ import UiInput from '@/components/ui/UiInput.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import TeamGrid from '@/components/season/TeamGrid.vue'
+import UiLoadGate from '@/components/ui/UiLoadGate.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import { useTeamList } from '@/composables/useTeams'
 import { useActiveSeason } from '@/composables/useActiveSeason'
 import { useRecruitBoard } from '@/composables/useRecruiting'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
-const { season } = useActiveSeason()
+const { season, loading: seasonLoading } = useActiveSeason()
 const { teams, loading, error } = useTeamList()
-const { posts } = useRecruitBoard()
+const { posts, loading: postsLoading } = useRecruitBoard()
+// Filter counts and the description need the season, teams and posts.
+const ready = useReady(() => seasonLoading.value || loading.value || postsLoading.value)
 
 const search = ref('')
 const filter = ref<string>('all')
@@ -44,7 +49,7 @@ const shown = computed(() => {
 
 <template>
   <div>
-    <PageHeader eyebrow="Teams" title="Find your squad" :description="`Every team registered for ${season?.name ?? 'this season'}.`">
+    <PageHeader eyebrow="Teams" title="Find your squad" :description="`Every team registered for ${season?.name ?? 'this season'}.`" :pending="!ready">
       <template #actions>
         <div class="w-full sm:w-72">
           <UiInput v-model="search" label="Search teams" type="search" placeholder="Name or tag" autocomplete="off" />
@@ -64,9 +69,15 @@ const shown = computed(() => {
         <UiButton to="/my-team" variant="secondary" size="sm">Manage</UiButton>
       </div>
 
-      <UiTabs v-model="filter" :tabs="tabs" label="Filter teams" variant="pill">
-        <TeamGrid :teams="shown" :loading="loading" :error="error" :season-id="season?.id" />
-      </UiTabs>
+      <UiLoadGate :ready="ready" variant="cards" label="Loading teams…">
+        <template #skeleton>
+          <div class="mb-6 flex gap-2"><div v-for="n in 3" :key="n" class="skeleton h-9 w-24 rounded-full" /></div>
+          <UiPageSkeleton variant="cards" />
+        </template>
+        <UiTabs v-model="filter" :tabs="tabs" label="Filter teams" variant="pill">
+          <TeamGrid :teams="shown" :loading="loading" :error="error" :season-id="season?.id" />
+        </UiTabs>
+      </UiLoadGate>
     </div>
   </div>
 </template>

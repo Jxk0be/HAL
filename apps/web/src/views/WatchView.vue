@@ -5,7 +5,8 @@ import PageHeader from '@/components/layout/PageHeader.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiLoadGate from '@/components/ui/UiLoadGate.vue'
+import { useReady } from '@/composables/useReady'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import StreamPlayer from '@/components/broadcast/StreamPlayer.vue'
 import { useLiveBroadcasts, useWatchSchedule } from '@/composables/useBroadcasts'
@@ -15,6 +16,7 @@ const route = useRoute()
 const router = useRouter()
 const { live, loaded } = useLiveBroadcasts()
 const schedule = useWatchSchedule()
+const ready = useReady(() => !loaded.value || schedule.loading.value)
 
 // ?match=<id> picks a stream (links from the live banner and match cards); else the first live one.
 const current = computed(() => {
@@ -30,11 +32,19 @@ function pick(matchId: string) {
   <div>
     <PageHeader eyebrow="Broadcasts" title="Watch" description="League matches, live from our casters. Replays stay here after the match." />
 
-    <div class="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6">
-      <UiSkeleton v-if="!loaded" :lines="8" />
+    <UiLoadGate :ready="ready" class="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6" label="Loading broadcasts…">
+      <template #skeleton>
+        <div class="flex flex-col gap-8">
+          <div class="skeleton aspect-video w-full rounded-xl" />
+          <div class="skeleton h-6 w-40" />
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div v-for="n in 3" :key="n" class="skeleton h-28 rounded-xl" />
+          </div>
+        </div>
+      </template>
 
       <!-- Live -->
-      <section v-else-if="current" aria-labelledby="live-title" class="flex flex-col gap-4">
+      <section v-if="current" aria-labelledby="live-title" class="flex flex-col gap-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="min-w-0">
             <p class="flex items-center gap-2 eyebrow text-live">
@@ -83,8 +93,7 @@ function pick(matchId: string) {
       <!-- Replays -->
       <section aria-labelledby="replays-title">
         <h2 id="replays-title" class="eyebrow mb-3 text-accent">Replays</h2>
-        <UiSkeleton v-if="schedule.loading.value" :lines="3" />
-        <p v-else-if="!schedule.replays.value.length" class="text-sm text-muted">No replays yet. Casters add them after the match.</p>
+        <p v-if="!schedule.replays.value.length" class="text-sm text-muted">No replays yet. Casters add them after the match.</p>
         <ul v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <li v-for="m in schedule.replays.value" :key="m.id" class="flex flex-col gap-2">
             <StreamPlayer :url="m.vodUrl!" :title="`${m.home.tag} vs ${m.away.tag} replay`" click-to-load />
@@ -96,6 +105,6 @@ function pick(matchId: string) {
           </li>
         </ul>
       </section>
-    </div>
+    </UiLoadGate>
   </div>
 </template>

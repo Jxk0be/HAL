@@ -9,7 +9,7 @@ import TeamLogo from '@/components/ui/TeamLogo.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiCard from '@/components/ui/UiCard.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
 import { useGameData } from '@/composables/useGameData'
 import { useReport } from '@/composables/useReport'
 import { useToast } from '@/composables/useToast'
@@ -118,7 +118,14 @@ function discard() {
 
 <template>
   <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-    <UiSkeleton v-if="loading" :lines="8" />
+    <div v-if="loading" role="status" aria-busy="true" class="flex flex-col gap-6">
+      <span class="sr-only">Loading the report form…</span>
+      <div class="flex flex-col gap-4 border-b border-line pb-6">
+        <div class="skeleton h-3 w-40 rounded-sm" />
+        <div class="flex items-center gap-4"><div class="skeleton size-12 rounded-lg" /><div class="skeleton h-8 w-24" /><div class="skeleton size-12 rounded-lg" /></div>
+      </div>
+      <UiPageSkeleton variant="table" :count="8" />
+    </div>
 
     <UiEmptyState v-else-if="!match" title="Match not found" description="This match doesn’t exist or was removed.">
       <UiButton to="/matches" variant="secondary">All matches</UiButton>

@@ -6,7 +6,8 @@ import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiInput from '@/components/ui/UiInput.vue'
 import UiModal from '@/components/ui/UiModal.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import { useContentTeams, useRecusal, type ContentTeam } from '@/composables/useAdmin'
 import { useToast } from '@/composables/useToast'
 
@@ -14,6 +15,8 @@ const props = defineProps<{ seasonId: string }>()
 const toast = useToast()
 const c = useContentTeams(() => props.seasonId)
 const { teams, divisions, loading, busy } = c
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 const { isRecused } = useRecusal()
 
 const search = ref('')
@@ -73,7 +76,7 @@ async function confirmDelete() {
   <div class="flex flex-col gap-4">
     <div class="max-w-sm"><UiInput v-model="search" label="Search teams" placeholder="Name or tag" /></div>
     <PublicLogNotice />
-    <UiSkeleton v-if="loading" :lines="6" />
+    <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="table" :count="6" /></div>
     <ul v-else class="flex flex-col divide-y divide-line rounded-lg border border-line bg-surface">
       <li v-if="!filtered.length" class="px-4 py-3 text-sm text-muted">No teams.</li>
       <li v-for="t in filtered" :key="t.id" class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 text-sm" :class="isRecused(t.id) ? 'opacity-70' : ''">

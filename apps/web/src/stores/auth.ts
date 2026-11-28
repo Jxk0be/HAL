@@ -39,6 +39,8 @@ export const useAuthStore = defineStore('auth', () => {
   /** True when the profile request itself failed (not "no profile yet"), so pages can show an error instead of loading forever. */
   const profileError = ref(false)
   const ready = ref(false)
+  /** In the league Discord server? null = not checked yet (the role sync records it). */
+  const inDiscord = ref<boolean | null>(null)
   let initPromise: Promise<void> | null = null
 
   const user = computed(() => session.value?.user ?? null)
@@ -116,6 +118,31 @@ export const useAuthStore = defineStore('auth', () => {
       : null
   }
 
+  async function loadDiscordPresence() {
+    const { data } = await supabase.rpc('my_discord_presence')
+    inDiscord.value = data?.[0]?.in_server ?? null
+  }
+
+  /**
+   * Ask the bot to look the player up in the Discord server again, then re-read the result.
+   * Throttled in the database (1 minute while they're not in the server, else 10 minutes).
+   * Returns the new status.
+   */
+  async function recheckDiscord(): Promise<boolean | null> {
+    const { data: queued } = await supabase.rpc('request_my_discord_sync')
+    if (queued) {
+      // The sync runs in an Edge Function; give it a moment, then read the result a few times.
+      for (const wait of [2500, 3500, 5000]) {
+        await new Promise((r) => setTimeout(r, wait))
+        await loadDiscordPresence()
+        if (inDiscord.value) break
+      }
+    } else {
+      await loadDiscordPresence()
+    }
+    return inDiscord.value
+  }
+
   /** Reload everything about the signed-in user (after saving the profile, joining a team, ...). */
   async function refresh() {
     const uid = session.value?.user.id
@@ -123,15 +150,13 @@ export const useAuthStore = defineStore('auth', () => {
       roles.value = []
       profile.value = null
       team.value = null
+      inDiscord.value = null
       return
     }
-    await Promise.all([loadRoles(uid), loadProfile(uid), loadTeam(uid)])
-    // Catch up Discord roles for players who joined the server after logging in (throttled to
-    // once per 10 minutes in the database; fire and forget).
-    void supabase.rpc('request_my_discord_sync').then(
-      () => undefined,
-      () => undefined,
-    )
+    await Promise.all([loadRoles(uid), loadProfile(uid), loadTeam(uid), loadDiscordPresence()])
+    // Catch up Discord roles (and the in-server check) for players who joined the server after
+    // logging in. Throttled in the database; runs in the background.
+    void recheckDiscord().catch(() => undefined)
   }
 
   /** Load the current session once; safe to call from guards and components. */
@@ -173,6 +198,7 @@ export const useAuthStore = defineStore('auth', () => {
     roles.value = []
     profile.value = null
     team.value = null
+    inDiscord.value = null
   }
 
   return {
@@ -183,6 +209,8 @@ export const useAuthStore = defineStore('auth', () => {
     profileError,
     team,
     ready,
+    inDiscord,
+    recheckDiscord,
     isSignedIn,
     displayName,
     avatarUrl,

@@ -8,7 +8,8 @@ import UiButton from '@/components/ui/UiButton.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiInput from '@/components/ui/UiInput.vue'
 import UiModal from '@/components/ui/UiModal.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import { broadcastActions, useCastingDesk, type CastingMatch } from '@/composables/useBroadcasts'
 import { useRecusal } from '@/composables/useAdmin'
@@ -24,6 +25,8 @@ import { toZoned } from '@/lib/time'
 const auth = useAuthStore()
 const toast = useToast()
 const { matches, loading, reload } = useCastingDesk(7)
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 const { isRecused } = useRecusal()
 const me = computed(() => auth.profile?.id ?? null)
 
@@ -74,7 +77,7 @@ async function goLive() {
   <div>
     <PageHeader compact eyebrow="Casters" title="Casting desk" description="Claim a match so other casters know it's covered, go live with your stream link, and end the broadcast when you're done. The link stays on the match page as the VOD." />
     <div class="flex flex-col gap-8 px-4 py-8 sm:px-6">
-      <UiSkeleton v-if="loading" :lines="6" />
+      <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="list" :count="5" /></div>
       <UiEmptyState v-else-if="!groups.length" title="Nothing to cast this week" description="Matches for today and the next 7 days appear here." />
       <section v-for="g in groups" :key="g.title" :aria-labelledby="`cast-${g.title}`">
         <h2 :id="`cast-${g.title}`" class="eyebrow mb-3 text-accent">{{ g.title }}</h2>

@@ -9,7 +9,8 @@ import ScreenshotViewer from '@/components/admin/ScreenshotViewer.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import { useMismatchDetail, useRecusal, type MismatchRow } from '@/composables/useAdmin'
 import { useToast } from '@/composables/useToast'
@@ -20,6 +21,8 @@ const toast = useToast()
 const matchId = computed(() => (typeof route.params.matchId === 'string' ? route.params.matchId : null))
 const d = useMismatchDetail(matchId)
 const { match, rows, reports, names, modes, maps, loading, busy } = d
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 const { isRecused } = useRecusal()
 const recused = computed(() => Boolean(match.value && isRecused(match.value.home.id, match.value.away.id)))
 
@@ -115,7 +118,7 @@ function shots(n: number) {
 
 <template>
   <div>
-    <UiSkeleton v-if="loading" class="px-6 py-10" :lines="8" />
+    <div v-if="!ready" role="status" aria-busy="true" class="px-6 py-10"><span class="sr-only">Loading…</span><UiPageSkeleton variant="table" :count="8" /></div>
     <div v-else-if="!match" class="px-4 py-10 sm:px-6">
       <UiEmptyState title="Match not found" description="It may have been removed.">
         <UiButton to="/admin/mismatches" variant="secondary">Back to the queue</UiButton>

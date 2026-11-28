@@ -27,7 +27,7 @@ const emit = defineEmits<{ changed: [] }>()
 
 const toast = useToast()
 const d = useMatchDispute(() => props.match.id)
-const { dispute, busy } = d
+const { dispute, busy, loaded } = d
 const tag = (teamId: string) => (teamId === props.match.home.id ? props.match.home.tag : props.match.away.tag)
 const categoryLabel = (c: DisputeCategory) => DISPUTE_CATEGORIES.find((x) => x.value === c)?.label ?? c
 
@@ -88,7 +88,7 @@ const images = computed(() =>
 </script>
 
 <template>
-  <div>
+  <div v-if="loaded">
     <UiCard v-if="dispute" eyebrow="Dispute" :title="dispute.status === 'open' ? 'Under review' : 'Resolved'">
       <div class="flex flex-col gap-4 text-sm">
         <p class="flex flex-wrap items-center gap-2 text-xs text-muted">

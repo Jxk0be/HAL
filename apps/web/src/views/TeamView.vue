@@ -6,10 +6,12 @@ import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiCard from '@/components/ui/UiCard.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import ScoreChip from '@/components/ui/ScoreChip.vue'
 import RosterList from '@/components/team/RosterList.vue'
+import TeamDiscordAlert from '@/components/team/TeamDiscordAlert.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import { useTeam } from '@/composables/useTeams'
 import { useSeasonSchedule } from '@/composables/useMatches'
@@ -25,9 +27,9 @@ const auth = useAuthStore()
 const id = computed(() => (typeof route.params.id === 'string' ? route.params.id : null))
 const { team, loading } = useTeam(id)
 const isMine = computed(() => team.value && auth.team?.id === team.value.id)
-const { matches } = useSeasonSchedule()
-const { record } = useTeamRecord(id)
-const { records: modeRecords } = useTeamModeRecords(id)
+const { matches, loading: matchesLoading } = useSeasonSchedule()
+const { record, loading: recordLoading } = useTeamRecord(id)
+const { records: modeRecords, loading: modesLoading } = useTeamModeRecords(id)
 
 const teamMatches = computed(() => matches.value.filter((m) => m.home.id === id.value || m.away.id === id.value))
 const done = (s: string) => s === 'confirmed' || s === 'forfeit'
@@ -44,13 +46,22 @@ const theirs = (m: (typeof teamMatches.value)[number]) => {
   return (side(m) === 'home' ? m.awaySeries : m.homeSeries) ?? 0
 }
 
-const { rows: standings } = useStandings(() => team.value?.seasonId, null)
+const { rows: standings, loading: standingsLoading } = useStandings(() => team.value?.seasonId, null)
 const standing = computed(() => standings.value.find((r) => r.team_id === id.value) ?? null)
 const mapDiff = computed(() => {
   const d = record.value.mapsWon - record.value.mapsLost
   return d > 0 ? `+${d}` : String(d)
 })
-const { posts } = useRecruitBoard()
+const { posts, loading: postsLoading } = useRecruitBoard()
+const ready = useReady(
+  () =>
+    loading.value ||
+    matchesLoading.value ||
+    recordLoading.value ||
+    modesLoading.value ||
+    standingsLoading.value ||
+    postsLoading.value,
+)
 const recruitPost = computed(() => posts.value.find((p) => p.teamId === id.value) ?? null)
 
 type Tab = 'roster' | 'matches' | 'stats' | 'recruiting'
@@ -69,7 +80,10 @@ watch(team, (t) => {
 
 <template>
   <div>
-    <div v-if="loading" class="mx-auto max-w-7xl px-4 py-14 sm:px-6"><UiSkeleton :lines="6" /></div>
+    <div v-if="!ready" role="status" aria-busy="true">
+      <span class="sr-only">Loading team…</span>
+      <UiPageSkeleton variant="detail" />
+    </div>
 
     <div v-else-if="!team" class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
       <UiEmptyState title="Team not found" description="This team doesn't exist or was removed.">
@@ -103,6 +117,8 @@ watch(team, (t) => {
       </section>
 
       <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        <!-- Only the team's own players and admins get this data from the database. -->
+        <TeamDiscordAlert v-if="isMine || auth.isAdmin" class="mb-6" :team-id="team.id" :roster="team.roster" />
         <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
           <UiStatTile label="Series" :value="`${record.wins}–${record.losses}`" hint="Regular season W–L" />
           <UiStatTile label="Map diff" :value="mapDiff" :hint="`${record.mapsWon}–${record.mapsLost} maps`" accent="neutral" />

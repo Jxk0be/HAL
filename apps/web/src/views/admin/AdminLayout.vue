@@ -99,7 +99,11 @@ const flat = computed(() => groups.value.flatMap((g) => g.links))
       </ul>
     </nav>
     <div class="min-w-0 flex-1">
-      <RouterView />
+      <RouterView v-slot="{ Component, route: r }">
+        <Transition name="page" mode="out-in">
+          <component :is="Component" :key="r.path" />
+        </Transition>
+      </RouterView>
     </div>
   </div>
 </template>

@@ -3,6 +3,8 @@ import { computed, ref, watch } from 'vue'
 import UiTabs from '@/components/ui/UiTabs.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiLoadGate from '@/components/ui/UiLoadGate.vue'
+import { useReady } from '@/composables/useReady'
 import StandingsTable from '@/components/stats/StandingsTable.vue'
 import StatLeaderboard from '@/components/stats/StatLeaderboard.vue'
 import { useDivisions, useLeaderboards, useStandings } from '@/composables/useStats'
@@ -10,7 +12,7 @@ import { useDivisions, useLeaderboards, useStandings } from '@/composables/useSt
 const props = defineProps<{ seasonId: string; seasonName: string; playoffTeams: number }>()
 
 const seasonId = computed(() => props.seasonId)
-const { divisions } = useDivisions(seasonId)
+const { divisions, loading: divisionsLoading } = useDivisions(seasonId)
 const division = ref<string>('league')
 watch(divisions, (d) => (division.value = d[0]?.id ?? 'league'), { immediate: true })
 const divisionId = computed(() => (division.value === 'league' ? null : division.value))
@@ -19,12 +21,14 @@ const tabs = computed(() =>
 )
 
 const { rows, loading } = useStandings(seasonId, divisionId)
-const { boards } = useLeaderboards(seasonId)
+const { boards, loading: boardsLoading } = useLeaderboards(seasonId)
+// First paint waits for divisions, the table and the leaderboards; later reloads stay in place.
+const ready = useReady(() => divisionsLoading.value || loading.value || boardsLoading.value)
 const anyTies = computed(() => rows.value.some((r) => r.needs_admin_decision))
 </script>
 
 <template>
-  <div class="flex flex-col gap-10">
+  <UiLoadGate :ready="ready" class="flex flex-col gap-10" variant="table" label="Loading standings…">
     <UiTabs v-model="division" label="Divisions" :tabs="tabs" variant="pill">
       <UiSkeleton v-if="loading" :lines="8" />
       <UiEmptyState v-else-if="rows.length === 0" title="No teams yet" description="Approved teams appear here once signups close." />
@@ -48,5 +52,5 @@ const anyTies = computed(() => rows.value.some((r) => r.needs_admin_decision))
         <StatLeaderboard title="Avg score per map" :rows="boards.avg_score" :value="(r) => (r.avg_score ?? 0).toLocaleString()" />
       </div>
     </section>
-  </div>
+  </UiLoadGate>
 </template>

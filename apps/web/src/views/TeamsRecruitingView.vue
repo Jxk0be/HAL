@@ -4,7 +4,8 @@ import PageHeader from '@/components/layout/PageHeader.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import RecruitingTabs from '@/components/players/RecruitingTabs.vue'
 import { removeRecruitPost, useMyRecruitInterest, useRecruitBoard, type RecruitCard } from '@/composables/useRecruiting'
@@ -16,6 +17,8 @@ const auth = useAuthStore()
 const toast = useToast()
 const { posts, loading, error, reload } = useRecruitBoard()
 const mine = useMyRecruitInterest(() => auth.user?.id)
+// Wait for your own interest list too, so cards don't flip from "Interested" to "Interest sent".
+const ready = useReady(() => loading.value || mine.loading.value)
 
 // Players who could join a team can say they're interested.
 const canJoin = computed(() => auth.isSignedIn && auth.canPlay && !auth.team && !auth.isBanned)
@@ -65,8 +68,9 @@ async function takeDown(p: RecruitCard) {
         to tell a team you're interested.
       </p>
 
-      <div v-if="loading" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div v-for="n in 3" :key="n" class="rounded-lg border border-line bg-surface p-5"><UiSkeleton :lines="4" /></div>
+      <div v-if="!ready" role="status" aria-busy="true">
+        <span class="sr-only">Loading recruiting posts…</span>
+        <UiPageSkeleton variant="cards" :count="3" />
       </div>
       <p v-else-if="error" role="alert" class="text-loss">{{ error }}</p>
       <UiEmptyState

@@ -4,18 +4,21 @@ import PageHeader from '@/components/layout/PageHeader.vue'
 import RecusedNotice from '@/components/admin/RecusedNotice.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import { useMismatchQueue } from '@/composables/useAdmin'
 
 const { items, loading } = useMismatchQueue()
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 </script>
 
 <template>
   <div>
     <PageHeader compact eyebrow="Admin" title="Mismatch queue" description="Fields where the two captains' reports disagree, oldest first. Map mismatches hold up the result; player stats don't." />
     <div class="px-4 py-8 sm:px-6">
-      <UiSkeleton v-if="loading" :lines="5" />
+      <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="list" :count="5" /></div>
       <UiEmptyState v-else-if="!items.length" title="Nothing to settle" description="Every report matches its opponent's." />
       <ul v-else class="flex flex-col gap-3">
         <li v-for="q in items" :key="q.match_id">

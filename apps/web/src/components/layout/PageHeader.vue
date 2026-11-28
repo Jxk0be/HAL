@@ -5,6 +5,8 @@ defineProps<{
   description?: string
   /** Smaller title for admin and tool pages. */
   compact?: boolean
+  /** The description depends on data that is still loading: show a placeholder line instead. */
+  pending?: boolean
 }>()
 </script>
 
@@ -18,7 +20,8 @@ defineProps<{
           <slot name="actions" />
         </div>
       </div>
-      <p v-if="description" class="mt-3 max-w-2xl text-muted" :class="compact ? '' : 'sm:text-lg'">{{ description }}</p>
+      <div v-if="pending" class="skeleton mt-4 h-5 w-full max-w-md rounded-sm" aria-hidden="true" />
+      <p v-else-if="description" class="mt-3 max-w-2xl text-muted" :class="compact ? '' : 'sm:text-lg'">{{ description }}</p>
     </div>
   </div>
 </template>

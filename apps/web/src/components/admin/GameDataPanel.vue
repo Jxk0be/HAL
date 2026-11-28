@@ -3,9 +3,12 @@ import { computed, ref, watch } from 'vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiInput from '@/components/ui/UiInput.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import { useGameData } from '@/composables/useGameData'
 import { useToast } from '@/composables/useToast'
+import { mapArt } from '@/lib/mapArt'
+import { ACCEPTED_IMAGE_TYPES } from '@/lib/image'
 
 /**
  * Mode-first editing: add a mode, select it, then add the maps played in that mode. A map name
@@ -72,6 +75,21 @@ function moveMode(index: number, dir: -1 | 1) {
   const bOrder = a.sortOrder === b.sortOrder ? index + 1 + dir : b.sortOrder
   void act(g.updateMode(a.id, { sort_order: bOrder })).then((ok) => ok && act(g.updateMode(b.id, { sort_order: aOrder })))
 }
+// ---- Artwork (the calling cards on the public Map pool page) ----------------------
+const activeMaps = computed(() => g.maps.value.filter((m) => m.active))
+const uploadingId = ref<string | null>(null)
+async function onArtPicked(mapId: string, mapName: string, e: Event) {
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file) return
+  uploadingId.value = mapId
+  await act(g.uploadMapArt(mapId, file), `New artwork for ${mapName}.`)
+  uploadingId.value = null
+}
+
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => g.loading.value)
 </script>
 
 <template>
@@ -82,7 +100,7 @@ function moveMode(index: number, dir: -1 | 1) {
       random map from that mode. Removing a map takes it out of that mode only; deactivate a mode
       instead of deleting it, so old results keep their modes.
     </p>
-    <UiSkeleton v-if="g.loading.value" :lines="5" />
+    <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="list" :count="5" /></div>
 
     <div v-else class="grid gap-6 md:grid-cols-[16rem_1fr]">
       <!-- Modes -->
@@ -172,5 +190,48 @@ function moveMode(index: number, dir: -1 | 1) {
         <p v-else id="pool-title" class="text-sm text-muted">Add a mode first, then select it to add its maps.</p>
       </section>
     </div>
+
+    <!-- Artwork -->
+    <section v-if="ready && activeMaps.length" aria-labelledby="art-title" class="rounded-lg border border-line bg-surface p-4 sm:p-5">
+      <h3 id="art-title" class="font-heading text-xl"><span class="eyebrow block text-muted">3. Artwork</span>Map pool cards</h3>
+      <p class="mt-1 text-sm text-muted">
+        The background on each map's card on the public <RouterLink to="/maps" class="text-accent hover:text-accent-strong">Map pool</RouterLink> page.
+        Use a wide screenshot (16:9); it's compressed to WebP. Maps without an upload use the art bundled with the site, if any.
+      </p>
+      <ul class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3" role="list">
+        <li v-for="m in activeMaps" :key="m.id" class="flex items-center gap-3 rounded-md border border-line bg-surface-2 p-2">
+          <div class="relative aspect-[16/7] w-28 shrink-0 overflow-hidden rounded-sm bg-surface-3">
+            <img v-if="mapArt(m)" :src="mapArt(m)!.srcSm ?? mapArt(m)!.src" alt="" class="size-full object-cover" loading="lazy" />
+            <span v-else class="texture-stripes absolute inset-0" aria-hidden="true" />
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="truncate font-medium">{{ m.name }}</p>
+            <p class="text-xs text-muted">{{ mapArt(m) ? (mapArt(m)!.custom ? 'Uploaded' : 'Default art') : 'No art yet' }}</p>
+            <div class="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs">
+              <label class="cursor-pointer font-semibold text-accent hover:text-accent-strong focus-within:outline-2 focus-within:outline-accent">
+                {{ uploadingId === m.id ? 'Uploading…' : 'Upload' }}
+                <input
+                  type="file"
+                  class="sr-only"
+                  :accept="ACCEPTED_IMAGE_TYPES.join(',')"
+                  :disabled="g.busy.value"
+                  :aria-label="`Upload artwork for ${m.name}`"
+                  @change="onArtPicked(m.id, m.name, $event)"
+                />
+              </label>
+              <button
+                v-if="m.imageUrl"
+                type="button"
+                class="text-muted hover:text-text disabled:opacity-50"
+                :disabled="g.busy.value"
+                @click="act(g.clearMapArt(m.id), `${m.name} is back to its default art.`)"
+              >
+                Use default<span class="sr-only"> for {{ m.name }}</span>
+              </button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </section>
   </div>
 </template>

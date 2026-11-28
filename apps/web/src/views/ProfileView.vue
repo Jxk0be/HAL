@@ -10,7 +10,10 @@ import UiBadge from '@/components/ui/UiBadge.vue'
 import RankBadge from '@/components/players/RankBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiCard from '@/components/ui/UiCard.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiLoadGate from '@/components/ui/UiLoadGate.vue'
+import { useReady } from '@/composables/useReady'
+import { useMyInvites } from '@/composables/useInvites'
+import { useMyEmergencySubRequests } from '@/composables/useEmergencySubs'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
@@ -18,6 +21,10 @@ import { PLATFORM_OPTIONS } from '@/lib/validation/profile'
 
 const auth = useAuthStore()
 const toast = useToast()
+const invites = useMyInvites()
+const esubs = useMyEmergencySubRequests()
+// Invite cards sit above the forms; wait for them so the forms don't jump down.
+const ready = useReady(() => invites.loading.value || esubs.loading.value)
 
 const platformLabel = computed(
   () => PLATFORM_OPTIONS.find((o) => o.value === auth.profile?.platform)?.label ?? 'No platform yet',
@@ -94,9 +101,9 @@ const roleLabel = computed(() => {
       </aside>
 
       <!-- Edit -->
-      <div class="flex flex-col gap-6">
-        <InvitesCard />
-        <EmergencySubInvitesCard />
+      <UiLoadGate :ready="ready" class="flex flex-col gap-6" variant="form" :count="5" label="Loading your profile…">
+        <InvitesCard :state="invites" />
+        <EmergencySubInvitesCard :state="esubs" />
         <UiCard eyebrow="Player details" title="Edit profile">
           <ProfileForm
             v-if="auth.profile"
@@ -104,7 +111,7 @@ const roleLabel = computed(() => {
             :on-team="Boolean(auth.team)"
             @saved="toast.success('Profile saved.')"
           />
-          <UiSkeleton v-else :lines="6" />
+          <p v-else role="alert" class="text-sm text-loss">Your profile didn't load. Refresh the page to try again.</p>
         </UiCard>
 
         <UiCard eyebrow="Public page" title="Customize">
@@ -115,9 +122,9 @@ const roleLabel = computed(() => {
             These show on your public player page next to your stats: match history, K/D trend, best maps and modes.
           </p>
           <ProfileCustomizeForm v-if="auth.profile" :profile="auth.profile" @saved="toast.success('Profile page updated.')" />
-          <UiSkeleton v-else :lines="6" />
+          <p v-else role="alert" class="text-sm text-loss">Your profile didn't load. Refresh the page to try again.</p>
         </UiCard>
-      </div>
+      </UiLoadGate>
     </div>
   </div>
 </template>

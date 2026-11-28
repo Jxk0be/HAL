@@ -151,8 +151,13 @@ export function useMatchEmergencySubs(
     return (data ?? []).map((f) => ({ id: f.id, activisionId: f.activision_id, platform: f.platform, role: null }))
   }
 
-  watch([() => toValue(match).id, () => toValue(teamId)], load, { immediate: true })
-  return { requests, roster, busy, request, clearOut, cancel, search, reload: load }
+  /** True once the first load has finished (cards stay hidden until then instead of flashing). */
+  const loaded = ref(false)
+  watch([() => toValue(match).id, () => toValue(teamId)], async () => {
+    await load()
+    loaded.value = true
+  }, { immediate: true })
+  return { requests, roster, busy, loaded, request, clearOut, cancel, search, reload: load }
 }
 
 export interface MyEsubRequest {
@@ -168,11 +173,13 @@ export function useMyEmergencySubRequests() {
   const auth = useAuthStore()
   const requests = ref<MyEsubRequest[]>([])
   const busyId = ref<string | null>(null)
+  const loading = ref(true)
 
   async function load() {
     const uid = auth.user?.id
     if (!uid) {
       requests.value = []
+      loading.value = false
       return
     }
     const { data } = await supabase
@@ -194,6 +201,7 @@ export function useMyEmergencySubRequests() {
         note: r.note,
         accepted: Boolean(r.player_confirmed_at),
       }))
+    loading.value = false
   }
 
   async function respond(id: string, accept: boolean): Promise<Result> {
@@ -206,5 +214,5 @@ export function useMyEmergencySubRequests() {
   }
 
   watch(() => auth.user?.id, load, { immediate: true })
-  return { requests, busyId, respond, reload: load }
+  return { requests, busyId, loading, respond, reload: load }
 }

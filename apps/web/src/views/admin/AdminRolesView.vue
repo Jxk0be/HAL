@@ -7,13 +7,16 @@ import UiAvatar from '@/components/ui/UiAvatar.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiInput from '@/components/ui/UiInput.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import { useStaffRoles, type StaffRole, type UserWithRoles } from '@/composables/useAdmin'
 import { useToast } from '@/composables/useToast'
 
 const toast = useToast()
 const s = useStaffRoles()
 const { staff, results, loading, busy } = s
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 const query = ref('')
 watchDebounced(query, (q) => void s.search(q), { debounce: 300 })
 
@@ -78,7 +81,7 @@ async function togglePlaying(u: UserWithRoles) {
 
       <section aria-labelledby="staff-title" class="flex flex-col gap-3">
         <h2 id="staff-title" class="eyebrow text-accent">Current staff</h2>
-        <UiSkeleton v-if="loading" :lines="3" />
+        <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="list" :count="3" /></div>
         <ul v-else class="flex flex-col divide-y divide-line rounded-lg border border-line bg-surface">
           <li v-for="u in staff" :key="u.id" class="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
             <UiAvatar :src="u.avatarUrl" :name="u.name" size="sm" decorative />

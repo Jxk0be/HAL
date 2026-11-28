@@ -4,7 +4,8 @@ import { useRoute, useRouter } from 'vue-router'
 import UiSelect from '@/components/ui/UiSelect.vue'
 import UiTabs from '@/components/ui/UiTabs.vue'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiLoadGate from '@/components/ui/UiLoadGate.vue'
+import { useReady } from '@/composables/useReady'
 import UiButton from '@/components/ui/UiButton.vue'
 import MatchCard from '@/components/match/MatchCard.vue'
 import { currentWeek, type MatchCardData } from '@/composables/useMatches'
@@ -76,10 +77,21 @@ const nights = computed(() => {
   return [...groups].map(([day, list]) => ({ day, list }))
 })
 const live = computed(() => props.matches.filter((m) => m.broadcastLive))
+const ready = useReady(() => props.loading)
 </script>
 
 <template>
-  <div class="flex flex-col gap-6">
+  <UiLoadGate :ready="ready" class="flex flex-col gap-6" label="Loading matches…">
+    <template #skeleton>
+      <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-2 sm:w-64"><div class="skeleton h-3 w-12 rounded-sm" /><div class="skeleton h-11 w-full" /></div>
+        <div class="flex gap-2"><div v-for="n in 6" :key="n" class="skeleton h-9 w-14 rounded-full" /></div>
+        <div class="skeleton h-3 w-40 rounded-sm" />
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div v-for="n in 6" :key="n" class="skeleton h-32 rounded-xl" />
+        </div>
+      </div>
+    </template>
     <section v-if="live.length" aria-labelledby="live-title">
       <h2 id="live-title" class="eyebrow mb-3 text-accent">Live now</h2>
       <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -89,11 +101,8 @@ const live = computed(() => props.matches.filter((m) => m.broadcastLive))
 
     <div class="sm:w-64"><UiSelect v-model="team" label="Team" :options="teamOptions" /></div>
 
-    <div v-if="loading" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div v-for="n in 6" :key="n" class="rounded-xl border border-line bg-surface p-4"><UiSkeleton :lines="4" /></div>
-    </div>
     <UiEmptyState
-      v-else-if="matches.length === 0"
+      v-if="matches.length === 0"
       title="Schedule drops soon"
       description="The schedule is published once team signups close. Join the Discord to hear first."
     >
@@ -114,5 +123,5 @@ const live = computed(() => props.matches.filter((m) => m.broadcastLive))
         </section>
       </div>
     </UiTabs>
-  </div>
+  </UiLoadGate>
 </template>

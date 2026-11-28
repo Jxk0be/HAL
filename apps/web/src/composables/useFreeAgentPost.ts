@@ -94,15 +94,18 @@ export function useFreeAgentModeration() {
 /** Open spots on the viewer's team (for showing Invite buttons). */
 export function useOpenSpots(teamId: () => string | null | undefined) {
   const open = ref(0)
+  const loading = ref(true)
   async function load() {
     const id = teamId()
     if (!id) {
       open.value = 0
+      loading.value = false
       return
     }
     const { data } = await supabase.rpc('team_open_spots', { p_team_id: id })
     open.value = data?.[0]?.open ?? 0
+    loading.value = false
   }
   watch(teamId, load, { immediate: true })
-  return { open, reload: load }
+  return { open, loading, reload: load }
 }

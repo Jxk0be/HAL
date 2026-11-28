@@ -3,13 +3,15 @@ import UiCard from '@/components/ui/UiCard.vue'
 import UiButton from '@/components/ui/UiButton.vue'
 import UiBadge from '@/components/ui/UiBadge.vue'
 import TeamLogo from '@/components/ui/TeamLogo.vue'
-import { useMyInvites } from '@/composables/useInvites'
+import type { useMyInvites } from '@/composables/useInvites'
 import { useToast } from '@/composables/useToast'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const toast = useToast()
-const { invites, loading, busyId, respond } = useMyInvites()
+// The page owns the data (so it can wait for it before rendering) and passes it in.
+const props = defineProps<{ state: ReturnType<typeof useMyInvites> }>()
+const { invites, loading, busyId, respond } = props.state
 
 async function answer(id: string, teamName: string, accept: boolean) {
   const result = await respond(id, accept)

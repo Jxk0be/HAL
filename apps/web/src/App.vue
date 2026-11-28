@@ -10,6 +10,8 @@ import AppFooter from '@/components/layout/AppFooter.vue'
 import LiveBanner from '@/components/layout/LiveBanner.vue'
 import AccountNotice from '@/components/layout/AccountNotice.vue'
 import UiToastHost from '@/components/ui/UiToastHost.vue'
+import AppSplash from '@/components/layout/AppSplash.vue'
+import { pageKey } from '@/lib/pageKey'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
@@ -31,12 +33,18 @@ const menuOpen = ref(false)
     Skip to content
   </a>
 
-  <div v-if="isPublic" class="flex min-h-dvh flex-col">
+  <AppSplash v-if="!auth.ready" />
+
+  <div v-else-if="isPublic" class="flex min-h-dvh flex-col">
     <LiveBanner />
     <PublicHeader />
     <AccountNotice />
     <main id="main" tabindex="-1" class="flex-1 focus:outline-none">
-      <RouterView />
+      <RouterView v-slot="{ Component, route: r }">
+        <Transition name="page" mode="out-in">
+          <component :is="Component" :key="pageKey(r)" />
+        </Transition>
+      </RouterView>
     </main>
     <AppFooter />
   </div>
@@ -48,7 +56,11 @@ const menuOpen = ref(false)
       <AppTopBar />
       <AccountNotice />
       <main id="main" tabindex="-1" class="flex-1 focus:outline-none">
-        <RouterView />
+        <RouterView v-slot="{ Component, route: r }">
+          <Transition name="page" mode="out-in">
+            <component :is="Component" :key="pageKey(r)" />
+          </Transition>
+        </RouterView>
       </main>
       <AppFooter />
     </div>

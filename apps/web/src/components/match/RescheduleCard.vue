@@ -22,7 +22,7 @@ const props = defineProps<{
 const emit = defineEmits<{ changed: [] }>()
 
 const toast = useToast()
-const { requests, reload } = useMatchReschedules(() => props.match.id)
+const { requests, loaded, reload } = useMatchReschedules(() => props.match.id)
 const pending = computed(() => requests.value.find((r) => r.status === 'pending') ?? null)
 const history = computed(() => requests.value.filter((r) => r.status !== 'pending').slice(0, 5))
 const tag = (teamId: string) => (teamId === props.match.home.id ? props.match.home.tag : props.match.away.tag)
@@ -82,7 +82,7 @@ const STATUS: Record<RescheduleRequest['status'], { label: string; variant: 'win
 </script>
 
 <template>
-  <UiCard v-if="pending || history.length || (captainOf && open)" eyebrow="Match time" title="Reschedule">
+  <UiCard v-if="loaded && (pending || history.length || (captainOf && open))" eyebrow="Match time" title="Reschedule">
     <div class="flex flex-col gap-4 text-sm">
       <div v-if="pending" class="rounded-md border border-accent-dim bg-accent-soft p-3">
         <p>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import UiBadge from '@/components/ui/UiBadge.vue'
 import UiButton from '@/components/ui/UiButton.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import { useRankExceptions } from '@/composables/useAdmin'
 import { useToast } from '@/composables/useToast'
 
@@ -11,6 +12,8 @@ import { useToast } from '@/composables/useToast'
  */
 const toast = useToast()
 const { rows, loading, busy, setException } = useRankExceptions()
+// Latched: later reloads (after an action, realtime) keep the content instead of re-showing the skeleton.
+const ready = useReady(() => loading.value)
 
 async function act(id: string, name: string, approve: boolean) {
   const r = await setException(id, approve)
@@ -29,7 +32,7 @@ const approvedOn = (iso: string) => new Date(iso).toLocaleDateString(undefined, 
         approves it here (rule 2.9). Approvals are logged publicly in the audit log.
       </p>
     </div>
-    <UiSkeleton v-if="loading" :lines="3" />
+    <div v-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="list" :count="3" /></div>
     <p v-else-if="!rows.length" class="rounded-lg border border-dashed border-line-strong px-4 py-6 text-center text-sm text-muted">
       No Iridescent players right now.
     </p>

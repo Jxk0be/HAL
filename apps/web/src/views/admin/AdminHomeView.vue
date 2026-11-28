@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
-import UiSkeleton from '@/components/ui/UiSkeleton.vue'
+import UiPageSkeleton from '@/components/ui/UiPageSkeleton.vue'
+import { useReady } from '@/composables/useReady'
 import UiStatTile from '@/components/ui/UiStatTile.vue'
 import UiCard from '@/components/ui/UiCard.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
@@ -11,7 +12,8 @@ import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const { overview, loading } = useAdminOverview()
-const { matches } = useSeasonSchedule()
+const { matches, loading: matchesLoading } = useSeasonSchedule()
+const ready = useReady(() => loading.value || matchesLoading.value)
 
 // Matches starting in the next 24 hours, with whether each side has checked in (status only).
 const next24 = computed(() => {
@@ -48,7 +50,7 @@ const tiles = computed(() => {
     <PageHeader compact eyebrow="Control center" title="Overview" description="What needs attention. Staff never act on matches or teams they play on; the database enforces it." />
     <div class="px-4 py-8 sm:px-6">
       <p v-if="!auth.isAdmin" class="text-sm text-muted">Casters: claim matches and go live from the <RouterLink to="/admin/casting" class="text-accent hover:text-accent-strong">casting desk</RouterLink>.</p>
-      <UiSkeleton v-else-if="loading" :lines="4" />
+      <div v-else-if="!ready" role="status" aria-busy="true"><span class="sr-only">Loading…</span><UiPageSkeleton variant="tiles" :count="3" /></div>
       <template v-else>
         <ul class="grid grid-cols-2 gap-3 xl:grid-cols-3">
           <li v-for="t in tiles" :key="t.label">

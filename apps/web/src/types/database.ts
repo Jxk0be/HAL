@@ -411,6 +411,46 @@ export type Database = {
         }
         Relationships: []
       }
+      discord_presence: {
+        Row: {
+          checked_at: string
+          in_server: boolean
+          user_id: string
+        }
+        Insert: {
+          checked_at?: string
+          in_server: boolean
+          user_id: string
+        }
+        Update: {
+          checked_at?: string
+          in_server?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discord_presence_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "free_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discord_presence_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discord_presence_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       discord_sync_errors: {
         Row: {
           action: string
@@ -1156,6 +1196,7 @@ export type Database = {
           active: boolean
           created_at: string
           id: string
+          image_url: string | null
           name: string
           updated_at: string
         }
@@ -1163,6 +1204,7 @@ export type Database = {
           active?: boolean
           created_at?: string
           id?: string
+          image_url?: string | null
           name: string
           updated_at?: string
         }
@@ -1170,6 +1212,7 @@ export type Database = {
           active?: boolean
           created_at?: string
           id?: string
+          image_url?: string | null
           name?: string
           updated_at?: string
         }
@@ -3821,6 +3864,7 @@ export type Database = {
         }[]
       }
       eights_leave: { Args: { p_user_id: string }; Returns: boolean }
+      eights_public_state: { Args: never; Returns: Json }
       eights_report: {
         Args: { p_match_id: string; p_user_id: string; p_winner: string }
         Returns: Json
@@ -3880,18 +3924,6 @@ export type Database = {
           total_count: number
         }[]
       }
-      has_role: {
-        Args: { p_role: Database["public"]["Enums"]["staff_role"] }
-        Returns: boolean
-      }
-      has_role_for: {
-        Args: {
-          p_role: Database["public"]["Enums"]["staff_role"]
-          p_user_id: string
-        }
-        Returns: boolean
-      }
-      eights_public_state: { Args: never; Returns: Json }
       hall_of_champions: {
         Args: never
         Returns: {
@@ -3910,9 +3942,16 @@ export type Database = {
           team_tag: string
         }[]
       }
-      site_counts: {
-        Args: never
-        Returns: { matches: number; players: number; teams: number }[]
+      has_role: {
+        Args: { p_role: Database["public"]["Enums"]["staff_role"] }
+        Returns: boolean
+      }
+      has_role_for: {
+        Args: {
+          p_role: Database["public"]["Enums"]["staff_role"]
+          p_user_id: string
+        }
+        Returns: boolean
       }
       invitable_players: {
         Args: { p_limit?: number; p_search: string }
@@ -4014,6 +4053,13 @@ export type Database = {
       match_of_dispute: { Args: { p_dispute_id: string }; Returns: string }
       match_of_map: { Args: { p_match_map_id: string }; Returns: string }
       match_settled: { Args: { p_match_id: string }; Returns: boolean }
+      my_discord_presence: {
+        Args: never
+        Returns: {
+          checked_at: string
+          in_server: boolean
+        }[]
+      }
       my_match_report_status: { Args: { p_match_id: string }; Returns: Json }
       my_team_ids: { Args: { p_season_id: string }; Returns: string[] }
       open_dispute: {
@@ -4267,6 +4313,14 @@ export type Database = {
         Args: { p_match_id: string; p_url: string }
         Returns: undefined
       }
+      site_counts: {
+        Args: never
+        Returns: {
+          matches: number
+          players: number
+          teams: number
+        }[]
+      }
       sub_board: {
         Args: never
         Returns: {
@@ -4289,6 +4343,14 @@ export type Database = {
           p_source?: Database["public"]["Enums"]["submission_source"]
         }
         Returns: Database["public"]["Enums"]["match_status"]
+      }
+      team_discord_presence: {
+        Args: { p_team_id: string }
+        Returns: {
+          checked_at: string
+          in_server: boolean
+          user_id: string
+        }[]
       }
       team_open_spots: {
         Args: { p_team_id: string }

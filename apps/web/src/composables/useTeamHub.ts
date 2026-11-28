@@ -8,9 +8,10 @@ import { useToast } from './useToast'
 export function useTeamHub(seasonId: MaybeRefOrGetter<string | null | undefined>) {
   const auth = useAuthStore()
   const toast = useToast()
-  const { rows } = useStandings(seasonId, null)
-  const { posts } = useRecruitBoard()
-  const { postIds, busy, interested } = useMyRecruitInterest(() => auth.user?.id)
+  const { rows, loading: standingsLoading } = useStandings(seasonId, null)
+  const { posts, loading: postsLoading } = useRecruitBoard()
+  const { postIds, busy, loading: interestLoading, interested } = useMyRecruitInterest(() => auth.user?.id)
+  const loading = computed(() => standingsLoading.value || postsLoading.value || interestLoading.value)
 
   const records = computed(() => new Map(rows.value.map((r) => [r.team_id, { wins: r.wins, losses: r.losses }])))
   const postByTeam = computed(() => new Map(posts.value.map((p) => [p.teamId, p.postId])))
@@ -23,5 +24,5 @@ export function useTeamHub(seasonId: MaybeRefOrGetter<string | null | undefined>
     else toast.success('The captains have been told you are interested.')
   }
 
-  return { records, postByTeam, canInterest, interestedIds: postIds, busyPost: busy, interest }
+  return { records, postByTeam, canInterest, interestedIds: postIds, busyPost: busy, loading, interest }
 }
