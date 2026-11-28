@@ -6,6 +6,12 @@ withDefaults(
     title?: string
     padded?: boolean
     as?: string
+    /** 2px top border: red, or neutral gray. */
+    accent?: 'red' | 'neutral'
+    /** Diagonal stripe texture. */
+    striped?: boolean
+    /** Hover lift for clickable cards. */
+    interactive?: boolean
   }>(),
   { padded: true, as: 'section' },
 )
@@ -14,8 +20,16 @@ withDefaults(
 <template>
   <component
     :is="as"
-    class="rounded-lg border border-line bg-surface shadow-panel"
-    :class="padded ? 'p-5 sm:p-6' : ''"
+    class="rounded-xl border border-line bg-surface shadow-panel"
+    :class="[
+      padded ? 'p-5 sm:p-6' : '',
+      accent ? 'card-accent' : '',
+      striped ? 'texture-stripes' : '',
+      interactive
+        ? 'transition-[border-color,transform] duration-150 hover:-translate-y-px hover:border-line-strong motion-reduce:hover:translate-y-0'
+        : '',
+    ]"
+    :style="accent === 'neutral' ? { '--card-accent': 'var(--color-line-strong)' } : undefined"
   >
     <header
       v-if="title || eyebrow || $slots.actions"

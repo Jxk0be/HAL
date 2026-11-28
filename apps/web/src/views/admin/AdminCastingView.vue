@@ -72,7 +72,7 @@ async function goLive() {
 
 <template>
   <div>
-    <PageHeader eyebrow="Casters" title="Casting desk" description="Claim a match so other casters know it's covered, go live with your stream link, and end the broadcast when you're done. The link stays on the match page as the VOD." />
+    <PageHeader compact eyebrow="Casters" title="Casting desk" description="Claim a match so other casters know it's covered, go live with your stream link, and end the broadcast when you're done. The link stays on the match page as the VOD." />
     <div class="flex flex-col gap-8 px-4 py-8 sm:px-6">
       <UiSkeleton v-if="loading" :lines="6" />
       <UiEmptyState v-else-if="!groups.length" title="Nothing to cast this week" description="Matches for today and the next 7 days appear here." />

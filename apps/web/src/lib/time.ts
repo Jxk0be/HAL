@@ -91,6 +91,16 @@ export function formatLocalTime(iso: string): string {
   }).format(new Date(iso))
 }
 
+/** Just the clock time in the viewer's zone ("9:00 PM"), for compact rows. */
+export function formatLocalClock(iso: string): string {
+  return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))
+}
+
+/** The calendar day in the viewer's zone ("Tue, Jan 13"), for date headers. */
+export function formatLocalDay(iso: string): string {
+  return new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(iso))
+}
+
 /** The league week containing `iso`: Monday 00:00 to the next Monday 00:00 (exclusive) in `tz`. */
 export function leagueWeekBounds(iso: string, tz: string = LEAGUE_TZ): { start: Date; end: Date } {
   const monday = mondayOf(toZoned(iso, tz).date)

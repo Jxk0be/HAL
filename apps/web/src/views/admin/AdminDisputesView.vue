@@ -106,7 +106,7 @@ async function issuePenalty() {
 
 <template>
   <div>
-    <PageHeader eyebrow="Admin" title="Disputes" description="Open disputes first. Decisions are public on the match page; evidence stays with the teams and staff." />
+    <PageHeader compact eyebrow="Admin" title="Disputes" description="Open disputes first. Decisions are public on the match page; evidence stays with the teams and staff." />
     <div class="px-4 py-8 sm:px-6">
       <UiSkeleton v-if="loading" :lines="6" />
       <UiTabs v-else v-model="tab" label="Dispute status" :tabs="tabs">

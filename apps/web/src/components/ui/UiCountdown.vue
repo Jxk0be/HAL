@@ -7,6 +7,8 @@ const props = withDefaults(
     to: string
     /** Shown once the time has passed. */
     endedLabel?: string
+    /** Inline size (body text) instead of the large display digits. */
+    compact?: boolean
   }>(),
   { endedLabel: 'Starting now' },
 )
@@ -34,11 +36,11 @@ const spoken = computed(() => {
 </script>
 
 <template>
-  <time :datetime="to" class="tnum inline-flex items-baseline gap-2 font-heading">
+  <time :datetime="to" class="tnum inline-flex items-baseline font-heading" :class="compact ? 'gap-1' : 'gap-2'">
     <template v-if="remaining > 0">
       <span class="sr-only">Starts in {{ spoken }}</span>
       <span v-for="p in parts" :key="p.label" class="inline-flex items-baseline" aria-hidden="true">
-        <span class="text-2xl text-text">{{ String(p.value).padStart(2, '0') }}</span>
+        <span class="text-text" :class="compact ? '' : 'text-2xl'">{{ String(p.value).padStart(2, '0') }}</span>
         <span class="ml-0.5 text-xs text-muted">{{ p.label }}</span>
       </span>
     </template>

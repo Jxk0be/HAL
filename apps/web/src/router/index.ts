@@ -10,6 +10,18 @@ const routes: RouteRecordRaw[] = [
 
   // Public
   {
+    path: '/season',
+    name: 'season',
+    component: () => import('@/views/SeasonView.vue'),
+    meta: { title: 'Season', tabHash: true },
+  },
+  {
+    path: '/season/:id',
+    name: 'season-by-id',
+    component: () => import('@/views/SeasonView.vue'),
+    meta: { title: 'Season', tabHash: true },
+  },
+  {
     path: '/matches',
     name: 'matches',
     component: () => import('@/views/MatchesView.vue'),
@@ -31,7 +43,7 @@ const routes: RouteRecordRaw[] = [
     path: '/leaderboard',
     name: 'leaderboard',
     component: () => import('@/views/LeaderboardView.vue'),
-    meta: { title: 'Leaderboard' },
+    meta: { title: 'Leaderboard', tabHash: true },
   },
   {
     path: '/teams',
@@ -43,7 +55,7 @@ const routes: RouteRecordRaw[] = [
     path: '/teams/:id',
     name: 'team',
     component: () => import('@/views/TeamView.vue'),
-    meta: { title: 'Team', eyebrow: 'Team', description: 'Roster, record and matches.', buildStep: 6 },
+    meta: { title: 'Team', eyebrow: 'Team', description: 'Roster, record and matches.', buildStep: 6, tabHash: true },
   },
   {
     path: '/players',
@@ -82,6 +94,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'Teams recruiting', eyebrow: 'Recruiting', description: 'Teams looking for a starter or a sub.' },
   },
   {
+    path: '/8s',
+    name: 'eights',
+    component: () => import('@/views/EightsView.vue'),
+    meta: { title: '8s' },
+  },
+  {
     path: '/rules',
     name: 'rules',
     component: () => import('@/views/RulesView.vue'),
@@ -103,7 +121,7 @@ const routes: RouteRecordRaw[] = [
     path: '/login',
     name: 'login',
     component: () => import('@/views/LoginView.vue'),
-    meta: { title: 'Log in' },
+    meta: { title: 'Log in', layout: 'public' },
   },
 
   // Signed in
@@ -111,13 +129,19 @@ const routes: RouteRecordRaw[] = [
     path: '/auth/callback',
     name: 'auth-callback',
     component: () => import('@/views/AuthCallbackView.vue'),
-    meta: { title: 'Signing in' },
+    meta: { title: 'Signing in', layout: 'public' },
   },
   {
     path: '/onboarding',
     name: 'onboarding',
     component: () => import('@/views/OnboardingView.vue'),
-    meta: { title: 'Set up your profile', requiresAuth: true },
+    meta: { title: 'Set up your profile', requiresAuth: true, layout: 'public' },
+  },
+  {
+    path: '/dashboard',
+    name: 'dashboard',
+    component: () => import('@/views/DashboardView.vue'),
+    meta: { title: 'Dashboard', requiresAuth: true },
   },
   {
     path: '/profile',
@@ -190,6 +214,8 @@ export const router = createRouter({
     if (saved) return saved
     // The Rules page scrolls to its own anchors (ids like "4.2" aren't valid CSS selectors).
     if (to.name === 'rules' && to.hash) return false
+    // Pages whose tabs live in the hash (#standings) keep their scroll position on a tab switch.
+    if (to.meta.tabHash && to.path === _from.path) return false
     if (to.hash) {
       const id = decodeURIComponent(to.hash.slice(1))
       return document.getElementById(id) ? { el: `#${CSS.escape(id)}`, top: 80 } : { top: 0 }

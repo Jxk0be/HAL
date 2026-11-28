@@ -40,11 +40,20 @@
   --color-loss-soft: rgb(242 120 92 / 0.12);
   --color-live: #ff4f5c;
 
+  /* App shell (rail, top bar) and tracks */
+  --color-rail: #0d0d0f;
+  --color-chip: #1a1a1e;
+  --color-track: #222227;
+  /* Discord's brand blurple: only for "Continue with Discord" and the Discord chip. */
+  --color-discord: #5865f2;
+  --spacing-rail: 72px;
+  --spacing-topbar: 60px;
 
   /* Type */
-  --font-sans: 'Inter Variable', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+  --font-sans: Barlow, 'Inter Variable', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, sans-serif;
+  --font-display: 'Chakra Petch', 'Barlow Condensed', 'Arial Narrow', ui-sans-serif, system-ui,
     sans-serif;
-  --font-display: 'Barlow Condensed', 'Arial Narrow', ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Shape */
@@ -102,6 +111,59 @@
   font-weight: 700;
   letter-spacing: 0.01em;
   text-transform: uppercase;
+}
+
+/* Eyebrow with a short accent bar in front. */
+@utility eyebrow-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  &::before {
+    content: '';
+    width: 20px;
+    height: 2px;
+    flex: none;
+    background: var(--color-accent);
+  }
+}
+
+/* Diagonal stripes layered over the element's own background color. */
+@utility texture-stripes {
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0 12px,
+    rgb(255 255 255 / 0.025) 12px 24px
+  );
+}
+
+/* Darker stripes for bg-brand bands. */
+@utility texture-stripes-brand {
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0 12px,
+    rgb(0 0 0 / 0.18) 12px 24px
+  );
+}
+
+/* 2px top border; set --card-accent (e.g. var(--color-line-strong)) for a neutral card. */
+@utility card-accent {
+  border-top: 2px solid var(--card-accent, var(--color-accent));
+}
+
+/* Giant page titles. */
+@utility title-xl {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  line-height: 1;
+  text-wrap: balance;
 }
 
 /* Inline rich text inside rulebook rules and callouts. */

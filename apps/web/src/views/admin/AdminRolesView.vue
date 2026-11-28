@@ -41,7 +41,7 @@ async function togglePlaying(u: UserWithRoles) {
 
 <template>
   <div>
-    <PageHeader eyebrow="Owner" title="User roles" description="Grant and revoke Admin and Caster. Staff roles sync to Discord automatically." />
+    <PageHeader compact eyebrow="Owner" title="User roles" description="Grant and revoke Admin and Caster. Staff roles sync to Discord automatically." />
     <div class="flex flex-col gap-8 px-4 py-8 sm:px-6">
       <ul class="grid gap-3 text-sm sm:grid-cols-2">
         <li v-for="g in GRANTABLE" :key="g.role" class="rounded-lg border border-line bg-surface p-4">

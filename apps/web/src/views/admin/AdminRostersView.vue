@@ -32,7 +32,7 @@ async function review(q: RosterRequestRow, approve: boolean) {
 
 <template>
   <div>
-    <PageHeader eyebrow="Admin" title="Roster approvals" description="Pending emergency subs, roster fixes and Iridescent rank exceptions. The free agent accepts first, then you approve; an approved emergency sub plays that one match only." />
+    <PageHeader compact eyebrow="Admin" title="Roster approvals" description="Pending emergency subs, roster fixes and Iridescent rank exceptions. The free agent accepts first, then you approve; an approved emergency sub plays that one match only." />
     <div class="px-4 py-8 sm:px-6">
       <UiSkeleton v-if="loading" :lines="5" />
       <UiEmptyState v-else-if="!rows.length" title="No pending requests" description="Captains request emergency subs from the match page." />

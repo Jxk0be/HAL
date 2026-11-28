@@ -13,7 +13,7 @@ const { items, loading } = useMismatchQueue()
 
 <template>
   <div>
-    <PageHeader eyebrow="Admin" title="Mismatch queue" description="Fields where the two captains' reports disagree, oldest first. Map mismatches hold up the result; player stats don't." />
+    <PageHeader compact eyebrow="Admin" title="Mismatch queue" description="Fields where the two captains' reports disagree, oldest first. Map mismatches hold up the result; player stats don't." />
     <div class="px-4 py-8 sm:px-6">
       <UiSkeleton v-if="loading" :lines="5" />
       <UiEmptyState v-else-if="!items.length" title="Nothing to settle" description="Every report matches its opponent's." />

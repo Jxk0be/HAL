@@ -13,6 +13,7 @@ import ManagePlayerModal from '@/components/team/ManagePlayerModal.vue'
 import InvitePanel from '@/components/team/InvitePanel.vue'
 import TeamRequestsPanel from '@/components/team/TeamRequestsPanel.vue'
 import TeamIdentityForm from '@/components/team/TeamIdentityForm.vue'
+import TeamBannerField from '@/components/team/TeamBannerField.vue'
 import PreseasonCard from '@/components/team/PreseasonCard.vue'
 import RecruitPostCard from '@/components/team/RecruitPostCard.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -26,6 +27,21 @@ import { site } from '@/config/site'
 const auth = useAuthStore()
 const toast = useToast()
 const actions = useTeamActions()
+
+async function uploadBanner(file: File) {
+  if (!team.value) return
+  const r = await actions.uploadBanner(team.value.id, file)
+  if (!r.ok) return toast.error(r.message ?? 'Could not upload the banner.')
+  toast.success('Banner updated.')
+  await reload()
+}
+async function removeBanner() {
+  if (!team.value) return
+  const r = await actions.updateTeam(team.value.id, { banner_url: null })
+  if (!r.ok) return toast.error(r.message ?? 'Could not remove the banner.')
+  toast.success('Banner removed.')
+  await reload()
+}
 const { season, loading: seasonLoading } = useActiveSeason()
 const { team, loading: teamLoading, reload } = useTeam(() => auth.team?.id)
 
@@ -270,6 +286,14 @@ const lockDate = computed(() =>
                 :busy="actions.busy.value"
                 :server-error="settingsError"
                 @submit="saveIdentity"
+              />
+            </UiCard>
+            <UiCard v-if="canManage" eyebrow="Settings" title="Team banner">
+              <TeamBannerField
+                :banner-url="team.bannerUrl"
+                :busy="actions.busy.value"
+                @upload="uploadBanner"
+                @remove="removeBanner"
               />
             </UiCard>
           </div>

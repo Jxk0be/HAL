@@ -6,7 +6,15 @@ import LeagueTime from './LeagueTime.vue'
 import MatchStatus from './MatchStatus.vue'
 import type { MatchCardData } from '@/composables/useMatches'
 
-const props = defineProps<{ match: MatchCardData; compact?: boolean }>()
+const props = withDefaults(
+  defineProps<{
+    match: MatchCardData
+    compact?: boolean
+    /** 'card' (default) or a one-line 'row', like a ticker item. */
+    layout?: 'card' | 'row'
+  }>(),
+  { layout: 'card' },
+)
 
 const final = computed(() => props.match.status === 'confirmed' || props.match.status === 'forfeit')
 const score = (side: 'home' | 'away') => {
@@ -23,7 +31,42 @@ const label = computed(() => {
 </script>
 
 <template>
-  <article class="relative flex flex-col gap-3 rounded-lg border border-line bg-surface p-4 transition-colors hover:border-accent-dim" :aria-label="label">
+  <!-- Row: week · home · score/time · away · status -->
+  <article
+    v-if="layout === 'row'"
+    class="relative flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2.5 transition-colors hover:border-line-strong"
+    :class="match.broadcastLive ? 'texture-stripes border-accent-dim' : ''"
+    :aria-label="label"
+  >
+    <span class="w-9 shrink-0 font-heading text-xs text-faint">{{ match.stage === 'playoff' ? 'PO' : weekLabel(match.week, true) }}</span>
+    <span class="flex min-w-0 flex-1 items-center justify-end gap-2">
+      <span class="truncate font-heading" :class="final && !won('home') ? 'text-muted' : ''">{{ match.home.tag }}</span>
+      <TeamLogo :tag="match.home.tag" :logo-url="match.home.logoUrl" size="sm" decorative />
+    </span>
+    <span class="tnum w-20 shrink-0 text-center font-heading" aria-hidden="true">
+      <template v-if="final">
+        <span :class="won('home') ? 'text-accent' : 'text-muted'">{{ score('home') }}</span>
+        <span class="text-faint">–</span>
+        <span :class="won('away') ? 'text-accent' : 'text-muted'">{{ score('away') }}</span>
+      </template>
+      <span v-else class="text-xs text-muted"><LeagueTime :iso="match.scheduledAt" short /></span>
+    </span>
+    <span class="flex min-w-0 flex-1 items-center gap-2">
+      <TeamLogo :tag="match.away.tag" :logo-url="match.away.logoUrl" size="sm" decorative />
+      <span class="truncate font-heading" :class="final && !won('away') ? 'text-muted' : ''">{{ match.away.tag }}</span>
+    </span>
+    <span v-if="match.broadcastLive" class="shrink-0 rounded-full bg-brand px-2 py-0.5 font-heading text-[10px] tracking-wider text-on-brand">LIVE</span>
+    <RouterLink :to="`/matches/${match.id}`" class="absolute inset-0 rounded-lg">
+      <span class="sr-only">{{ label }}</span>
+    </RouterLink>
+  </article>
+
+  <article
+    v-else
+    class="relative flex flex-col gap-3 rounded-xl border bg-surface p-4 shadow-panel transition-[border-color,transform] duration-150 hover:-translate-y-px hover:border-line-strong motion-reduce:hover:translate-y-0"
+    :class="match.broadcastLive ? 'texture-stripes card-accent border-accent-dim' : 'border-line'"
+    :aria-label="label"
+  >
     <div class="flex items-center justify-between gap-2 text-xs text-muted">
       <span>
         <template v-if="match.stage === 'playoff'">Playoffs · </template>

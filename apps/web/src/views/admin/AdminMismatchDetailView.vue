@@ -123,7 +123,7 @@ function shots(n: number) {
     </div>
 
     <template v-else>
-      <PageHeader eyebrow="Mismatch queue" :title="`${match.home.tag} vs ${match.away.tag}`">
+      <PageHeader compact eyebrow="Mismatch queue" :title="`${match.home.tag} vs ${match.away.tag}`">
         <template #actions>
           <UiButton :to="`/matches/${match.id}`" variant="secondary" size="sm">Match page</UiButton>
           <UiButton to="/admin/mismatches" variant="ghost" size="sm">Queue</UiButton>

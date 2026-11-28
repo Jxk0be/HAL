@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { compressImage } from '@/lib/image'
 import { useAuthStore } from '@/stores/auth'
 import { dbErrorMessage } from '@/lib/errors'
 import type { MemberRole } from '@/lib/teams'
@@ -47,7 +48,7 @@ export function useTeamActions() {
 
   const updateTeam = (
     teamId: string,
-    patch: { name?: string; tag?: string; logo_url?: string | null; description?: string | null },
+    patch: { name?: string; tag?: string; logo_url?: string | null; banner_url?: string | null; description?: string | null },
   ) =>
     run(() => supabase.from('teams').update(patch).eq('id', teamId), TAKEN)
 
@@ -63,6 +64,28 @@ export function useTeamActions() {
     if (error) return { ok: false, message: 'Could not upload the logo. Use a PNG, JPG or WebP under 1 MB.' }
     const { data } = supabase.storage.from('team-logos').getPublicUrl(path)
     return updateTeam(teamId, { logo_url: data.publicUrl })
+  }
+
+  /** Compress to WebP (1600px wide max) and upload next to the logo, then save the URL. */
+  async function uploadBanner(teamId: string, file: File): Promise<Result> {
+    busy.value = true
+    let blob: Blob
+    let ext: string
+    try {
+      ;({ blob, ext } = await compressImage(file, 1600))
+    } catch {
+      busy.value = false
+      return { ok: false, message: 'Could not read that image. Use a PNG, JPG or WebP.' }
+    }
+    const path = `${teamId}/banner-${Date.now()}.${ext}`
+    const { error } = await supabase.storage.from('team-logos').upload(path, blob, {
+      contentType: blob.type || `image/${ext}`,
+      cacheControl: '31536000',
+    })
+    busy.value = false
+    if (error) return { ok: false, message: 'Could not upload the banner. Try a smaller image.' }
+    const { data } = supabase.storage.from('team-logos').getPublicUrl(path)
+    return updateTeam(teamId, { banner_url: data.publicUrl })
   }
 
   const setRole = (memberId: string, role: MemberRole) =>
@@ -100,6 +123,7 @@ export function useTeamActions() {
     createTeam,
     updateTeam,
     uploadLogo,
+    uploadBanner,
     setRole,
     setCoCaptain,
     transferCaptaincy,

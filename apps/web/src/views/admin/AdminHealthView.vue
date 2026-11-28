@@ -25,7 +25,7 @@ const tiles = computed(() => {
 
 <template>
   <div>
-    <PageHeader eyebrow="Admin" title="Health" description="Errors from the site and the Discord bot, the queue of Discord posts, and the scheduled jobs.">
+    <PageHeader compact eyebrow="Admin" title="Health" description="Errors from the site and the Discord bot, the queue of Discord posts, and the scheduled jobs.">
       <template #actions><UiButton size="sm" variant="secondary" @click="reload">Refresh</UiButton></template>
     </PageHeader>
     <div class="flex flex-col gap-6 px-4 py-8 sm:px-6">

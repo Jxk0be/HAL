@@ -11,7 +11,14 @@ import { NIGHTS, toZoned, zonedToUtc, type Night } from '@/lib/time'
 type Season = Database['public']['Tables']['seasons']['Row']
 
 const props = defineProps<{ season: Season; readonly: boolean; busy: boolean }>()
-const emit = defineEmits<{ save: [patch: SeasonPatch] }>()
+const emit = defineEmits<{ save: [patch: SeasonPatch]; banner: [file: File] }>()
+
+function onBanner(e: Event) {
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (file) emit('banner', file)
+  input.value = ''
+}
 
 const form = reactive({
   name: '',
@@ -95,6 +102,24 @@ function submit() {
         <UiInput v-model="form.rosterLock" type="date" label="Roster lock" hint="Rosters lock at 11:59 PM ET on this date." />
         <UiSelect v-model="form.playoffTeams" label="Playoff teams" :options="playoffOptions" />
         <UiInput v-model="form.prize" label="Prize" placeholder="$250 to the champion" />
+      </div>
+      <div>
+        <p class="eyebrow mb-2 text-muted">Season banner</p>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start">
+          <div class="aspect-video w-full max-w-sm overflow-hidden rounded-lg border border-line bg-surface-2 texture-stripes">
+            <img v-if="season.banner_url" :src="season.banner_url" alt="Current season banner" class="size-full object-cover" />
+          </div>
+          <div class="flex flex-col gap-2 text-sm text-muted">
+            <p>Shown at the top of the season page. Use a wide 16:9 image; it's converted to WebP (1920px max).</p>
+            <div v-if="!readonly" class="flex flex-wrap gap-2">
+              <label class="inline-flex h-11 cursor-pointer items-center rounded-md border border-line bg-chip px-4 font-heading text-sm tracking-wide text-text uppercase hover:border-line-strong focus-within:outline-2 focus-within:outline-accent">
+                {{ season.banner_url ? 'Replace banner' : 'Upload banner' }}
+                <input type="file" accept="image/png,image/jpeg,image/webp" class="sr-only" :disabled="busy" @change="onBanner" />
+              </label>
+              <UiButton v-if="season.banner_url" variant="ghost" :disabled="busy" @click="emit('save', { banner_url: null })">Remove</UiButton>
+            </div>
+          </div>
+        </div>
       </div>
       <div>
         <p class="eyebrow mb-2 text-muted">Match nights</p>
