@@ -67,6 +67,8 @@ Effective: November 20, 2026
 
 **3.12** Team names, tags and logos must follow the conduct rules in Section 11. Staff may require a team to change any of them.
 
+**3.13** Every player on a roster, starters and subs alike, must be in the BIL Discord server for as long as they are on the team. Match reminders, check-in, team channels and staff contact all happen there. Players who aren't in the server are flagged on their team's page, and staff may hold a team's approval until everyone has joined.
+
 ## 4. Substitutes
 
 **4.1** Subs can be swapped in only between maps, never during one.

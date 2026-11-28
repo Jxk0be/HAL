@@ -258,6 +258,7 @@ Every staff action is public on the audit log: https://YOUR-SITE/audit-log
 **Rosters**
 • Up to 4 starters + 3 subs. One team per player per season. Teams need 4 players to be approved (3.1–3.5).
 • 3 roster changes per season once the regular season starts. Rosters lock about 2 weeks before playoffs (3.9–3.10).
+• Every rostered player, starters and subs, must stay in this Discord server (3.13).
 • A player must be on the roster 24 hours before a match to play in it (4.2).
 • Short-handed? Mark who's out on the match page and request up to 2 emergency subs who aren't on a team (4.3).
 

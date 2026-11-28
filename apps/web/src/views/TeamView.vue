@@ -14,6 +14,7 @@ import RosterList from '@/components/team/RosterList.vue'
 import TeamDiscordAlert from '@/components/team/TeamDiscordAlert.vue'
 import LeagueTime from '@/components/match/LeagueTime.vue'
 import { useTeam } from '@/composables/useTeams'
+import { useTeamDiscordPresence } from '@/composables/useDiscordPresence'
 import { useSeasonSchedule } from '@/composables/useMatches'
 import { useStandings, useTeamModeRecords, useTeamRecord } from '@/composables/useStats'
 import { useRecruitBoard } from '@/composables/useRecruiting'
@@ -53,6 +54,7 @@ const mapDiff = computed(() => {
   return d > 0 ? `+${d}` : String(d)
 })
 const { posts, loading: postsLoading } = useRecruitBoard()
+const { status: discordStatus, loading: discordLoading } = useTeamDiscordPresence(id)
 const ready = useReady(
   () =>
     loading.value ||
@@ -60,7 +62,8 @@ const ready = useReady(
     recordLoading.value ||
     modesLoading.value ||
     standingsLoading.value ||
-    postsLoading.value,
+    postsLoading.value ||
+    discordLoading.value,
 )
 const recruitPost = computed(() => posts.value.find((p) => p.teamId === id.value) ?? null)
 
@@ -117,8 +120,8 @@ watch(team, (t) => {
       </section>
 
       <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        <!-- Only the team's own players and admins get this data from the database. -->
-        <TeamDiscordAlert v-if="isMine || auth.isAdmin" class="mb-6" :team-id="team.id" :roster="team.roster" />
+        <!-- Rule 3.13, public: who on this roster isn't in the league Discord. -->
+        <TeamDiscordAlert class="mb-6" :status="discordStatus" :roster="team.roster" :can-manage="Boolean(isMine && (auth.team?.isCaptain || auth.team?.isCoCaptain))" />
         <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
           <UiStatTile label="Series" :value="`${record.wins}–${record.losses}`" hint="Regular season W–L" />
           <UiStatTile label="Map diff" :value="mapDiff" :hint="`${record.mapsWon}–${record.mapsLost} maps`" accent="neutral" />

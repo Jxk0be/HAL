@@ -21,6 +21,7 @@ import TeamDiscordAlert from '@/components/team/TeamDiscordAlert.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useActiveSeason } from '@/composables/useActiveSeason'
 import { useTeam } from '@/composables/useTeams'
+import { useTeamDiscordPresence } from '@/composables/useDiscordPresence'
 import { useTeamActions } from '@/composables/useTeamActions'
 import { useToast } from '@/composables/useToast'
 import { rosterCounts, type RosterPlayer, type TeamIdentity } from '@/lib/teams'
@@ -47,7 +48,8 @@ async function removeBanner() {
 const { season, loading: seasonLoading } = useActiveSeason()
 const { team, loading: teamLoading, reload } = useTeam(() => auth.team?.id)
 // Latched: reloading the team after an edit keeps the page instead of flashing the skeleton.
-const ready = useReady(() => seasonLoading.value || teamLoading.value)
+const { status: discordStatus, loading: discordLoading } = useTeamDiscordPresence(() => auth.team?.id)
+const ready = useReady(() => seasonLoading.value || teamLoading.value || discordLoading.value)
 
 const uid = computed(() => auth.user?.id)
 const isCaptain = computed(() => team.value?.captainId === uid.value)
@@ -224,7 +226,7 @@ const lockDate = computed(() =>
           <strong class="text-loss">Note from league staff:</strong> {{ team.reviewNote }}
         </p>
 
-        <TeamDiscordAlert :team-id="team.id" :roster="team.roster" :can-manage="canManage" />
+        <TeamDiscordAlert :status="discordStatus" :roster="team.roster" :can-manage="canManage" />
 
         <dl class="grid grid-cols-2 overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-4" style="gap: 1px">
           <div class="bg-surface p-4">
